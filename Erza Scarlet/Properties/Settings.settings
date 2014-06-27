@@ -1,0 +1,48 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Erza_Scarlet.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="download_dir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\users\macs\downloads\images</Value>
+    </Setting>
+    <Setting Name="connection_string" Type="System.String" Scope="User">
+      <Value Profile="(Default)">data source=C:\Users\macs\Dropbox\utils\Erza\erza.sqlite</Value>
+    </Setting>
+    <Setting Name="download" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="add_info_db" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="gelbooru" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="danbooru" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="konachan" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="sankaku" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="download_povtor" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="LoginForDanbooru" Type="System.String" Scope="User">
+      <Value Profile="(Default)">macsimbelous</Value>
+    </Setting>
+    <Setting Name="yande_re" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="create_sub_dir" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ApiKeyForDanbooru" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F5eC.ADAOFChEkOwVA1x.BUES0S9GaRqSoohs7wO</Value>
+    </Setting>
+    <Setting Name="UserAgent" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
