@@ -15,8 +15,20 @@ namespace Lucy
         {
             string ConnectionString = @"data source=C:\Users\macs\Dropbox\utils\Erza\erza.sqlite";
             string tag = "bdsm";
-            string prefix_path = "d:\\pictures\\animeart\\media\\";
+            string prefix_path1 = "d:\\pictures\\animeart\\media\\";
+            string prefix_path2 = "d:\\pictures\\animeart\\художники\\";
             string dest_path = "d:\\pictures\\animeart\\unsorted\\";
+            List<string> imgs = new List<string>();
+            imgs.AddRange(GetFilesFromImageDB(ConnectionString, tag, prefix_path1));
+            imgs.AddRange(GetFilesFromImageDB(ConnectionString, tag, prefix_path2));
+            foreach (string img in imgs)
+            {
+                Console.WriteLine("{0} >> {1}", img, dest_path + Path.GetFileName(img));
+                File.Move(img, dest_path + Path.GetFileName(img));
+            }
+        }
+        static List<string> GetFilesFromImageDB(string ConnectionString, string tag, string prefix_path) 
+        {
             List<string> imgs = new List<string>();
             using (SQLiteConnection connection = new SQLiteConnection(ConnectionString))
             {
@@ -37,11 +49,7 @@ namespace Lucy
                 }
                 reader.Close();
             }
-            foreach (string img in imgs)
-            {
-                Console.WriteLine("{0} >> {1}", img, dest_path + Path.GetFileName(img));
-                File.Move(img, dest_path + Path.GetFileName(img));
-            }
+            return imgs;
         }
     }
 }
