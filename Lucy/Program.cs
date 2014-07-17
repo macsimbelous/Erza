@@ -24,7 +24,6 @@ namespace Lucy
             {
                 tag = args[0];
             }
-            //string tag = "bestiality";
             string prefix_path1 = "d:\\pictures\\animeart\\media\\";
             string prefix_path2 = "d:\\pictures\\animeart\\художники\\";
             string dest_path = "d:\\pictures\\animeart\\unsorted\\";
