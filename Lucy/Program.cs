@@ -33,7 +33,11 @@ namespace Lucy
             foreach (string img in imgs)
             {
                 Console.WriteLine("{0} >> {1}", img, dest_path + Path.GetFileName(img));
-                File.Move(img, dest_path + Path.GetFileName(img));
+                try
+                {
+                    File.Move(img, dest_path + Path.GetFileName(img));
+                }
+                catch (FileNotFoundException) { Console.WriteLine("Файла нет!"); }
             }
         }
         static List<string> GetFilesFromImageDB(string ConnectionString, string tag, string prefix_path) 
