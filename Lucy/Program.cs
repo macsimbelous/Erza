@@ -14,7 +14,17 @@ namespace Lucy
         static void Main(string[] args)
         {
             string ConnectionString = @"data source=C:\Users\macs\Dropbox\utils\Erza\erza.sqlite";
-            string tag = "bdsm";
+            string tag;
+            if (args.Length <= 0)
+            {
+                Console.WriteLine("Укажите тег!");
+                return; 
+            }
+            else
+            {
+                tag = args[0];
+            }
+            //string tag = "bestiality";
             string prefix_path1 = "d:\\pictures\\animeart\\media\\";
             string prefix_path2 = "d:\\pictures\\animeart\\художники\\";
             string dest_path = "d:\\pictures\\animeart\\unsorted\\";
