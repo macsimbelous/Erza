@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.*/
+    along with Foobar.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,7 +93,7 @@ namespace Erza
                         int temp = 0;
                         for (; ; )
                         {
-                            sankaku_cookies = GetSankakuCookies("http://chan.sankakucomplex.com/");
+                            sankaku_cookies = GetSankakuCookies("https://chan.sankakucomplex.com/");
                             if (sankaku_cookies != null)
                             {
                                 break;
@@ -465,7 +465,7 @@ namespace Erza
             int count = 0;
             while (true)
             {
-                nPostsCount = posts_count(String.Format("http://yande.re/post.xml?tags={0}&limit=1", tag));
+                nPostsCount = posts_count(String.Format("https://yande.re/post.xml?tags={0}&limit=1", tag));
                 if (nPostsCount >= 0)
                 {
                     break;
@@ -486,7 +486,7 @@ namespace Erza
             int count_errors = 0;
             for (; ; )
             {
-                string strURL = String.Format("http://yande.re/post.xml?tags={0}&page={1}&limit={2}", tag, nPage, YANDERE_LIMIT_POSTS);
+                string strURL = String.Format("https://yande.re/post.xml?tags={0}&page={1}&limit={2}", tag, nPage, YANDERE_LIMIT_POSTS);
                 Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount , strURL);
                 try
                 {
@@ -539,7 +539,7 @@ namespace Erza
             Client = new WebClient();
             for (; ; )
             {
-                string strURL = String.Format("http://yande.re/post.json?tags={0}&page={1}&limit={2}", tag, nPage, YANDERE_LIMIT_POSTS);
+                string strURL = String.Format("https://yande.re/post.json?tags={0}&page={1}&limit={2}", tag, nPage, YANDERE_LIMIT_POSTS);
                 Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
                 try
                 {
@@ -665,7 +665,7 @@ namespace Erza
                 int temp = 0;
                 for (; ; )
                 {
-                    sankaku_cookies = GetSankakuCookies("http://chan.sankakucomplex.com/");
+                    sankaku_cookies = GetSankakuCookies("https://chan.sankakucomplex.com/");
                     if (sankaku_cookies != null)
                     {
                         break;
@@ -688,7 +688,7 @@ namespace Erza
                     }
                 }
             }
-            string BaseURL = "http://chan.sankakucomplex.com/post/index";
+            string BaseURL = "https://chan.sankakucomplex.com/post/index";
             List<ImageInfo> imgs = new List<ImageInfo>();
             int i = 1;
             while (true)
@@ -825,11 +825,11 @@ namespace Erza
                 }
                 else
                 {
-                    img.urls.Add("http://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".jpg");
-                    img.urls.Add("http://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".png");
-                    img.urls.Add("http://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".gif");
-                    img.urls.Add("http://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".swf");
-                    img.urls.Add("http://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".jpeg");
+                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".jpg");
+                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".png");
+                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".gif");
+                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".swf");
+                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".jpeg");
                     //img.file_url = img.urls[0];
                 }
                 temp.Add(img);
@@ -1057,8 +1057,8 @@ namespace Erza
                 if (ext.InnerText.ToLower() == "txt") { break; }
                 if (ext.InnerText.ToLower().Length > 4) { break; }
                 if (ext.InnerText.ToLower().LastIndexOf('?') > -1) { break; }
-                mImgDescriptor.urls.Add("http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText);
-                mImgDescriptor.danbooru_url = "http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
+                mImgDescriptor.urls.Add("https://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText);
+                mImgDescriptor.danbooru_url = "https://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
                 list.Add(mImgDescriptor);
             }
             return list;
@@ -1207,7 +1207,7 @@ namespace Erza
         }
         static long DownloadImage(ImageInfo img, string dir)
         {
-            //CookieCollection cookies = GetSankakuCookies("http://chan.sankakucomplex.com/");
+            //CookieCollection cookies = GetSankakuCookies("https://chan.sankakucomplex.com/");
             int cnt;
             if (Erza.Default.download_povtor < 1)
             {
@@ -1257,24 +1257,24 @@ namespace Erza
         }
         static string GetReferer(string url, ImageInfo img)
         {
-            if (url.LastIndexOf("http://chan.sankakustatic.com/data/") >= 0)
+            if (url.LastIndexOf("https://chan.sankakustatic.com/data/") >= 0)
             {
-                Uri uri = new Uri("http://chan.sankakucomplex.com/post/show/" + img.sankaku_post_id.ToString());
+                Uri uri = new Uri("https://chan.sankakucomplex.com/post/show/" + img.sankaku_post_id.ToString());
                 return uri.AbsoluteUri;
             }
             if (url.LastIndexOf("gelbooru.com/") >= 0)
             {
-                Uri uri = new Uri("http://gelbooru.com/index.php?page=post&s=view&id=" + img.gelbooru_post_id.ToString());
+                Uri uri = new Uri("https://gelbooru.com/index.php?page=post&s=view&id=" + img.gelbooru_post_id.ToString());
                 return uri.AbsoluteUri;
             }
-            if (url.LastIndexOf("http://konachan.com/") >= 0)
+            if (url.LastIndexOf("https://konachan.com/") >= 0)
             {
-                Uri uri = new Uri("http://konachan.com/post/show/" + img.konachan_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
+                Uri uri = new Uri("https://konachan.com/post/show/" + img.konachan_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
                 return uri.AbsoluteUri;
             }
-            if (url.LastIndexOf("http://sonohara.donmai.us/") >= 0)
+            if (url.LastIndexOf("https://sonohara.donmai.us/") >= 0)
             {
-                Uri uri = new Uri("http://danbooru.donmai.us/post/show/" + img.danbooru_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
+                Uri uri = new Uri("https://danbooru.donmai.us/post/show/" + img.danbooru_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
                 return uri.AbsoluteUri;
             }
             if (url.LastIndexOf("https://yande.re/") >= 0)
@@ -1386,7 +1386,7 @@ namespace Erza
             Stream rStream = null;
             try
             {
-                httpWRQ.Referer = "http://chan.sankakucomplex.com/post/show/" + img.sankaku_post_id.ToString();
+                httpWRQ.Referer = "https://chan.sankakucomplex.com/post/show/" + img.sankaku_post_id.ToString();
                 httpWRQ.UserAgent = Erza.Default.UserAgent;
                 httpWRQ.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
                 httpWRQ.Headers.Add("Accept-Encoding: identity");
@@ -1466,7 +1466,7 @@ namespace Erza
         }
         static string GetPostPage(int npost, CookieCollection cookies)
         {
-            string strURL = "http://chan.sankakucomplex.com/post/show/" + npost.ToString();
+            string strURL = "https://chan.sankakucomplex.com/post/show/" + npost.ToString();
             Console.WriteLine("Загружаем и парсим пост: " + strURL);
             //WebClient Client = new WebClient();
             //Uri uri = new Uri(strURL);
@@ -1490,14 +1490,15 @@ namespace Erza
         static string GetOriginalUrlFromPostPage(string post)
         {
             string file_url = "<li>Original: <a href=\"";
-            Regex rx = new Regex(file_url + "(?:(?:ht|f)tps?://)?(?:[\\-\\w]+:[\\-\\w]+@)?(?:[0-9a-z][\\-0-9a-z]*[0-9a-z]\\.)+[a-z]{2,6}(?::\\d{1,5})?(?:[?/\\\\#][?!^$.(){}:|=[\\]+\\-/\\\\*;&~#@,%\\wА-Яа-я]*)?", RegexOptions.Compiled);
+            //Regex rx = new Regex(file_url + "(?:(?:ht|f)tps?://)?(?:[\\-\\w]+:[\\-\\w]+@)?(?:[0-9a-z][\\-0-9a-z]*[0-9a-z]\\.)+[a-z]{2,6}(?::\\d{1,5})?(?:[?/\\\\#][?!^$.(){}:|=[\\]+\\-/\\\\*;&~#@,%\\wА-Яа-я]*)?", RegexOptions.Compiled);
+            Regex rx = new Regex(file_url + @"\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?", RegexOptions.Compiled);
             try
             {
                 Match match = rx.Match(post);
                 if (match.Success)
                 {
                     string url = match.Value.Substring(file_url.Length);
-                    return url;
+                    return "https:" + url;
                 }
                 else
                 {
@@ -1506,7 +1507,7 @@ namespace Erza
                     if (match_swf.Success)
                     {
                         string url = match_swf.Value.Substring(12).Replace("\" >Save this flash (right click and save)</a></p>", String.Empty);
-                        return url;
+                        return "https:" + url;
                     }
                     else
                     {
