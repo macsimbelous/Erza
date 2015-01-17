@@ -13,7 +13,7 @@ namespace Lucy
     {
         static void Main(string[] args)
         {
-            string ConnectionString = @"data source=C:\Users\macs\Dropbox\utils\Erza\erza.sqlite";
+            string ConnectionString = @"data source=C:\utils\Erza\erza.sqlite";
             string tag;
             if (args.Length <= 0)
             {
@@ -24,9 +24,9 @@ namespace Lucy
             {
                 tag = args[0];
             }
-            string prefix_path1 = "d:\\pictures\\animeart\\Series\\";
-            string prefix_path2 = "d:\\pictures\\animeart\\художники\\";
-            string dest_path = "d:\\pictures\\animeart\\unsorted\\";
+            string prefix_path1 = "d:\\pictures\\animeart\\unsorted\\";
+            //string prefix_path2 = "d:\\pictures\\animeart\\художники\\";
+            string dest_path = "d:\\temp\\";
             List<string> imgs = new List<string>();
             imgs.AddRange(GetFilesFromImageDB(ConnectionString, tag, prefix_path1));
             //imgs.AddRange(GetFilesFromImageDB(ConnectionString, tag, prefix_path2));
