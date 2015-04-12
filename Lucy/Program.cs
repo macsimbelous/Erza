@@ -24,7 +24,7 @@ namespace Lucy
             {
                 tag = args[0];
             }
-            string prefix_path1 = "d:\\pictures\\animeart\\unsorted\\";
+            string prefix_path1 = "d:\\pictures\\animeart\\PNG\\";
             //string prefix_path2 = "d:\\pictures\\animeart\\художники\\";
             string dest_path = "d:\\temp\\";
             List<string> imgs = new List<string>();
