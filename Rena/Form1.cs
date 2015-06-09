@@ -174,7 +174,7 @@ namespace Rena
                         
                         synchronizationContext.Post(ConsoleMsg, fs[i].Substring(fs[i].LastIndexOf('\\') + 1) + " -> " + t.Substring(fs[i].LastIndexOf('\\') + 1).ToLower());
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
                         synchronizationContext.Post(ConsoleMsg, "ДУБЛИКАТ!!!" + fs[i]);
                         dup++;
@@ -212,7 +212,7 @@ namespace Rena
                         System.IO.File.Move(fs[i], t.ToLower());
                         synchronizationContext.Post(ConsoleMsg, fs[i].Substring(fs[i].LastIndexOf('\\') + 1) + " -> " + t.Substring(fs[i].LastIndexOf('\\') + 1).ToLower());
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
                         synchronizationContext.Post(ConsoleMsg, "ДУБЛИКАТ!!! " + fs[i]);
                         dup++;
@@ -251,7 +251,7 @@ namespace Rena
                         
                         synchronizationContext.Post(ConsoleMsg, fs[i].Substring(fs[i].LastIndexOf('\\') + 1) + " -> " + t.Substring(fs[i].LastIndexOf('\\') + 1).ToLower());
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
                         synchronizationContext.Post(ConsoleMsg, "ДУБЛИКАТ!!!" + fs[i]);
                         dup++;

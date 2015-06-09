@@ -130,5 +130,17 @@ namespace Moka {
                 this["is_deleted_dir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\XnView\\xnview.exe")]
+        public string XnViewPath {
+            get {
+                return ((string)(this["XnViewPath"]));
+            }
+            set {
+                this["XnViewPath"] = value;
+            }
+        }
     }
 }

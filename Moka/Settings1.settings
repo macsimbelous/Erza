@@ -29,5 +29,8 @@
     <Setting Name="is_deleted_dir" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\temp\is_deleted</Value>
     </Setting>
+    <Setting Name="XnViewPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Program Files (x86)\XnView\xnview.exe</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

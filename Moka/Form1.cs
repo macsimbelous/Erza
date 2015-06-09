@@ -210,7 +210,21 @@ namespace Moka
                     ((BindingList<CImage>)this.Result_listBox.DataSource)[n] = value;
                 }
             }
-            using (TextWriter file = new StreamWriter(".\\" + "sharli" + ".txt"))
+            SlideShowXnView ss = new SlideShowXnView();
+            ss.images = new List<string>();
+            foreach(CImage ci in (BindingList<CImage>)this.Result_listBox.DataSource) { ss.images.Add(ci.file); }
+            //ss.images = (BindingList<CImage>)this.Result_listBox.DataSource;
+            string temp_file = Path.GetTempFileName();
+            ss.GenerateSlideShow(temp_file);
+            //Запускаем слайдшоу
+            Process myProcess = new Process();
+            myProcess.StartInfo.FileName = Settings1.Default.XnViewPath;
+            myProcess.StartInfo.Arguments = temp_file;
+            myProcess.EnableRaisingEvents = true;
+            myProcess.Start();
+            myProcess.WaitForExit();
+            System.IO.File.Delete(temp_file);
+            /*using (TextWriter file = new StreamWriter(".\\" + "sharli" + ".txt"))
             {
                 for (int i2 = 0; i2 < ((BindingList<CImage>)this.Result_listBox.DataSource).Count; i2++)
                 {
@@ -226,7 +240,7 @@ namespace Moka
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();
-            System.IO.File.Delete(".\\" + "sharli" + ".txt");
+            System.IO.File.Delete(".\\" + "sharli" + ".txt");*/
         }
 
         private void Result_listBox_MouseDoubleClick(object sender, MouseEventArgs e)

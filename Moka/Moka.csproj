@@ -176,6 +176,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings1.settings</DependentUpon>
     </Compile>
+    <Compile Include="SlideShowXnView.cs" />
     <EmbeddedResource Include="AddDirProgressForm.resx">
       <DependentUpon>AddDirProgressForm.cs</DependentUpon>
     </EmbeddedResource>

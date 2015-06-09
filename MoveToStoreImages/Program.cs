@@ -67,7 +67,7 @@ namespace Shina
                 System.IO.File.Move(file, DestFile.ToLower());
                 System.Console.WriteLine(file.Substring(file.LastIndexOf('\\') + 1) + " -> " + t.Substring(file.LastIndexOf('\\') + 1).ToLower());
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 System.Console.WriteLine("ДУБЛИКАТ!!! " + file);
                 return false;
