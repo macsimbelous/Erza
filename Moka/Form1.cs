@@ -215,11 +215,13 @@ namespace Moka
             foreach(CImage ci in (BindingList<CImage>)this.Result_listBox.DataSource) { ss.images.Add(ci.file); }
             //ss.images = (BindingList<CImage>)this.Result_listBox.DataSource;
             string temp_file = Path.GetTempFileName();
+            ss.RandomOrder = 0;
+            ss.Loop = 1;
             ss.GenerateSlideShow(temp_file);
             //Запускаем слайдшоу
             Process myProcess = new Process();
             myProcess.StartInfo.FileName = Settings1.Default.XnViewPath;
-            myProcess.StartInfo.Arguments = temp_file;
+            myProcess.StartInfo.Arguments = "-slide " + temp_file;
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();
