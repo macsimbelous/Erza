@@ -35,7 +35,7 @@ namespace GenSlideShowFroXnView
             //Запускаем слайдшоу
             Process myProcess = new Process();
             myProcess.StartInfo.FileName = Properties.Settings1.Default.XnViewPath;
-            myProcess.StartInfo.Arguments = temp_file;
+            myProcess.StartInfo.Arguments = "-slide " + temp_file;
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();
