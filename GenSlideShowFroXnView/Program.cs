@@ -30,7 +30,7 @@ namespace GenSlideShowFroXnView
         {
             SlideShowXnView ss = new SlideShowXnView();
             ss.images = find_sqlite(args);
-            string temp_file = Path.GetTempFileName();
+            string temp_file = Path.GetTempFileName() + ".sld";
             ss.GenerateSlideShow(temp_file);
             //Запускаем слайдшоу
             Process myProcess = new Process();
