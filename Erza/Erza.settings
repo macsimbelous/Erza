@@ -9,7 +9,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="danbooru" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="konachan" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
@@ -18,7 +18,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="sankaku" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="use_sqlite" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
@@ -33,13 +33,13 @@
       <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="login" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">macsimbelous</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="password" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">050782</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="api_key" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">F5eC.ADAOFChEkOwVA1x.BUES0S9GaRqSoohs7wO</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="CacheConnectionString" Type="System.String" Scope="Application">
       <Value Profile="(Default)">data source=C:\temp\ErzaCache.sqlite</Value>

@@ -1057,8 +1057,8 @@ namespace Erza
                 if (ext.InnerText.ToLower() == "txt") { break; }
                 if (ext.InnerText.ToLower().Length > 4) { break; }
                 if (ext.InnerText.ToLower().LastIndexOf('?') > -1) { break; }
-                mImgDescriptor.urls.Add("https://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText);
-                mImgDescriptor.danbooru_url = "https://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
+                mImgDescriptor.urls.Add("http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText);
+                mImgDescriptor.danbooru_url = "http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
                 list.Add(mImgDescriptor);
             }
             return list;
