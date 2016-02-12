@@ -600,7 +600,7 @@ namespace Erza
             int count = 0;
             while (true)
             {
-                nPostsCount = posts_count(String.Format("http://gelbooru.com/index.php?page=dapi&s=post&q=index&tags={0}&pid=0&limit=1", tag));
+                nPostsCount = posts_count_gelbooru(String.Format("http://gelbooru.com/index.php?page=dapi&s=post&q=index&tags={0}&pid=0&limit=1", tag));
                 if (nPostsCount >= 0)
                 {
                     break;
@@ -841,7 +841,7 @@ namespace Erza
             }
             return temp;
         }
-        static int posts_count(string url)
+        static int posts_count_gelbooru(string url)
         {
             int nLocalPostsCount = 0;
             WebClient Client = new WebClient();
@@ -851,6 +851,59 @@ namespace Erza
                 //Client.Headers.Add("Cookie", "user_id = 42820; pass_hash = 12b71a982c0c189c7a0c9ac25d9713213296f616");
                 //string xml = Client.DownloadString(uri);
                 string xml = DownloadStringFromGelbooru(url, "http://gelbooru.com/", gelbooru_cookies);
+                if (xml == null)
+                {
+                    return -1;
+                }
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(xml);
+                XmlNodeList nodeList = mXML.GetElementsByTagName("posts");
+                XmlNode node = nodeList.Item(0);
+                //Определяем число постов
+                for (int i = 0; i < node.Attributes.Count; i++)
+                {
+                    if (node.Attributes[i].Name == "count") nLocalPostsCount = Convert.ToInt32(node.Attributes[i].Value);
+                }
+            }
+            catch (WebException ex)
+            {
+                Console.WriteLine(ex.Message);
+                log.Debug("posts_count " + ex.Message);
+                nLocalPostsCount = -1;
+            }
+            catch (NullReferenceException ex)
+            {
+                Console.WriteLine(ex.Message);
+                log.Debug("posts_count " + ex.Message);
+                nLocalPostsCount = -1;
+            }
+            catch (ArgumentNullException ex)
+            {
+                Console.WriteLine(ex.Message);
+                log.Debug("posts_count " + ex.Message);
+                nLocalPostsCount = -1;
+            }
+            catch (XmlException ex)
+            {
+                Console.WriteLine(ex.Message);
+                log.Debug("posts_count " + ex.Message);
+                nLocalPostsCount = -1;
+            }
+            finally
+            {
+                Client.Dispose();
+            }
+            return nLocalPostsCount;
+        }
+        static int posts_count(string url)
+        {
+            int nLocalPostsCount = 0;
+            WebClient Client = new WebClient();
+            try
+            {
+                Uri uri = new Uri(url);
+                string xml = Client.DownloadString(uri);
+                //string xml = DownloadStringFromGelbooru(url, "http://gelbooru.com/", gelbooru_cookies);
                 if (xml == null)
                 {
                     return -1;
