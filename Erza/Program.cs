@@ -47,6 +47,7 @@ namespace Erza
         static List<string> tags;
         static public ErzaCache cache;
         static CookieCollection sankaku_cookies = null;
+        static CookieCollection gelbooru_cookies = null;
         static int LIMIT_ERRORS = 4;
         static void Main(string[] args)
         {
@@ -588,6 +589,9 @@ namespace Erza
         }
         static List<ImageInfo> get_hash_gelbooru(string tag)
         {
+            gelbooru_cookies = new CookieCollection();
+            gelbooru_cookies.Add(new Cookie("user_id", "42820", "/", "gelbooru.com"));
+            gelbooru_cookies.Add(new Cookie("pass_hash", "12b71a982c0c189c7a0c9ac25d9713213296f616", "/", "gelbooru.com"));
             const int GELBOORU_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 0;                //Счетчик страниц
@@ -623,7 +627,8 @@ namespace Erza
                 {
                     Uri uri = new Uri(strURL);
                     DateTime start = DateTime.Now;
-                    string xml = Client.DownloadString(uri);
+                    //string xml = Client.DownloadString(uri);
+                    string xml = DownloadStringFromGelbooru(strURL, "http://gelbooru.com/", gelbooru_cookies);
                     if (xml == null)
                     {
                         if (count_errors < LIMIT_ERRORS)
@@ -843,7 +848,9 @@ namespace Erza
             try
             {
                 Uri uri = new Uri(url);
-                string xml = Client.DownloadString(uri);
+                //Client.Headers.Add("Cookie", "user_id = 42820; pass_hash = 12b71a982c0c189c7a0c9ac25d9713213296f616");
+                //string xml = Client.DownloadString(uri);
+                string xml = DownloadStringFromGelbooru(url, "http://gelbooru.com/", gelbooru_cookies);
                 if (xml == null)
                 {
                     return -1;
@@ -887,6 +894,25 @@ namespace Erza
                 Client.Dispose();
             }
             return nLocalPostsCount;
+        }
+        public static string DownloadStringFromGelbooru(string url, string referer, CookieCollection cookies)
+        {
+            HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(url);
+            downloadRequest.UserAgent = Erza.Default.UserAgent;
+            downloadRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+            downloadRequest.Headers.Add("Accept-Encoding: identity");
+            downloadRequest.CookieContainer = new CookieContainer();
+            downloadRequest.CookieContainer.Add(cookies);
+            if (referer != null)
+            {
+                downloadRequest.Referer = referer;
+            }
+            string source;
+            using (StreamReader reader = new StreamReader(downloadRequest.GetResponse().GetResponseStream()))
+            {
+                source = reader.ReadToEnd();
+            }
+            return source;
         }
         static List<ImageInfo> ParseXMLKonachan(string strXML)
         {
