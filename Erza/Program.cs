@@ -30,22 +30,20 @@ using System.Security.Cryptography;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
+using System.Runtime.Serialization.Json;
+using System.Runtime.Serialization;
 using ErzaLib;
 
 namespace Erza
 {
     class Program
     {
-        static bool use_sqlite = true;
-        static bool download_images = true;
+        static ErzaConfig config = null;
         static bool clear_cache = false;
-        static string sqlite_connection_string = null;
-        static string download_dir = null;
         static bool use_sub_dir = true;
         static List<string> tags;
         static public ErzaCache cache;
         static CookieCollection gelbooru_cookies = null;
-        static int LIMIT_ERRORS = 4;
         static void Main(string[] args)
         {
             try
@@ -54,7 +52,7 @@ namespace Erza
                 List<ImageInfo> il = new List<ImageInfo>();
                 if (args.Length <= 0)
                 {
-                    cache = new ErzaCache(Erza.Default.CacheConnectionString);
+                    cache = new ErzaCache(Program.config.CacheDBConnectionString);
                     if (cache.GetCountItem() <= 0)
                     {
                         Console.WriteLine("Кэш пуст!\nЗадайте теги.");
@@ -62,13 +60,13 @@ namespace Erza
                     }
                     Console.WriteLine("Востанавливаю список из кэша.");
                     il = cache.GetItems();
-                    download_dir = cache.GetDownloadDir();
+                    Program.config.DownloadPath = cache.GetDownloadDir();
                 }
                 else
                 {
                     Program.tags = new List<string>();
                     ParseArgs(args);
-                    cache = new ErzaCache(Erza.Default.CacheConnectionString);
+                    cache = new ErzaCache(Program.config.CacheDBConnectionString);
                     if (cache.GetCountItem() > 0)
                     {
                         Console.WriteLine("Кэш не пуст!");
@@ -88,26 +86,26 @@ namespace Erza
                         Console.WriteLine("Не заданы теги!");
                         return;
                     }
-                    if (Program.use_sub_dir) { download_dir = download_dir + @"\" + Program.tags[0]; }
+                    if (Program.use_sub_dir) { Program.config.DownloadPath = Program.config.DownloadPath + @"\" + Program.tags[0]; }
                     ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
                     for (int i = 0; i < Program.tags.Count; i++)
                     {
-                        if (Erza.Default.konachan)
+                        if (Program.config.UseKonachan)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с коначан");
                             il = SliyanieLists(il, get_hash_konachan(Program.tags[i]));
                         }
-                        if (Erza.Default.danbooru)
+                        if (Program.config.UseDanbooru)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с данбуры");
                             il = SliyanieLists(il, get_hash_danbooru_new_api(Program.tags[i]));
                         }
-                        if (Erza.Default.imouto)
+                        if (Program.config.UseYandere)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с сестрёнки");
                             il = SliyanieLists(il, get_hash_imouto(Program.tags[i]));
                         }
-                        if (Erza.Default.gelbooru)
+                        if (Program.config.UseGelbooru)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с гелбуры");
                             il = SliyanieLists(il, get_hash_gelbooru(Program.tags[i]));
@@ -119,10 +117,10 @@ namespace Erza
                         return;
                     }
                     #region SQLite
-                    if (Program.use_sqlite)
+                    if (Program.config.UseDB)
                     {
                         Console.WriteLine("Добавляем хэши в базу данных SQLite");
-                        ImagesDB idb = new ImagesDB(Program.sqlite_connection_string);
+                        ImagesDB idb = new ImagesDB(Program.config.ConnectionString);
                         idb.ProgressCallBack = new ImagesDB.ProgressCallBackT(ProgressSQLiteCallBack);
                         DateTime start = DateTime.Now;
                         idb.AddImages(il);
@@ -132,13 +130,13 @@ namespace Erza
                     #endregion
                     Console.WriteLine("Кэшируем записи");
                     cache.AddItems(il);
-                    cache.SetDownloadDir(download_dir);
+                    cache.SetDownloadDir(Program.config.DownloadPath);
                 }
                 #region Download
-                if (Program.download_images)
+                if (Program.config.Download)
                 {
                     Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
-                    int num6 = download(il, download_dir);
+                    int num6 = download(il, Program.config.DownloadPath);
                 }
                 #endregion
                 if (cache.GetCountItem() > 0)
@@ -163,11 +161,50 @@ namespace Erza
         }
         static void LoadSettings()
         {
-            Program.clear_cache = Erza.Default.ClearCache;
-            Program.download_dir = Erza.Default.download_dir;
-            Program.download_images = Erza.Default.download;
-            Program.use_sqlite = Erza.Default.use_sqlite;
-            Program.sqlite_connection_string = Erza.Default.ConnectionString;
+            Program.config = new ErzaConfig();
+            //Параметры по умолчанию
+            Program.config.ConnectionString = @"data source=.\erza.sqlite";
+            Program.config.CacheDBConnectionString = @"data source=.\ErzaCache.sqlite";
+            Program.config.UseCacheDB = true;
+            Program.config.UseDanbooru = true;
+            Program.config.UseDB = true;
+            Program.config.UseGelbooru = true;
+            Program.config.UseKonachan = true;
+            Program.config.UseYandere = true;
+            Program.config.UserAgent = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
+            Program.config.LimitError = 4;
+            Program.config.GelbooruLogin = "";
+            Program.config.GelbooruPassword = "";
+            Program.config.DanbooruLogin = "";
+            Program.config.DanbooruPassword = "";
+            Program.config.DanbooruAPIKey = "";
+            Program.config.Download = true;
+            Program.config.DownloadPath = @".\images";
+            DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(ErzaConfig));
+            if (File.Exists(".\\Erza.json"))
+            {
+                using (FileStream fs = new FileStream(".\\Erza.json", FileMode.Open))
+                {
+                    Program.config = (ErzaConfig)jsonFormatter.ReadObject(fs);
+                }
+                return;
+            }
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Erza\\Erza.json"))
+            {
+                using (FileStream fs = new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Erza\\Erza.json", FileMode.Open))
+                {
+                    Program.config = (ErzaConfig)jsonFormatter.ReadObject(fs);
+                }
+                return;
+            }
+            if (File.Exists(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]) + "\\Erza.json"))
+            {
+                using (FileStream fs = new FileStream(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]) + "\\Erza.json", FileMode.Open))
+                {
+                    Program.config = (ErzaConfig)jsonFormatter.ReadObject(fs);
+                }
+                return;
+            }
         }
         static void ParseArgs(string[] args)
         {
@@ -193,29 +230,29 @@ namespace Erza
                 }
                 if (param == sqlite_string)
                 {
-                    Program.use_sqlite = true;
+                    Program.config.UseDB = true;
                     continue;
                 }
                 if (param == nosqlite_string)
                 {
-                    Program.use_sqlite = false;
+                    Program.config.UseDB = false;
                     continue;
                 }
                 if (param == download_string)
                 {
-                    Program.download_images = true;
+                    Program.config.Download = true;
                     continue;
                 }
                 if (param == nodownload_string)
                 {
-                    Program.download_images = false;
+                    Program.config.Download = false;
                     continue;
                 }
                 if (param.Length >= sqlite_path_string.Length)
                 {
                     if (param.Substring(0, sqlite_path_string.Length) == sqlite_path_string)
                     {
-                        Program.sqlite_connection_string = "data source=" + param.Substring(sqlite_path_string.Length);
+                        Program.config.ConnectionString = "data source=" + param.Substring(sqlite_path_string.Length);
                         continue;
                     }
                 }
@@ -223,7 +260,7 @@ namespace Erza
                 {
                     if (param.Substring(0, dir_string.Length) == dir_string)
                     {
-                        Program.download_dir = param.Substring(dir_string.Length);
+                        Program.config.DownloadPath = param.Substring(dir_string.Length);
                         continue;
                     }
                 }
@@ -239,7 +276,7 @@ namespace Erza
             for (; ; )
             {
                 WebClient Client = new WebClient();
-                string strURL = String.Format("http://danbooru.donmai.us/posts.xml?tags={0}&page={1}&login={2}&api_key={3}&limit={4}", tag, nPage, Erza.Default.login, Erza.Default.api_key, DANBOORU_LIMIT_POSTS);
+                string strURL = String.Format("http://danbooru.donmai.us/posts.xml?tags={0}&page={1}&login={2}&api_key={3}&limit={4}", tag, nPage, Program.config.DanbooruLogin, Program.config.DanbooruAPIKey, DANBOORU_LIMIT_POSTS);
                 Console.WriteLine("({0}/ХЗ) Загружаем и парсим: {1}", img_list.Count, strURL);
                 try
                 {
@@ -247,7 +284,7 @@ namespace Erza
                     DateTime start = DateTime.Now;
                     string xml = Client.DownloadString(uri);
                     if (xml == null) {
-                        if (count_errors < LIMIT_ERRORS)
+                        if (count_errors < Program.config.LimitError)
                         {
                             count_errors++;
                             continue;
@@ -309,7 +346,7 @@ namespace Erza
                     break;
                 }
                 count++;
-                if (count >= LIMIT_ERRORS)
+                if (count >= Program.config.LimitError)
                 {
                     Console.WriteLine("Не удалось получить количество постов!");
                 }
@@ -332,7 +369,7 @@ namespace Erza
                     string xml = Client.DownloadString(uri);
                     if (xml == null)
                     {
-                        if (count_errors < LIMIT_ERRORS)
+                        if (count_errors < Program.config.LimitError)
                         {
                             count_errors++;
                             continue;
@@ -379,7 +416,7 @@ namespace Erza
                     break;
                 }
                 count++;
-                if (count >= LIMIT_ERRORS)
+                if (count >= Program.config.LimitError)
                 {
                     Console.WriteLine("Не удалось получить количество постов!");
                 }
@@ -402,7 +439,7 @@ namespace Erza
                     string xml = Client.DownloadString(uri);
                     if (xml == null)
                     {
-                        if (count_errors < LIMIT_ERRORS)
+                        if (count_errors < Program.config.LimitError)
                         {
                             count_errors++;
                             continue;
@@ -509,7 +546,7 @@ namespace Erza
                     break;
                 }
                 count++;
-                if (count >= LIMIT_ERRORS)
+                if (count >= Program.config.LimitError)
                 {
                     Console.WriteLine("Не удалось получить количество постов!");
                 }
@@ -533,7 +570,7 @@ namespace Erza
                     string xml = DownloadStringFromGelbooru(strURL, "http://gelbooru.com/", gelbooru_cookies);
                     if (xml == null)
                     {
-                        if (count_errors < LIMIT_ERRORS)
+                        if (count_errors < Program.config.LimitError)
                         {
                             count_errors++;
                             continue;
@@ -695,7 +732,7 @@ namespace Erza
         public static string DownloadStringFromGelbooru(string url, string referer, CookieCollection cookies)
         {
             HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(url);
-            downloadRequest.UserAgent = Erza.Default.UserAgent;
+            downloadRequest.UserAgent = Program.config.UserAgent;
             downloadRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
             downloadRequest.Headers.Add("Accept-Encoding: identity");
             downloadRequest.CookieContainer = new CookieContainer();
@@ -982,7 +1019,7 @@ namespace Erza
             int count_deleted = 0;
             int count_error = 0;
             int count_skip = 0;
-            ImagesDB idb = new ImagesDB(Program.sqlite_connection_string);
+            ImagesDB idb = new ImagesDB(Program.config.ConnectionString);
             //List<string> DownloadedList = new List<string>();
             //DownloadedList.Sort();
             Directory.CreateDirectory(dir);
@@ -990,7 +1027,7 @@ namespace Erza
             {
                 Console.WriteLine("\n###### {0}/{1} ######", (i+1), list.Count);
                 //if(DownloadedList.BinarySearch(list[i].GetHashString()) >= 0){int g = 1+1;}
-                if (Program.use_sqlite)
+                if (Program.config.UseDB)
                 {
                     ImageInfo img = idb.ExistImage(list[i].hash);
                     if (img != null)
@@ -1031,13 +1068,13 @@ namespace Erza
         {
             //CookieCollection cookies = GetSankakuCookies("https://chan.sankakucomplex.com/");
             int cnt;
-            if (Erza.Default.download_povtor < 1)
+            if (Program.config.LimitError < 1)
             {
                 cnt = 1;
             }
             else
             {
-                cnt = Erza.Default.download_povtor;
+                cnt = Program.config.LimitError;
             }
             for (int index = 0; index < cnt; index++)
             {
@@ -1286,6 +1323,48 @@ namespace Erza
         {
             // Always accept
             return true;
+        }
+    }
+    [DataContract]
+    public class ErzaConfig
+    {
+        [DataMember]
+        public string ConnectionString;
+        [DataMember]
+        public bool UseGelbooru;
+        [DataMember]
+        public bool UseDanbooru;
+        [DataMember]
+        public bool UseYandere;
+        [DataMember]
+        public bool UseKonachan;
+        [DataMember]
+        public bool UseDB;
+        [DataMember]
+        public bool Download;
+        [DataMember]
+        public string DownloadPath;
+        [DataMember]
+        public int LimitError;
+        [DataMember]
+        public string DanbooruLogin;
+        [DataMember]
+        public string DanbooruPassword;
+        [DataMember]
+        public string DanbooruAPIKey;
+        [DataMember]
+        public string GelbooruLogin;
+        [DataMember]
+        public string GelbooruPassword;
+        [DataMember]
+        public bool UseCacheDB;
+        [DataMember]
+        public string CacheDBConnectionString;
+        [DataMember]
+        public string UserAgent;
+
+        public ErzaConfig()
+        {
         }
     }
 }

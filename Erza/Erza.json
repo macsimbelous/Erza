@@ -1,0 +1,19 @@
+{
+"CacheDBConnectionString":"data source=C:\\temp\\ErzaCache.sqlite",
+"ConnectionString":"data source=C:\\utils\\Erza\\erza.sqlite",
+"DanbooruAPIKey":"apikey",
+"DanbooruLogin":"",
+"DanbooruPassword":"",
+"Download":true,
+"DownloadPath":"C:\\users\\macs\\downloads\\images",
+"GelbooruLogin":"",
+"GelbooruPassword":"",
+"LimitError":4,
+"UseCacheDB":true,
+"UseDB":true,
+"UseDanbooru":true,
+"UseGelbooru":true,
+"UseKonachan":true,
+"UseYandere":true,
+"UserAgent":"Mozilla \/ 5.0(Windows NT 6.2; WOW64) AppleWebKit \/ 537.36(KHTML, like Gecko) Chrome \/ 34.0.1847.116 Safari \/ 537.36"
+}
