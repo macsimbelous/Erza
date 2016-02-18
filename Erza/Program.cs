@@ -529,9 +529,12 @@ namespace Erza
         }
         static List<ImageInfo> get_hash_gelbooru(string tag)
         {
-            gelbooru_cookies = new CookieCollection();
-            gelbooru_cookies.Add(new Cookie("user_id", "42820", "/", "gelbooru.com"));
-            gelbooru_cookies.Add(new Cookie("pass_hash", "12b71a982c0c189c7a0c9ac25d9713213296f616", "/", "gelbooru.com"));
+            gelbooru_cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
+            if(gelbooru_cookies == null)
+            {
+                Console.WriteLine("Не удалось авторизоваться на Gelbooru!");
+                return null;
+            }
             const int GELBOORU_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 0;                //Счетчик страниц
@@ -600,6 +603,36 @@ namespace Erza
                 }
             }
             return img_list;
+        }
+        static CookieCollection GetGelbooruCookies(string user, string password)
+        {
+            try
+            {
+                HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create("http://gelbooru.com/index.php?page=account&s=login&code=00");
+                httpWebRequest.CookieContainer = new CookieContainer();
+                httpWebRequest.Method = "POST";
+                httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+                string PostData = String.Format("user={0}&pass={1}", user, password);
+                Encoding encoding = Encoding.UTF8;
+                byte[] byte1 = encoding.GetBytes(PostData);
+                httpWebRequest.ContentLength = byte1.Length;
+                using (Stream st = httpWebRequest.GetRequestStream()) {
+                    st.Write(byte1, 0, byte1.Length);
+                    st.Close();
+                }
+                httpWebRequest.AllowAutoRedirect = false;
+                HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                //using (StreamReader reader = new StreamReader(httpWebResponse.GetResponseStream()))
+                //{
+                //string s = reader.ReadToEnd();
+                //}
+                return httpWebResponse.Cookies;
+            }
+            catch (WebException we)
+            {
+                Console.WriteLine(we.Message);
+                return null;
+            }
         }
         static List<ImageInfo> parse_json(string json)
         {
