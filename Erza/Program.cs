@@ -163,8 +163,8 @@ namespace Erza
         {
             Program.config = new ErzaConfig();
             //Параметры по умолчанию
-            Program.config.ConnectionString = @"data source=.\erza.sqlite";
-            Program.config.CacheDBConnectionString = @"data source=.\ErzaCache.sqlite";
+            Program.config.ConnectionString = @"data source=C:\utils\erza\erza.sqlite";
+            Program.config.CacheDBConnectionString = @"data source=C:\temp\ErzaCache.sqlite";
             Program.config.UseCacheDB = true;
             Program.config.UseDanbooru = true;
             Program.config.UseDB = true;
@@ -179,7 +179,7 @@ namespace Erza
             Program.config.DanbooruPassword = "";
             Program.config.DanbooruAPIKey = "";
             Program.config.Download = true;
-            Program.config.DownloadPath = @".\images";
+            Program.config.DownloadPath = @"C:\Users\macs\Downloads\images";
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(ErzaConfig));
             if (File.Exists(".\\Erza.json"))
             {
