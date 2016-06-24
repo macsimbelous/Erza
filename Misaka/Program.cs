@@ -47,7 +47,7 @@ namespace Misaka
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
 
-                    command.CommandText = "SELECT id, file_name FROM hash_tags WHERE file_name IS NOT NULL";
+                    command.CommandText = "SELECT id, file_name FROM hash_tags WHERE file_name IS NOT NULL ORDER BY file_name ASC";
                     command.Connection = connection;
                     SQLiteDataReader reader = command.ExecuteReader();
                     int count = 0;

@@ -29,7 +29,7 @@ namespace Shina
 {
     class Program
     {
-        static string ConnectionString = @"data source=C:\Users\macs\Dropbox\utils\Erza\erza.sqlite";
+        static string ConnectionString = @"data source=C:\utils\Erza\erza.sqlite";
         static void Main(string[] args)
         {
             List<ImageInfo> il;
