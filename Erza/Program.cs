@@ -816,8 +816,8 @@ namespace Erza
                     }
                     if (node.Attributes[j].Name == "file_url")
                     {
-                        mImgDescriptor.urls.Add(node.Attributes[j].Value);
-                        mImgDescriptor.konachan_url = node.Attributes[j].Value;
+                        mImgDescriptor.konachan_url = "http:" + node.Attributes[j].Value;
+                        mImgDescriptor.urls.Add(mImgDescriptor.konachan_url);
                     }
                     if (node.Attributes[j].Name == "id")
                     {
@@ -1140,24 +1140,24 @@ namespace Erza
         }
         static string GetReferer(string url, ImageInfo img)
         {
-            if (url.LastIndexOf("https://chan.sankakustatic.com/data/") >= 0)
+            /*if (url.LastIndexOf("https://chan.sankakustatic.com/data/") >= 0)
             {
                 Uri uri = new Uri("https://chan.sankakucomplex.com/post/show/" + img.sankaku_post_id.ToString());
                 return uri.AbsoluteUri;
-            }
+            }*/
             if (url.LastIndexOf("gelbooru.com/") >= 0)
             {
-                Uri uri = new Uri("https://gelbooru.com/index.php?page=post&s=view&id=" + img.gelbooru_post_id.ToString());
+                Uri uri = new Uri("http://gelbooru.com/index.php?page=post&s=view&id=" + img.gelbooru_post_id.ToString());
                 return uri.AbsoluteUri;
             }
-            if (url.LastIndexOf("https://konachan.com/") >= 0)
+            if (url.LastIndexOf("http://konachan.com/") >= 0)
             {
-                Uri uri = new Uri("https://konachan.com/post/show/" + img.konachan_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
+                Uri uri = new Uri("http://konachan.com/post/show/" + img.konachan_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
                 return uri.AbsoluteUri;
             }
-            if (url.LastIndexOf("https://sonohara.donmai.us/") >= 0)
+            if (url.LastIndexOf("http://sonohara.donmai.us/") >= 0)
             {
-                Uri uri = new Uri("https://danbooru.donmai.us/post/show/" + img.danbooru_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
+                Uri uri = new Uri("http://danbooru.donmai.us/post/show/" + img.danbooru_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
                 return uri.AbsoluteUri;
             }
             if (url.LastIndexOf("https://yande.re/") >= 0)
