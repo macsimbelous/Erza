@@ -86,29 +86,29 @@ namespace Erza
                         Console.WriteLine("Не заданы теги!");
                         return;
                     }
-                    if (Program.use_sub_dir) { Program.config.DownloadPath = Program.config.DownloadPath + @"\" + Program.tags[0]; }
+                    if (Program.use_sub_dir) { Program.config.DownloadPath = Program.config.DownloadPath + @"\" + WebUtility.UrlEncode(Program.tags[0]); }
                     ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
                     for (int i = 0; i < Program.tags.Count; i++)
                     {
                         if (Program.config.UseKonachan)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с коначан");
-                            il = SliyanieLists(il, get_hash_konachan(Program.tags[i]));
+                            il = SliyanieLists(il, get_hash_konachan(WebUtility.UrlEncode(Program.tags[i])));
                         }
                         if (Program.config.UseDanbooru)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с данбуры");
-                            il = SliyanieLists(il, get_hash_danbooru_new_api(Program.tags[i]));
+                            il = SliyanieLists(il, get_hash_danbooru_new_api(WebUtility.UrlEncode(Program.tags[i])));
                         }
                         if (Program.config.UseYandere)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с сестрёнки");
-                            il = SliyanieLists(il, get_hash_imouto(Program.tags[i]));
+                            il = SliyanieLists(il, get_hash_imouto(WebUtility.UrlEncode(Program.tags[i])));
                         }
                         if (Program.config.UseGelbooru)
                         {
                             Console.WriteLine("Импортируем тег " + Program.tags[i] + " с гелбуры");
-                            il = SliyanieLists(il, get_hash_gelbooru(Program.tags[i]));
+                            il = SliyanieLists(il, get_hash_gelbooru(WebUtility.UrlEncode(Program.tags[i])));
                         }
                     }
                     if (il.Count <= 0)
@@ -192,14 +192,6 @@ namespace Erza
             if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Erza\\Erza.json"))
             {
                 using (FileStream fs = new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Erza\\Erza.json", FileMode.Open))
-                {
-                    Program.config = (ErzaConfig)jsonFormatter.ReadObject(fs);
-                }
-                return;
-            }
-            if (File.Exists(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]) + "\\Erza.json"))
-            {
-                using (FileStream fs = new FileStream(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]) + "\\Erza.json", FileMode.Open))
                 {
                     Program.config = (ErzaConfig)jsonFormatter.ReadObject(fs);
                 }
@@ -472,62 +464,6 @@ namespace Erza
             Client.Dispose();
             return img_list;
         }
-        static List<ImageInfo> GetImageInfoFromYandere_json(string tag)
-        {
-            const int YANDERE_LIMIT_POSTS = 100;
-            int nPostsCount = 0;          //Счетчик постов для скачивания
-            int nPage = 1;                //Счетчик страниц
-            WebClient Client;
-            List<ImageInfo> img_list = new List<ImageInfo>();
-            Client = new WebClient();
-            for (; ; )
-            {
-                string strURL = String.Format("https://yande.re/post.json?tags={0}&page={1}&limit={2}", tag, nPage, YANDERE_LIMIT_POSTS);
-                Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
-                try
-                {
-                    Uri uri = new Uri(strURL);
-                    DateTime start = DateTime.Now;
-                    string json = Client.DownloadString(uri);
-                    List<ImageInfo> list = ParseYandere_json(json);
-                    if (list.Count <= 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        img_list.AddRange(list);
-                        nPage++;
-                    }
-                    MyWait(start, 5000);
-                }
-                catch (WebException we)
-                {
-                    Console.WriteLine("Ошибка: " + we.Message);
-                    Thread.Sleep(60000);
-                    continue;
-                }
-            }
-            Client.Dispose();
-            return img_list;
-        }
-        static List<ImageInfo> ParseYandere_json(string json)
-        {
-            JavaScriptSerializer ser = new JavaScriptSerializer();
-            List<json_image> result = ser.Deserialize<List<json_image>>(json);
-            List<ImageInfo> temp = new List<ImageInfo>();
-            foreach (json_image ji in result)
-            {
-                ImageInfo img = new ImageInfo();
-                img.SetHashString(ji.md5);
-                img.AddStringOfTags(ji.tags);
-                img.yandere_post_id = ji.id;
-                img.urls.Add(ji.file_url);
-                img.yandere_url = ji.file_url;
-                temp.Add(img);
-            }
-            return temp;
-        }
         static List<ImageInfo> get_hash_gelbooru(string tag)
         {
             gelbooru_cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
@@ -634,35 +570,6 @@ namespace Erza
                 Console.WriteLine(we.Message);
                 return null;
             }
-        }
-        static List<ImageInfo> parse_json(string json)
-        {
-            JavaScriptSerializer ser = new JavaScriptSerializer();
-            List<json_image> result = ser.Deserialize<List<json_image>>(json);
-            List<ImageInfo> temp = new List<ImageInfo>();
-            for (int i = 0; i < result.Count; i++)
-            {
-                ImageInfo img = new ImageInfo();
-                //img.hash = HexStringToBytes(result[i].md5);
-                img.SetHashString(result[i].md5);
-                img.AddStringOfTags(result[i].tags);
-                img.sankaku_post_id = result[i].id;
-                if (result[i].file_url != null)
-                {
-                    img.urls.Add(result[i].file_url);
-                }
-                else
-                {
-                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".jpg");
-                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".png");
-                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".gif");
-                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".swf");
-                    img.urls.Add("https://cs.sankakucomplex.com/data/" + img.GetHashString().Substring(0, 2) + "/" + img.GetHashString().Substring(2, 2) + "/" + img.GetHashString() + ".jpeg");
-                    //img.file_url = img.urls[0];
-                }
-                temp.Add(img);
-            }
-            return temp;
         }
         static int posts_count_gelbooru(string url)
         {
@@ -1054,13 +961,10 @@ namespace Erza
             int count_error = 0;
             int count_skip = 0;
             ImagesDB idb = new ImagesDB(Program.config.ConnectionString);
-            //List<string> DownloadedList = new List<string>();
-            //DownloadedList.Sort();
             Directory.CreateDirectory(dir);
             for (int i = 0; i < list.Count; i++)
             {
                 Console.WriteLine("\n###### {0}/{1} ######", (i+1), list.Count);
-                //if(DownloadedList.BinarySearch(list[i].GetHashString()) >= 0){int g = 1+1;}
                 if (Program.config.UseDB)
                 {
                     ImageInfo img = idb.ExistImage(list[i].hash);
@@ -1088,7 +992,6 @@ namespace Erza
                 { 
                     count_complit++;
                     cache.DeleteItem(list[i].hash);
-                    //InsertHashToDownloadedList(DownloadedList, list[i].GetHashString());
                 }
                 else
                 {
@@ -1100,7 +1003,6 @@ namespace Erza
         }
         static long DownloadImage(ImageInfo img, string dir)
         {
-            //CookieCollection cookies = GetSankakuCookies("https://chan.sankakucomplex.com/");
             int cnt;
             if (Program.config.LimitError < 1)
             {
@@ -1140,11 +1042,6 @@ namespace Erza
         }
         static string GetReferer(string url, ImageInfo img)
         {
-            /*if (url.LastIndexOf("https://chan.sankakustatic.com/data/") >= 0)
-            {
-                Uri uri = new Uri("https://chan.sankakucomplex.com/post/show/" + img.sankaku_post_id.ToString());
-                return uri.AbsoluteUri;
-            }*/
             if (url.LastIndexOf("gelbooru.com/") >= 0)
             {
                 Uri uri = new Uri("http://gelbooru.com/index.php?page=post&s=view&id=" + img.gelbooru_post_id.ToString());
@@ -1185,7 +1082,6 @@ namespace Erza
                     if (wrp.ContentLength == fi.Length)
                     {
                         Console.WriteLine("Уже скачан.");
-                        //wrp.Close();
                         return 0;
                     }
                     else
@@ -1208,21 +1104,15 @@ namespace Erza
                         DateTime pred = DateTime.Now;
                         Console.Write("\rСкачано " + cnt.ToString("#,###,###") + " из " + wrp.ContentLength.ToString("#,###,###") + " байт Скорость: " + ((cnt / (pred - start).TotalSeconds) / 1024).ToString("0.00") + " Килобайт в секунду.");
                     }
-                    //DateTime finish = DateTime.Now;
-                    //Console.WriteLine("Средняя скорость загрузки составила {0} байт в секунду.", ((cnt / (finish - start).TotalSeconds) / 1024).ToString("0.00"));
                 }
                 if (cnt < wrp.ContentLength)
                 {
                     Console.WriteLine("\nОбрыв! Закачка не завершена!");
-                    //rStream.Close();
-                    //wrp.Close();
                     return 1;
                 }
                 else
                 {
                     Console.WriteLine("\nЗакачка завершена.");
-                    //rStream.Close();
-                    //wrp.Close();
                     return 0;
                 }
             }
@@ -1274,78 +1164,6 @@ namespace Erza
             }
         }
         #endregion
-    }
-    class json_image
-    {
-        private int _height;
-        private int _width;
-        private int _sample_height;
-        private int _sample_width;
-        private int _score;
-        private object _created_at;
-        private string _file_url;
-        private string _status;
-        private string _preview_url;
-        private int _file_size;
-        private int _preview_width;
-        private int _preview_height;
-        private string _author;
-        private string _tags;
-        private bool _has_comments;
-        private int _parent_id;
-        private string _rating;
-        private string _source;
-        private int _creator_id;
-        private bool _has_notes;
-        private string _md5;
-        private int _change;
-        private int _id;
-        private bool _has_children;
-        private string _sample_url;
-        public int height { get { return _height; } set { _height = value; } }
-        public int width { get { return _width; } set { _width = value; } }
-        public int sample_height { get { return _sample_height; } set { _sample_height = value; } }
-        public int sample_width { get { return _sample_width; } set { _sample_width = value; } }
-        public int score { get { return _score; } set { _score = value; } }
-        public object created_at { get { return _created_at; } set { _created_at = value; } }
-        public string file_url { get { return _file_url; } set { _file_url = value; } }
-        public string status { get { return _status; } set { _status = value; } }
-        public string preview_url { get { return _preview_url; } set { _preview_url = value; } }
-        public object file_size
-        {
-            get { return _file_size; }
-            set
-            {
-                if (value == null) { _file_size = 0; }
-                else { _file_size = (int)value; }
-            }
-        }
-        public int preview_width { get { return _preview_width; } set { _preview_width = value; } }
-        public int preview_height { get { return _preview_height; } set { _preview_height = value; } }
-        public string author { get { return _author; } set { _author = value; } }
-        public string tags { get { return _tags; } set { _tags = value; } }
-        public bool has_comments { get { return _has_comments; } set { _has_comments = value; } }
-        public object parent_id
-        {
-            get { return _parent_id; }
-            set
-            {
-                if (value == null) { _parent_id = 0; }
-                else
-                {
-                    _parent_id = System.Convert.ToInt32(value);
-                }
-            }
-        }
-        public string rating { get { return _rating; } set { _rating = value; } }
-        public string source { get { return _source; } set { _source = value; } }
-        public int creator_id { get { return _creator_id; } set { _creator_id = value; } }
-        public bool has_notes { get { return _has_notes; } set { _has_notes = value; } }
-        public string md5 { get { return _md5; } set { _md5 = value; } }
-        public int change { get { return _change; } set { _change = value; } }
-        public int id { get { return _id; } set { _id = value; } }
-        public bool has_children { get { return _has_children; } set { _has_children = value; } }
-        public string sample_url { get { return _sample_url; } set { _sample_url = value; } }
     }
     internal class AcceptAllCertificatePolicy : ICertificatePolicy
     {
