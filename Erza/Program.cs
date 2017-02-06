@@ -132,7 +132,12 @@ namespace Erza
             Program.config.DanbooruPassword = "";
             Program.config.DanbooruAPIKey = "";
             Program.config.Download = true;
-            Program.config.DownloadPath = @"C:\Users\macs\Downloads\images";
+            Program.config.DownloadPath = ".";
+            Program.config.UseProxy = false;
+            Program.config.ProxyAddress = null;
+            Program.config.ProxyPort = 0;
+            Program.config.ProxyLogin = null;
+            Program.config.ProxyPassword = null;
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(ErzaConfig));
             if (File.Exists(".\\Erza.json"))
             {
@@ -216,6 +221,12 @@ namespace Erza
             for (; ; )
             {
                 WebClient Client = new WebClient();
+                if (Program.config.UseProxy)
+                {
+                    WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                    myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                    Client.Proxy = myProxy;
+                }
                 string strURL = String.Format("http://danbooru.donmai.us/posts.xml?tags={0}&page={1}&login={2}&api_key={3}&limit={4}", tag, nPage, Program.config.DanbooruLogin, Program.config.DanbooruAPIKey, DANBOORU_LIMIT_POSTS);
                 Console.WriteLine("({0}/ХЗ) Загружаем и парсим: {1}", img_list.Count, strURL);
                 try
@@ -275,7 +286,6 @@ namespace Erza
             const int KONACHAN_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 1;                //Счетчик страниц
-            WebClient Client;
             List<ImageInfo> img_list = new List<ImageInfo>();
             int count = 0;
             while (true)
@@ -296,7 +306,13 @@ namespace Erza
                 Console.WriteLine("Ничего ненайдено!");
                 return img_list;
             }
-            Client = new WebClient();
+            WebClient Client = new WebClient();
+            if (Program.config.UseProxy)
+            {
+                WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                Client.Proxy = myProxy;
+            }
             int count_errors = 0;
             for (; ; )
             {
@@ -345,7 +361,6 @@ namespace Erza
             const int YANDERE_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 1;                //Счетчик страниц
-            WebClient Client;
             List<ImageInfo> img_list = new List<ImageInfo>();
             int count = 0;
             while (true)
@@ -366,7 +381,13 @@ namespace Erza
                 Console.WriteLine("Ничего ненайдено!");
                 return img_list;
             }
-            Client = new WebClient();
+            WebClient Client = new WebClient();
+            if (Program.config.UseProxy)
+            {
+                WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                Client.Proxy = myProxy;
+            }
             int count_errors = 0;
             for (; ; )
             {
@@ -422,7 +443,6 @@ namespace Erza
             const int GELBOORU_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 0;                //Счетчик страниц
-            WebClient Client;
             List<ImageInfo> img_list = new List<ImageInfo>();
             int count = 0;
             while (true)
@@ -443,7 +463,6 @@ namespace Erza
                 Console.WriteLine("Ничего ненайдено!");
                 return img_list;
             }
-            Client = new WebClient();
             int count_errors = 0;
             for (; ; )
             {
@@ -453,7 +472,6 @@ namespace Erza
                 {
                     Uri uri = new Uri(strURL);
                     DateTime start = DateTime.Now;
-                    //string xml = Client.DownloadString(uri);
                     string xml = DownloadStringFromGelbooru(strURL, "http://gelbooru.com/", gelbooru_cookies);
                     if (xml == null)
                     {
@@ -493,6 +511,12 @@ namespace Erza
             try
             {
                 HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create("http://gelbooru.com/index.php?page=account&s=login&code=00");
+                if (Program.config.UseProxy)
+                {
+                    WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                    myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                    httpWebRequest.Proxy = myProxy;
+                }
                 httpWebRequest.CookieContainer = new CookieContainer();
                 httpWebRequest.Method = "POST";
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded";
@@ -521,7 +545,6 @@ namespace Erza
         static int posts_count_gelbooru(string url)
         {
             int nLocalPostsCount = 0;
-            WebClient Client = new WebClient();
             try
             {
                 Uri uri = new Uri(url);
@@ -562,16 +585,18 @@ namespace Erza
                 Console.WriteLine(ex.Message);
                 nLocalPostsCount = -1;
             }
-            finally
-            {
-                Client.Dispose();
-            }
             return nLocalPostsCount;
         }
         static int posts_count(string url)
         {
             int nLocalPostsCount = 0;
             WebClient Client = new WebClient();
+            if (Program.config.UseProxy)
+            {
+                WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                Client.Proxy = myProxy;
+            }
             try
             {
                 Uri uri = new Uri(url);
@@ -620,6 +645,12 @@ namespace Erza
         public static string DownloadStringFromGelbooru(string url, string referer, CookieCollection cookies)
         {
             HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(url);
+            if (Program.config.UseProxy)
+            {
+                WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                downloadRequest.Proxy = myProxy;
+            }
             downloadRequest.UserAgent = Program.config.UserAgent;
             downloadRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
             downloadRequest.Headers.Add("Accept-Encoding: identity");
@@ -1014,6 +1045,12 @@ namespace Erza
             Console.WriteLine("Начинаем закачку {0}.", url);
             FileInfo fi = new FileInfo(filename);
             HttpWebRequest httpWRQ = (HttpWebRequest)HttpWebRequest.Create(new Uri(url));
+            if (Program.config.UseProxy)
+            {
+                WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                httpWRQ.Proxy = myProxy;
+            }
             WebResponse wrp = null;
             Stream rStream = null;
             try
@@ -1083,31 +1120,6 @@ namespace Erza
                 }
             }
         }
-        static string GetFileName(ImageInfo img, string dir, string url)
-        {
-            int temp = url.IndexOf('?');
-            if (temp >= 0)
-            {
-                url = url.Substring(0, temp);
-            }
-            string extension = Path.GetExtension(url);
-            if (extension == ".jpeg")
-            {
-                return dir + "\\" + img.GetHashString() + ".jpg";
-            }
-            else
-            {
-                return dir + "\\" + img.GetHashString() + extension;
-            }
-        }
-        static void InsertHashToDownloadedList(List<string> DownloadedList, string hash)
-        {
-            int index = DownloadedList.BinarySearch(hash);
-            if (index < 0)
-            {
-                DownloadedList.Insert(~index, hash);
-            }
-        }
         #endregion
     }
     internal class AcceptAllCertificatePolicy : ICertificatePolicy
@@ -1155,6 +1167,16 @@ namespace Erza
         public string GelbooruPassword;
         [DataMember]
         public string UserAgent;
+        [DataMember]
+        public bool UseProxy;
+        [DataMember]
+        public string ProxyAddress;
+        [DataMember]
+        public int ProxyPort;
+        [DataMember]
+        public string ProxyLogin;
+        [DataMember]
+        public string ProxyPassword;
 
         public ErzaConfig()
         {
