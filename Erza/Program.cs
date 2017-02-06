@@ -119,8 +119,6 @@ namespace Erza
             Program.config = new ErzaConfig();
             //Параметры по умолчанию
             Program.config.ConnectionString = @"data source=C:\utils\erza\erza.sqlite";
-            Program.config.CacheDBConnectionString = @"data source=C:\temp\ErzaCache.sqlite";
-            Program.config.UseCacheDB = true;
             Program.config.UseDanbooru = true;
             Program.config.UseDB = true;
             Program.config.UseGelbooru = true;
@@ -1155,10 +1153,6 @@ namespace Erza
         public string GelbooruLogin;
         [DataMember]
         public string GelbooruPassword;
-        [DataMember]
-        public bool UseCacheDB;
-        [DataMember]
-        public string CacheDBConnectionString;
         [DataMember]
         public string UserAgent;
 
