@@ -39,10 +39,8 @@ namespace Erza
     class Program
     {
         static ErzaConfig config = null;
-        static bool clear_cache = false;
         static bool use_sub_dir = true;
         static List<string> tags;
-        static public ErzaCache cache;
         static CookieCollection gelbooru_cookies = null;
         static void Main(string[] args)
         {
@@ -50,88 +48,55 @@ namespace Erza
             {
                 LoadSettings();
                 List<ImageInfo> il = new List<ImageInfo>();
-                if (args.Length <= 0)
+                Program.tags = new List<string>();
+                ParseArgs(args);
+                if (tags.Count <= 0)
                 {
-                    cache = new ErzaCache(Program.config.CacheDBConnectionString);
-                    if (cache.GetCountItem() <= 0)
-                    {
-                        Console.WriteLine("Кэш пуст!\nЗадайте теги.");
-                        return;
-                    }
-                    Console.WriteLine("Востанавливаю список из кэша.");
-                    il = cache.GetItems();
-                    Program.config.DownloadPath = cache.GetDownloadDir();
+                    Console.WriteLine("Не заданы теги!");
+                    return;
                 }
-                else
+                if (Program.use_sub_dir) { Program.config.DownloadPath = Program.config.DownloadPath + @"\" + WebUtility.UrlEncode(Program.tags[0]); }
+                ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
+                for (int i = 0; i < Program.tags.Count; i++)
                 {
-                    Program.tags = new List<string>();
-                    ParseArgs(args);
-                    cache = new ErzaCache(Program.config.CacheDBConnectionString);
-                    if (cache.GetCountItem() > 0)
+                    if (Program.config.UseKonachan)
                     {
-                        Console.WriteLine("Кэш не пуст!");
-                        if (Program.clear_cache)
-                        {
-                            Console.WriteLine("Очишаю кэш.");
-                            cache.Clear();
-                        }
-                        else
-                        {
-                            Console.WriteLine("Используйте опцию --clearcache для очистки кэша или запустите меня без параметров для закачки нескачанных файлов.");
-                            return;
-                        }
+                        Console.WriteLine("Импортируем тег " + Program.tags[i] + " с коначан");
+                        il = SliyanieLists(il, get_hash_konachan(WebUtility.UrlEncode(Program.tags[i])));
                     }
-                    if (tags.Count <= 0)
+                    if (Program.config.UseDanbooru)
                     {
-                        Console.WriteLine("Не заданы теги!");
-                        return;
+                        Console.WriteLine("Импортируем тег " + Program.tags[i] + " с данбуры");
+                        il = SliyanieLists(il, get_hash_danbooru_new_api(WebUtility.UrlEncode(Program.tags[i])));
                     }
-                    if (Program.use_sub_dir) { Program.config.DownloadPath = Program.config.DownloadPath + @"\" + WebUtility.UrlEncode(Program.tags[0]); }
-                    ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
-                    for (int i = 0; i < Program.tags.Count; i++)
+                    if (Program.config.UseYandere)
                     {
-                        if (Program.config.UseKonachan)
-                        {
-                            Console.WriteLine("Импортируем тег " + Program.tags[i] + " с коначан");
-                            il = SliyanieLists(il, get_hash_konachan(WebUtility.UrlEncode(Program.tags[i])));
-                        }
-                        if (Program.config.UseDanbooru)
-                        {
-                            Console.WriteLine("Импортируем тег " + Program.tags[i] + " с данбуры");
-                            il = SliyanieLists(il, get_hash_danbooru_new_api(WebUtility.UrlEncode(Program.tags[i])));
-                        }
-                        if (Program.config.UseYandere)
-                        {
-                            Console.WriteLine("Импортируем тег " + Program.tags[i] + " с сестрёнки");
-                            il = SliyanieLists(il, get_hash_imouto(WebUtility.UrlEncode(Program.tags[i])));
-                        }
-                        if (Program.config.UseGelbooru)
-                        {
-                            Console.WriteLine("Импортируем тег " + Program.tags[i] + " с гелбуры");
-                            il = SliyanieLists(il, get_hash_gelbooru(WebUtility.UrlEncode(Program.tags[i])));
-                        }
+                        Console.WriteLine("Импортируем тег " + Program.tags[i] + " с сестрёнки");
+                        il = SliyanieLists(il, get_hash_imouto(WebUtility.UrlEncode(Program.tags[i])));
                     }
-                    if (il.Count <= 0)
+                    if (Program.config.UseGelbooru)
                     {
-                        Console.WriteLine("Ничего ненайдено.");
-                        return;
+                        Console.WriteLine("Импортируем тег " + Program.tags[i] + " с гелбуры");
+                        il = SliyanieLists(il, get_hash_gelbooru(WebUtility.UrlEncode(Program.tags[i])));
                     }
-                    #region SQLite
-                    if (Program.config.UseDB)
-                    {
-                        Console.WriteLine("Добавляем хэши в базу данных SQLite");
-                        ImagesDB idb = new ImagesDB(Program.config.ConnectionString);
-                        idb.ProgressCallBack = new ImagesDB.ProgressCallBackT(ProgressSQLiteCallBack);
-                        DateTime start = DateTime.Now;
-                        idb.AddImages(il);
-                        DateTime finish = DateTime.Now;
-                        Console.WriteLine("\nХэшей добавлено: {0} за: {1} секунд ({2} в секунду)", il.Count.ToString(), (finish - start).TotalSeconds.ToString("0.00"), (il.Count / (finish - start).TotalSeconds).ToString("0.00"));
-                    }
-                    #endregion
-                    Console.WriteLine("Кэшируем записи");
-                    cache.AddItems(il);
-                    cache.SetDownloadDir(Program.config.DownloadPath);
                 }
+                if (il.Count <= 0)
+                {
+                    Console.WriteLine("Ничего ненайдено.");
+                    return;
+                }
+                #region SQLite
+                if (Program.config.UseDB)
+                {
+                    Console.WriteLine("Добавляем хэши в базу данных SQLite");
+                    ImagesDB idb = new ImagesDB(Program.config.ConnectionString);
+                    idb.ProgressCallBack = new ImagesDB.ProgressCallBackT(ProgressSQLiteCallBack);
+                    DateTime start = DateTime.Now;
+                    idb.AddImages(il);
+                    DateTime finish = DateTime.Now;
+                    Console.WriteLine("\nХэшей добавлено: {0} за: {1} секунд ({2} в секунду)", il.Count.ToString(), (finish - start).TotalSeconds.ToString("0.00"), (il.Count / (finish - start).TotalSeconds).ToString("0.00"));
+                }
+                #endregion
                 #region Download
                 if (Program.config.Download)
                 {
@@ -139,16 +104,6 @@ namespace Erza
                     int num6 = download(il, Program.config.DownloadPath);
                 }
                 #endregion
-                if (cache.GetCountItem() > 0)
-                {
-                    Console.WriteLine("В кэше остались записи!");
-                    return;
-                }
-                else
-                {
-                    Console.WriteLine("В кэше ничего не осталось!\nСжимаю его для экономии места");
-                    cache.Vacuum();
-                }
             }
             catch (Exception ex)
             {
@@ -207,18 +162,12 @@ namespace Erza
             string dir_string = "--dir=";
             string download_string = "--download";
             string nodownload_string = "--nodownload";
-            string clear_cache = "--clearcache";
             string nosubdir_string = "--nosubdir";
             foreach (string param in args)
             {
                 if (param == nosubdir_string)
                 {
                     Program.use_sub_dir = false;
-                    continue;
-                }
-                if (param == clear_cache)
-                {
-                    Program.clear_cache = true;
                     continue;
                 }
                 if (param == sqlite_string)
@@ -975,7 +924,6 @@ namespace Erza
                         {
                             Console.WriteLine("Этот фаил уже был ранее удалён.");
                             count_deleted++;
-                            cache.DeleteItem(list[i].hash);
                             continue;
                         }
                         if (img.file != null)
@@ -983,7 +931,6 @@ namespace Erza
                             Console.WriteLine("Этот фаил уже был ранее скачан.");
                             Console.WriteLine(img.file);
                             count_skip++;
-                            cache.DeleteItem(list[i].hash);
                             continue;
                         }
                     }
@@ -992,7 +939,6 @@ namespace Erza
                 if (r == 0)
                 { 
                     count_complit++;
-                    cache.DeleteItem(list[i].hash);
                 }
                 else
                 {
