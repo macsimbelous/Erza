@@ -16,122 +16,90 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Globalization;
 
 namespace ErzaLib
 {
     public class ImageInfo
     {
-        public bool is_new = true;
-        public bool is_deleted = false;
-        public ulong db_id = 0;
-        public int sankaku_post_id = 0;
-        public int danbooru_post_id = 0;
-        public int gelbooru_post_id = 0;
-        public int konachan_post_id = 0;
-        public int yandere_post_id = 0;
-        public byte[] hash = null;
-        public string file = null;
-        public string sankaku_url = null;
-        public string danbooru_url = null;
-        public string gelbooru_url = null;
-        public string konachan_url = null;
-        public string yandere_url = null;
-        public List<string> tags = new List<string>();
-        public List<string> urls = new List<string>();
-        public string GetHashString()
-        {
-            return BitConverter.ToString(this.hash).Replace("-", string.Empty).ToLower();
-        }
-        public void SetHashString(string hash_string)
-        {
-            if (hash_string == null)
-            {
-                throw new ArgumentNullException("hexString");
-            }
-            if ((hash_string.Length & 1) != 0)
-            {
-                throw new ArgumentOutOfRangeException("hexString", hash_string, "hexString must contain an even number of characters.");
-            }
-            byte[] result = new byte[hash_string.Length / 2];
-            for (int i = 0; i < hash_string.Length; i += 2)
-            {
-                result[i / 2] = byte.Parse(hash_string.Substring(i, 2), NumberStyles.HexNumber);
-            }
-            this.hash = result;
-        }
+        public bool IsDeleted = false;
+        public long ImageID = -1;
+        public string Hash = null;
+        public string FilePath = null;
+        public int Width = 0;
+        public int Height = 0;
+        public List<string> Tags = new List<string>();
         public string GetStringOfTags()
         {
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < this.tags.Count; i++)
+            for (int i = 0; i < this.Tags.Count; i++)
             {
                 if (i == 0)
                 {
-                    sb.Append(this.tags[i]);
+                    sb.Append(this.Tags[i]);
                 }
                 else
                 {
                     sb.Append(' ');
-                    sb.Append(this.tags[i]);
+                    sb.Append(this.Tags[i]);
                 }
             }
             return sb.ToString();
         }
-        public void AddTag(string tag)
+        public void AddTag(string Tag)
         {
-            if ((tag != null) && (tag != String.Empty))
+            if ((Tag != null) && (Tag != String.Empty))
             {
-                if (this.tags.LastIndexOf(tag) < 0)
+                if (this.Tags.LastIndexOf(Tag) < 0)
                 {
-                    this.tags.Add(tag);
+                    this.Tags.Add(Tag);
                 }
             }
         }
-        public void AddTags(string[] tags_array)
+        public void AddTags(string[] Tags)
         {
-            foreach (string tag in tags_array)
+            foreach (string tag in Tags)
             {
                 if ((tag != null) && (tag != String.Empty))
                 {
-                    if (this.tags.LastIndexOf(tag) < 0)
+                    if (this.Tags.LastIndexOf(tag) < 0)
                     {
-                        this.tags.Add(tag);
+                        this.Tags.Add(tag);
                     }
                 }
             }
         }
-        public void AddTags(List<string> tags_array)
+        public void AddTags(List<string> Tags)
         {
-            foreach (string tag in tags_array)
+            foreach (string tag in Tags)
             {
                 if ((tag != null) && (tag != String.Empty))
                 {
-                    if (this.tags.LastIndexOf(tag) < 0)
+                    if (this.Tags.LastIndexOf(tag) < 0)
                     {
-                        this.tags.Add(tag);
+                        this.Tags.Add(tag);
                     }
                 }
             }
         }
-        public void AddStringOfTags(string tags_string)
+        public void AddStringOfTags(string TagsString)
         {
-            string[] tags_array = tags_string.Split(' ');
+            string[] tags_array = TagsString.Split(' ');
             foreach (string tag in tags_array)
             {
                 if ((tag != null) && (tag != String.Empty))
                 {
-                    if (this.tags.LastIndexOf(tag) < 0)
+                    if (this.Tags.LastIndexOf(tag) < 0)
                     {
-                        this.tags.Add(tag);
+                        this.Tags.Add(tag);
                     }
                 }
             }
         }
         public override string ToString()
         {
-            if (this.file != String.Empty)
+            if (this.FilePath != String.Empty)
             {
-                return file.Substring(file.LastIndexOf('\\') + 1);
+                return FilePath.Substring(FilePath.LastIndexOf('\\') + 1);
             }
             else
             {
