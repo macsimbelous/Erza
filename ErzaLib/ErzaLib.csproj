@@ -70,7 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Grabber.cs" />
     <Compile Include="ImageInfo.cs" />
     <Compile Include="ImagesDB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
