@@ -72,7 +72,6 @@
   <ItemGroup>
     <Compile Include="ErzaDB.cs" />
     <Compile Include="ImageInfo.cs" />
-    <Compile Include="ImagesDB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

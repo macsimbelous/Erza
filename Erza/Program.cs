@@ -42,12 +42,13 @@ namespace Erza
         static bool use_sub_dir = true;
         static List<string> tags;
         static CookieCollection gelbooru_cookies = null;
+        static SQLiteConnection connection = null;
         static void Main(string[] args)
         {
             try
             {
                 LoadSettings();
-                List<ImageInfo> il = new List<ImageInfo>();
+                List<ImageInfo2> il = new List<ImageInfo2>();
                 Program.tags = new List<string>();
                 ParseArgs(args);
                 if (tags.Count <= 0)
@@ -85,14 +86,18 @@ namespace Erza
                     Console.WriteLine("Ничего ненайдено.");
                     return;
                 }
+                connection = new SQLiteConnection(Program.config.ConnectionString);
+                connection.Open();
                 #region SQLite
                 if (Program.config.UseDB)
                 {
                     Console.WriteLine("Добавляем хэши в базу данных SQLite");
-                    ImagesDB idb = new ImagesDB(Program.config.ConnectionString);
-                    idb.ProgressCallBack = new ImagesDB.ProgressCallBackT(ProgressSQLiteCallBack);
                     DateTime start = DateTime.Now;
-                    idb.AddImages(il);
+                    for (int i = 0; i < il.Count; i++)
+                    {
+                        ErzaLib.ErzaDB.LoadImageToErza(il[i], connection);
+                        Console.Write("Обрабатываю хэш {0} ({1}/{2})\r", il[i].Hash, i, il.Count);
+                    }
                     DateTime finish = DateTime.Now;
                     Console.WriteLine("\nХэшей добавлено: {0} за: {1} секунд ({2} в секунду)", il.Count.ToString(), (finish - start).TotalSeconds.ToString("0.00"), (il.Count / (finish - start).TotalSeconds).ToString("0.00"));
                 }
@@ -104,6 +109,7 @@ namespace Erza
                     int num6 = download(il, Program.config.DownloadPath);
                 }
                 #endregion
+                connection.Close();
             }
             catch (Exception ex)
             {
@@ -212,11 +218,11 @@ namespace Erza
                 Program.tags.Add(param);
             }
         }
-        static List<ImageInfo> get_hash_danbooru_new_api(string tag)
+        static List<ImageInfo2> get_hash_danbooru_new_api(string tag)
         {
             const int DANBOORU_LIMIT_POSTS = 100;
             int nPage = 1;                //Счетчик страниц
-            List<ImageInfo> img_list = new List<ImageInfo>();
+            List<ImageInfo2> img_list = new List<ImageInfo2>();
             int count_errors = 0;
             for (; ; )
             {
@@ -245,7 +251,7 @@ namespace Erza
                             break;
                         }
                     }
-                    List<ImageInfo> list = ParseXMLDanBooru_new_api(xml);
+                    List<ImageInfo2> list = ParseXMLDanBooru_new_api(xml);
                     if (list.Count <= 0)
                     {
                         break;
@@ -281,12 +287,12 @@ namespace Erza
             }
             return img_list;
         }
-        static List<ImageInfo> get_hash_konachan(string tag)
+        static List<ImageInfo2> get_hash_konachan(string tag)
         {
             const int KONACHAN_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 1;                //Счетчик страниц
-            List<ImageInfo> img_list = new List<ImageInfo>();
+            List<ImageInfo2> img_list = new List<ImageInfo2>();
             int count = 0;
             while (true)
             {
@@ -335,7 +341,7 @@ namespace Erza
                             break;
                         }
                     }
-                    List<ImageInfo> list = ParseXMLKonachan(xml);
+                    List<ImageInfo2> list = ParseXMLKonachan(xml);
                     if (list.Count <= 0)
                     {
                         break;
@@ -356,12 +362,12 @@ namespace Erza
             }
             return img_list;
         }
-        static List<ImageInfo> get_hash_imouto(string tag)
+        static List<ImageInfo2> get_hash_imouto(string tag)
         {
             const int YANDERE_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 1;                //Счетчик страниц
-            List<ImageInfo> img_list = new List<ImageInfo>();
+            List<ImageInfo2> img_list = new List<ImageInfo2>();
             int count = 0;
             while (true)
             {
@@ -410,7 +416,7 @@ namespace Erza
                             break;
                         }
                     }
-                    List<ImageInfo> list = ParseXMLYandere(xml);
+                    List<ImageInfo2> list = ParseXMLYandere(xml);
                     if (list.Count <= 0)
                     {
                         break;
@@ -432,7 +438,7 @@ namespace Erza
             Client.Dispose();
             return img_list;
         }
-        static List<ImageInfo> get_hash_gelbooru(string tag)
+        static List<ImageInfo2> get_hash_gelbooru(string tag)
         {
             gelbooru_cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
             if(gelbooru_cookies == null)
@@ -443,7 +449,7 @@ namespace Erza
             const int GELBOORU_LIMIT_POSTS = 100;
             int nPostsCount = 0;          //Счетчик постов для скачивания
             int nPage = 0;                //Счетчик страниц
-            List<ImageInfo> img_list = new List<ImageInfo>();
+            List<ImageInfo2> img_list = new List<ImageInfo2>();
             int count = 0;
             while (true)
             {
@@ -485,7 +491,7 @@ namespace Erza
                             break;
                         }
                     }
-                    List<ImageInfo> list = ParseXMLGelBooru(xml);
+                    List<ImageInfo2> list = ParseXMLGelBooru(xml);
                     if (list.Count <= 0)
                     {
                         break;
@@ -667,9 +673,9 @@ namespace Erza
             }
             return source;
         }
-        static List<ImageInfo> ParseXMLKonachan(string strXML)
+        static List<ImageInfo2> ParseXMLKonachan(string strXML)
         {
-            List<ImageInfo> list = new List<ImageInfo>();
+            List<ImageInfo2> list = new List<ImageInfo2>();
             XmlDocument mXML = new XmlDocument();
             try
             {
@@ -684,7 +690,7 @@ namespace Erza
             //Парсим посты
             for (int i = 0; i < nodeList.Count; i++)
             {
-                ImageInfo mImgDescriptor = new ImageInfo();
+                ImageInfo2 mImgDescriptor = new ImageInfo2();
                 XmlNode node = nodeList.Item(i);
                 for (int j = 0; j < node.Attributes.Count; j++)
                 {
@@ -713,9 +719,9 @@ namespace Erza
             }
             return list;
         }
-        static List<ImageInfo> ParseXMLGelBooru(string strXML)
+        static List<ImageInfo2> ParseXMLGelBooru(string strXML)
         {
-            List<ImageInfo> list = new List<ImageInfo>();
+            List<ImageInfo2> list = new List<ImageInfo2>();
             XmlDocument mXML = new XmlDocument();
             try
             {
@@ -730,7 +736,7 @@ namespace Erza
             //Парсим посты
             for (int i = 0; i < nodeList.Count; i++)
             {
-                ImageInfo mImgDescriptor = new ImageInfo();
+                ImageInfo2 mImgDescriptor = new ImageInfo2();
                 XmlNode node = nodeList.Item(i);
                 for (int j = 0; j < node.Attributes.Count; j++)
                 {
@@ -760,9 +766,9 @@ namespace Erza
             }
             return list;
         }
-        static List<ImageInfo> ParseXMLYandere(string strXML)
+        static List<ImageInfo2> ParseXMLYandere(string strXML)
         {
-            List<ImageInfo> list = new List<ImageInfo>();
+            List<ImageInfo2> list = new List<ImageInfo2>();
             XmlDocument mXML = new XmlDocument();
             try
             {
@@ -777,7 +783,7 @@ namespace Erza
             //Парсим посты
             for (int i = 0; i < nodeList.Count; i++)
             {
-                ImageInfo mImgDescriptor = new ImageInfo();
+                ImageInfo2 mImgDescriptor = new ImageInfo2();
                 XmlNode node = nodeList.Item(i);
                 for (int j = 0; j < node.Attributes.Count; j++)
                 {
@@ -806,9 +812,9 @@ namespace Erza
             }
             return list;
         }
-        static List<ImageInfo> ParseXMLDanBooru_new_api(string strXML)
+        static List<ImageInfo2> ParseXMLDanBooru_new_api(string strXML)
         {
-            List<ImageInfo> list = new List<ImageInfo>();
+            List<ImageInfo2> list = new List<ImageInfo2>();
             XmlDocument mXML = new XmlDocument();
             try
             {
@@ -823,7 +829,7 @@ namespace Erza
             //Парсим посты
             foreach (XmlNode node in nodeList)
             {
-                ImageInfo mImgDescriptor = new ImageInfo();
+                ImageInfo2 mImgDescriptor = new ImageInfo2();
                 //Console.WriteLine(node.OuterXml);
                 XmlElement md5 = node["md5"];
                 if (md5 == null) { continue; }
@@ -864,18 +870,18 @@ namespace Erza
 
             return result;
         }
-        static int FindHash(List<ImageInfo> list, ImageInfo img)
+        static int FindHash(List<ImageInfo2> list, ImageInfo2 img)
         {
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i].hash.SequenceEqual(img.hash))
+                if (list[i].Hash.SequenceEqual(img.Hash))
                 {
                     return i;
                 }
             }
             return -1;
         }
-        static List<ImageInfo> SliyanieLists(List<ImageInfo> list, List<ImageInfo> temp)
+        static List<ImageInfo2> SliyanieLists(List<ImageInfo2> list, List<ImageInfo2> temp)
         {
             for (int temp_i = 0; temp_i < temp.Count; temp_i++)
             {
@@ -894,7 +900,7 @@ namespace Erza
                             list[t].tags.Add(temp[temp_i].tags[temp_i3]);
                         }
                     }*/
-                    list[t].AddTags(temp[temp_i].tags);
+                    list[t].AddTags(temp[temp_i].Tags);
                     list[t].urls.AddRange(temp[temp_i].urls);
                     if (temp[temp_i].sankaku_post_id > 0) { list[t].sankaku_post_id = temp[temp_i].sankaku_post_id; }
                     if (temp[temp_i].gelbooru_post_id > 0) { list[t].gelbooru_post_id = temp[temp_i].gelbooru_post_id; }
@@ -933,32 +939,31 @@ namespace Erza
             }
         }
         #region DownloadFile
-        static int download(List<ImageInfo> list, string dir)
+        static int download(List<ImageInfo2> list, string dir)
         {
             int count_complit = 0;
             int count_deleted = 0;
             int count_error = 0;
             int count_skip = 0;
-            ImagesDB idb = new ImagesDB(Program.config.ConnectionString);
             Directory.CreateDirectory(dir);
             for (int i = 0; i < list.Count; i++)
             {
                 Console.WriteLine("\n###### {0}/{1} ######", (i+1), list.Count);
                 if (Program.config.UseDB)
                 {
-                    ImageInfo img = idb.ExistImage(list[i].hash);
+                    ImageInfo img = ErzaLib.ErzaDB.GetImageWithOutTags(list[i].Hash, connection);
                     if (img != null)
                     {
-                        if (img.is_deleted)
+                        if (img.IsDeleted)
                         {
                             Console.WriteLine("Этот фаил уже был ранее удалён.");
                             count_deleted++;
                             continue;
                         }
-                        if (img.file != null)
+                        if (img.FilePath != null)
                         {
                             Console.WriteLine("Этот фаил уже был ранее скачан.");
-                            Console.WriteLine(img.file);
+                            Console.WriteLine(img.FilePath);
                             count_skip++;
                             continue;
                         }
@@ -977,7 +982,7 @@ namespace Erza
             Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, list.Count);
             return 0;
         }
-        static long DownloadImage(ImageInfo img, string dir)
+        static long DownloadImage(ImageInfo2 img, string dir)
         {
             int cnt;
             if (Program.config.LimitError < 1)
@@ -996,7 +1001,7 @@ namespace Erza
                     DateTime start = DateTime.Now;
                     if (extension == ".jpeg")
                     {
-                        long result = DownloadFile(url, dir + "\\" + img.GetHashString() + ".jpg", GetReferer(url, img));
+                        long result = DownloadFile(url, dir + "\\" + img.Hash + ".jpg", GetReferer(url, img));
                         if (result == 0)
                         {
                             MyWait(start, 2500);
@@ -1005,7 +1010,7 @@ namespace Erza
                     }
                     else
                     {
-                        long result = DownloadFile(url, dir + "\\" + img.GetHashString() + extension, GetReferer(url, img));
+                        long result = DownloadFile(url, dir + "\\" + img.Hash + extension, GetReferer(url, img));
                         if (result == 0)
                         {
                             MyWait(start, 2500);
@@ -1016,7 +1021,7 @@ namespace Erza
             }
             return 1;
         }
-        static string GetReferer(string url, ImageInfo img)
+        static string GetReferer(string url, ImageInfo2 img)
         {
             if (url.LastIndexOf("gelbooru.com/") >= 0)
             {
@@ -1121,6 +1126,35 @@ namespace Erza
             }
         }
         #endregion
+    }
+    class ImageInfo2 : ErzaLib.ImageInfo
+    {
+        public List<string> urls = new List<string>();
+        public int sankaku_post_id = 0;
+        public int danbooru_post_id = 0;
+        public int gelbooru_post_id = 0;
+        public int konachan_post_id = 0;
+        public int yandere_post_id = 0;
+        public string sankaku_url = null;
+        public string danbooru_url = null;
+        public string gelbooru_url = null;
+        public string konachan_url = null;
+        public string yandere_url = null;
+        public void SetHashString(string hash_string)
+        {
+            this.Hash = hash_string;
+        }
+        public override string ToString()
+        {
+            if (this.FilePath != String.Empty)
+            {
+                return this.FilePath.Substring(this.FilePath.LastIndexOf('\\') + 1);
+            }
+            else
+            {
+                return "No File!";
+            }
+        }
     }
     internal class AcceptAllCertificatePolicy : ICertificatePolicy
     {

@@ -24,6 +24,7 @@ using System.Xml;
 using System.Threading;
 using ErzaLib;
 using System.Diagnostics;
+using System.Data.SQLite;
 
 namespace Shina
 {
@@ -72,6 +73,248 @@ namespace Shina
             }
             Console.WriteLine("Получены теги для {0} из {1} изображений", resolved_count, il.Count);
             //Console.ReadKey();
+        }
+        public static ImageInfo GetImageInfoFromImageBoards(bool UseDanbooru, bool UseKonachan, bool UseYandere, bool UseGelbooru, string hash)
+        {
+            ImageInfo img = null;
+            if (UseDanbooru)
+            {
+                ImageInfo temp_img = null;
+                temp_img = GetImageInfoFromDanbooru(hash);
+                if (temp_img != null)
+                {
+                    if (img != null)
+                    {
+                        img.AddTags(temp_img.tags);
+                    }
+                    else
+                    {
+                        img = temp_img;
+                    }
+                }
+            }
+            if (UseKonachan)
+            {
+                ImageInfo temp_img = null;
+                temp_img = GetImageInfoFromKonachan(hash);
+                if (temp_img != null)
+                {
+                    if (img != null)
+                    {
+                        img.AddTags(temp_img.tags);
+                    }
+                    else
+                    {
+                        img = temp_img;
+                    }
+                }
+            }
+            if (UseYandere)
+            {
+                ImageInfo temp_img = null;
+                temp_img = GetImageInfoFromYandere(hash);
+                if (temp_img != null)
+                {
+                    if (img != null)
+                    {
+                        img.AddTags(temp_img.tags);
+                    }
+                    else
+                    {
+                        img = temp_img;
+                    }
+                }
+            }
+            if (UseGelbooru)
+            {
+                ImageInfo temp_img = null;
+                temp_img = GetImageInfoFromGelbooru(hash);
+                if (temp_img != null)
+                {
+                    if (img != null)
+                    {
+                        img.AddTags(temp_img.tags);
+                    }
+                    else
+                    {
+                        img = temp_img;
+                    }
+                }
+            }
+            return img;
+        }
+        public static ImageInfo GetImageInfoFromDanbooru(string hash)
+        {
+            WebClient Client = new WebClient();
+            string strURL = String.Format("http://danbooru.donmai.us/posts.xml?tags=md5:{0}&login={1}&api_key={2}", hash, LoginForDanbooru, ApiKeyForDanbooru);
+            try
+            {
+                Uri uri = new Uri(strURL);
+                string tags = null;
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(Client.DownloadString(uri));
+                XmlNodeList nodeList = mXML.GetElementsByTagName("post");
+                foreach (XmlNode node in nodeList)
+                {
+                    XmlElement xml_tags = node["tag-string"];
+                    tags = xml_tags.InnerText;
+                    ImageInfo img = new ImageInfo();
+                    img.AddStringOfTags(tags);
+                    img.SetHashString(hash);
+                    return img;
+                }
+                return null;
+            }
+            catch (WebException we)
+            {
+                we.GetType();
+                return null;
+            }
+            catch (XmlException e)
+            {
+                e.GetType();
+                return null;
+            }
+            finally
+            {
+                if (Client != null)
+                {
+                    Client.Dispose();
+                    Client = null;
+                }
+            }
+        }
+        public static ImageInfo GetImageInfoFromKonachan(string hash)
+        {
+            WebClient Client;
+            Client = new WebClient();
+            string strURL = String.Format("http://konachan.com/post.xml?tags=md5:{0}", hash);
+            try
+            {
+                Uri uri = new Uri(strURL);
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(Client.DownloadString(uri));
+                XmlNodeList nodeList = mXML.GetElementsByTagName("post");
+                foreach (XmlNode node in nodeList)
+                {
+                    for (int j = 0; j < node.Attributes.Count; j++)
+                    {
+                        if (node.Attributes[j].Name == "tags")
+                        {
+                            ImageInfo img = new ImageInfo();
+                            img.AddStringOfTags(node.Attributes[j].Value);
+                            img.SetHashString(hash);
+                            return img;
+                        }
+                    }
+                    return null;
+                }
+                return null;
+            }
+            catch (WebException)
+            {
+                return null;
+            }
+            catch (XmlException)
+            {
+                return null;
+            }
+            finally
+            {
+                if (Client != null)
+                {
+                    Client.Dispose();
+                    Client = null;
+                }
+            }
+        }
+        public static ImageInfo GetImageInfoFromYandere(string hash)
+        {
+            WebClient Client;
+            Client = new WebClient();
+            string strURL = String.Format("http://yande.re/post.xml?tags=md5:{0}", hash);
+            try
+            {
+                Uri uri = new Uri(strURL);
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(Client.DownloadString(uri));
+                XmlNodeList nodeList = mXML.GetElementsByTagName("post");
+                foreach (XmlNode node in nodeList)
+                {
+                    for (int j = 0; j < node.Attributes.Count; j++)
+                    {
+                        if (node.Attributes[j].Name == "tags")
+                        {
+                            ImageInfo img = new ImageInfo();
+                            img.AddStringOfTags(node.Attributes[j].Value);
+                            img.SetHashString(hash);
+                            return img;
+                        }
+                    }
+                    return null;
+                }
+                return null;
+            }
+            catch (WebException)
+            {
+                return null;
+            }
+            catch (XmlException)
+            {
+                return null;
+            }
+            finally
+            {
+                if (Client != null)
+                {
+                    Client.Dispose();
+                    Client = null;
+                }
+            }
+        }
+        public static ImageInfo GetImageInfoFromGelbooru(string hash)
+        {
+            WebClient Client;
+            Client = new WebClient();
+            string strURL = String.Format("http://gelbooru.com/index.php?page=dapi&s=post&q=index&tags=md5:{0}", hash);
+            try
+            {
+                Uri uri = new Uri(strURL);
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(Client.DownloadString(uri));
+                XmlNodeList nodeList = mXML.GetElementsByTagName("post");
+                foreach (XmlNode node in nodeList)
+                {
+                    for (int j = 0; j < node.Attributes.Count; j++)
+                    {
+                        if (node.Attributes[j].Name == "tags")
+                        {
+                            ImageInfo img = new ImageInfo();
+                            img.AddStringOfTags(node.Attributes[j].Value);
+                            img.SetHashString(hash);
+                            return img;
+                        }
+                    }
+                    return null;
+                }
+                return null;
+            }
+            catch (WebException)
+            {
+                return null;
+            }
+            catch (XmlException)
+            {
+                return null;
+            }
+            finally
+            {
+                if (Client != null)
+                {
+                    Client.Dispose();
+                    Client = null;
+                }
+            }
         }
         static void MyWait(DateTime start, int delay)
         {
