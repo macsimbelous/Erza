@@ -31,39 +31,52 @@ namespace Shina
     class Program
     {
         static string ConnectionString = @"data source=C:\utils\Erza\erza.sqlite";
+        static string UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+        static string LoginForDanbooru = "macsimbelous";
+        static string ApiKeyForDanbooru = "F5eC.ADAOFChEkOwVA1x.BUES0S9GaRqSoohs7wO";
         static void Main(string[] args)
         {
-            List<ImageInfo> il;
+            List<ImageInfo> il = new List<ImageInfo>();
             Console.WriteLine("Считываем хэши из базы данных");
-            ImagesDB erza = new ImagesDB(ConnectionString);
-            erza.ProgressCallBack = new ImagesDB.ProgressCallBackT(ProgressSQLiteCallBack);
             var timer = Stopwatch.StartNew();
-            il = erza.GetAllImagesWithOutTags();
+            using (SQLiteConnection connection = new SQLiteConnection(@"data source=C:\utils\Erza\erza.sqlite"))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand())
+                {
+                    command.CommandText = "select * from hash_tags";
+                    command.Connection = connection;
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    int count = 0;
+                    while (reader.Read())
+                    {
+                        ImageInfo img = new ImageInfo();
+                        img.Hash = BitConverter.ToString((byte[])reader["hash"]).Replace("-", string.Empty).ToLower();
+                        img.IsDeleted = (bool)reader["is_deleted"];
+                        il.Add(img);
+                        count++;
+                        Console.Write("\r" + count.ToString("#######"));
+                    }
+                    reader.Close();
+                    Console.WriteLine("\rВсего: " + (count++).ToString());
+                }
+            }
             timer.Stop();
             Console.WriteLine("\nСчитано хэшей: {0} за: {1} секунд ({2} в секунду)", il.Count.ToString(), (timer.ElapsedMilliseconds / 1000).ToString("0.00"), (il.Count / (timer.ElapsedMilliseconds / 1000)).ToString("0.00"));
 
             int resolved_count = 0;
-            Grabber grab = new Grabber();
-            grab.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
-            grab.LoginForDanbooru = "macsimbelous";
-            grab.ApiKeyForDanbooru = "F5eC.ADAOFChEkOwVA1x.BUES0S9GaRqSoohs7wO";
-            grab.UseDanbooru = true;
-            grab.UseGelbooru = true;
-            grab.UseKonachan = true;
-            grab.UseSankaku = false;
-            grab.UseYandere = true;
             Console.WriteLine("Проверяем хэши зерез Данбуру, Яндере, Коначан и Гелбуру");
             for (int i = 0; i < il.Count; i++)
             {
-                Console.Write("[{0}/{1}] Проверяю {2}: ", i + 1, il.Count, il[i].GetHashString());
+                Console.Write("[{0}/{1}] Проверяю {2}: ", i + 1, il.Count, il[i].Hash);
                 DateTime start = DateTime.Now;
-                ImageInfo img = grab.GetImageInfoFromImageBoards(il[i].GetHashString());
+                ImageInfo img = GetImageInfoFromImageBoards(true, true, true, true, il[i].Hash);
                 if (img != null)
                 {
-                    il[i].AddTags(img.tags);
-                    erza.UpdateTagsForImage(il[i]);
+                    il[i].AddTags(img.Tags);
+                    UpdateTagsForImage(il[i].Hash, il[i].Tags);
                     resolved_count++;
-                    Console.WriteLine("Получено {0} тегов", il[i].tags.Count);
+                    Console.WriteLine("Получено {0} тегов", il[i].Tags.Count);
                 }
                 else
                 {
@@ -73,6 +86,18 @@ namespace Shina
             }
             Console.WriteLine("Получены теги для {0} из {1} изображений", resolved_count, il.Count);
             //Console.ReadKey();
+        }
+        static void UpdateTagsForImage(string hash, List<string> tags)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(@"data source=C:\utils\Erza\erza.sqlite"))
+            {
+                connection.Open();
+                foreach (string t in tags)
+                {
+                    ErzaDB.AddTagToImage(hash, t, connection);
+                }
+                connection.Close();
+             }
         }
         public static ImageInfo GetImageInfoFromImageBoards(bool UseDanbooru, bool UseKonachan, bool UseYandere, bool UseGelbooru, string hash)
         {
@@ -85,7 +110,7 @@ namespace Shina
                 {
                     if (img != null)
                     {
-                        img.AddTags(temp_img.tags);
+                        img.AddTags(temp_img.Tags);
                     }
                     else
                     {
@@ -101,7 +126,7 @@ namespace Shina
                 {
                     if (img != null)
                     {
-                        img.AddTags(temp_img.tags);
+                        img.AddTags(temp_img.Tags);
                     }
                     else
                     {
@@ -117,7 +142,7 @@ namespace Shina
                 {
                     if (img != null)
                     {
-                        img.AddTags(temp_img.tags);
+                        img.AddTags(temp_img.Tags);
                     }
                     else
                     {
@@ -133,7 +158,7 @@ namespace Shina
                 {
                     if (img != null)
                     {
-                        img.AddTags(temp_img.tags);
+                        img.AddTags(temp_img.Tags);
                     }
                     else
                     {
@@ -160,7 +185,7 @@ namespace Shina
                     tags = xml_tags.InnerText;
                     ImageInfo img = new ImageInfo();
                     img.AddStringOfTags(tags);
-                    img.SetHashString(hash);
+                    img.Hash = hash;
                     return img;
                 }
                 return null;
@@ -203,7 +228,7 @@ namespace Shina
                         {
                             ImageInfo img = new ImageInfo();
                             img.AddStringOfTags(node.Attributes[j].Value);
-                            img.SetHashString(hash);
+                            img.Hash = hash;
                             return img;
                         }
                     }
@@ -247,7 +272,7 @@ namespace Shina
                         {
                             ImageInfo img = new ImageInfo();
                             img.AddStringOfTags(node.Attributes[j].Value);
-                            img.SetHashString(hash);
+                            img.Hash =hash;
                             return img;
                         }
                     }
@@ -291,7 +316,7 @@ namespace Shina
                         {
                             ImageInfo img = new ImageInfo();
                             img.AddStringOfTags(node.Attributes[j].Value);
-                            img.SetHashString(hash);
+                            img.Hash = hash;
                             return img;
                         }
                     }
