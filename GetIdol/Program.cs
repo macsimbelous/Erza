@@ -726,7 +726,7 @@ namespace GetIdol
                 //using (SQLiteConnection connection = new SQLiteConnection(Program.config.ConnectionString))
                 //{
                 //connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand())
+                /*using (SQLiteCommand command = new SQLiteCommand())
                 {
                     command.CommandText = "select * from hash_tags where hash = @hash";
                     command.Parameters.AddWithValue("hash", SetHashString(md5));
@@ -786,7 +786,7 @@ namespace GetIdol
                         }
                     }
                 }
-                    }
+                    }*/
                 //}
                 ImageInfo img = new ImageInfo();
                 img.Hash = md5;
