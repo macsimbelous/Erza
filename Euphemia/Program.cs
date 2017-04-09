@@ -197,7 +197,7 @@ namespace Euphemia
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
-                    command.CommandText = "select file_name from hash_tags where file_name IS NOT NULL";
+                    command.CommandText = "select file_path from images where file_path IS NOT NULL";
                     command.Connection = connection;
                     SQLiteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
