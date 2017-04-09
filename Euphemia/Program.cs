@@ -22,6 +22,7 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Data;
 using System.Data.SQLite;
+using ErzaLib;
 
 namespace Euphemia
 {
@@ -45,7 +46,7 @@ namespace Euphemia
                 }
             }
             Console.WriteLine("Получаю список файлов из {0}", dir);
-            List<CImage> il = new List<CImage>();
+            List<ImageInfo> il = new List<ImageInfo>();
             string[] files = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
             for (int i = 0; i < files.Length;i++ )
             {
@@ -59,15 +60,15 @@ namespace Euphemia
                 int count = 0;
                 foreach (string file in files)
                 {
-                    if (IsImageFile(file))
+                    if (ImageInfo.IsImageFile(file))
                     {
                         count++;
                         Console.WriteLine("Подсчитываю хэш {0} [{1}/{2}]", Path.GetFileName(file), count, files_count);
-                        CImage img = new CImage();
-                        img.hash = CalculateHashFile(file);
-                        img.hash_str = BitConverter.ToString(img.hash).Replace("-", string.Empty);
-                        img.hash_str = img.hash_str.ToLower();
-                        img.file = file;
+                        ImageInfo img = new ImageInfo();
+                        byte[] temp = CalculateHashFile(file);
+                        img.Hash = BitConverter.ToString(temp).Replace("-", string.Empty);
+                        img.Hash = img.Hash.ToLower();
+                        img.FilePath = file;
                         il.Add(img);
                     }
                 }
@@ -77,7 +78,7 @@ namespace Euphemia
                 int count = 0;
                 foreach (string file in files)
                 {
-                    if (IsImageFile(file))
+                    if (ImageInfo.IsImageFile(file))
                     {
                         count++;
                         if (files_in_db.BinarySearch(file) >= 0)
@@ -86,11 +87,11 @@ namespace Euphemia
                             continue;
                         }
                         Console.WriteLine("Подсчитываю хэш {0} [{1}/{2}]", Path.GetFileName(file), count, files_count);
-                        CImage img = new CImage();
-                        img.hash = CalculateHashFile(file);
-                        img.hash_str = BitConverter.ToString(img.hash).Replace("-", string.Empty);
-                        img.hash_str = img.hash_str.ToLower();
-                        img.file = file;
+                        ImageInfo img = new ImageInfo();
+                        byte[] temp = CalculateHashFile(file);
+                        img.Hash = BitConverter.ToString(temp).Replace("-", string.Empty);
+                        img.Hash = img.Hash.ToLower();
+                        img.FilePath = file;
                         il.Add(img);
                     }
                 }
@@ -99,7 +100,7 @@ namespace Euphemia
             ImageToDB(il);
             //Console.ReadKey();
         }
-        static void ImageToDB(List<CImage> il)
+        static void ImageToDB(List<ImageInfo> il)
         {
             Console.WriteLine("Добавляем хэши в базу данных SQLite");
             using (SQLiteConnection connection = new SQLiteConnection(connection_string))
@@ -109,45 +110,20 @@ namespace Euphemia
                 SQLiteTransaction transact = connection.BeginTransaction();
                 for (int i2 = 0; i2 < il.Count; i2++)
                 {
-                    Console.Write("Обрабатываю хэш {0} ({1}/{2})\r", il[i2].hash_str, (i2 + 1), il.Count);
-                    using (SQLiteCommand command = new SQLiteCommand())
+                    Console.Write("Обрабатываю хэш {0} ({1}/{2})\r", il[i2].Hash, (i2 + 1), il.Count);
+                    ImageInfo temp = ErzaDB.GetImageWithOutTags(il[i2].Hash, connection);
+                    if(temp != null)
                     {
-                        command.CommandText = "select * from hash_tags where hash = @hash";
-                        //command.Parameters.Add("hash", DbType.Binary, 16).Value = il[i2].hash;
-                        command.Parameters.AddWithValue("hash", il[i2].hash);
-                        command.Connection = connection;
-                        SQLiteDataReader reader = command.ExecuteReader();
-                        if (reader.Read())
+                        if (temp.IsDeleted)
                         {
-                            ulong id = System.Convert.ToUInt64(reader["id"]);
-                            bool is_deleted = System.Convert.ToBoolean(reader["is_deleted"]);
-                            reader.Close();
-                            if (is_deleted)
-                            {
-                                il[i2].is_deleted = true;
-                                continue;
-                            }
-                            using (SQLiteCommand update_command = new SQLiteCommand(connection))
-                            {
-                                update_command.CommandText = "UPDATE hash_tags SET file_name = @file_name WHERE id = @id";
-                                update_command.Parameters.AddWithValue("id", id);
-                                update_command.Parameters.AddWithValue("file_name", il[i2].file);
-                                update_command.ExecuteNonQuery();
-                            }
+                            il[i2].IsDeleted = true;
+                            continue;
                         }
-                        else
-                        {
-                            reader.Close();
-                            using (SQLiteCommand insert_command = new SQLiteCommand(connection))
-                            {
-                                insert_command.CommandText = "insert into hash_tags (hash, file_name, is_new, is_deleted) values (@hash, @file_name, @is_new, @is_deleted)";
-                                insert_command.Parameters.AddWithValue("hash", il[i2].hash);
-                                insert_command.Parameters.AddWithValue("is_new", true);
-                                insert_command.Parameters.AddWithValue("is_deleted", false);
-                                insert_command.Parameters.AddWithValue("file_name", il[i2].file);
-                                insert_command.ExecuteNonQuery();
-                            }
-                        }
+                        ErzaDB.SetImagePath(il[i2].Hash, il[i2].FilePath, connection);
+                    }
+                    else
+                    {
+                        ErzaDB.AddImage(il[i2].Hash, false, il[i2].FilePath, 0, 0, connection);
                     }
                 }
                 transact.Commit();
@@ -187,40 +163,6 @@ namespace Euphemia
             byte[] hash = hash_enc.ComputeHash(fsData);
             fsData.Close();
             return hash;
-        }
-        static bool IsImageFile(string s)
-        {
-            int t = s.LastIndexOf('.');
-            if (t >= 0)
-            {
-                string ext = s.Substring(t).ToLower();
-                switch (ext)
-                {
-                    case ".jpg":
-                        return true;
-                    //break;
-                    case ".jpeg":
-                        return true;
-                    //break;
-                    case ".png":
-                        return true;
-                    //break;
-                    case ".bmp":
-                        return true;
-                    //break;
-                    case ".gif":
-                        return true;
-                    //break;
-                    case ".tif":
-                        return true;
-                    //break;
-                    case ".tiff":
-                        return true;
-                    //break;
-
-                }
-            }
-            return false;
         }
         static bool ExistFileToImageDB(string file)
         {
@@ -266,56 +208,6 @@ namespace Euphemia
                 }
             }
             return temp;
-        }
-    }
-    public class CImage
-    {
-        public bool is_new = true;
-        public bool is_deleted = false;
-        public long id;
-        public byte[] hash;
-        public string file = null;
-        //public string file_url;
-        public List<string> tags = new List<string>();
-        public List<string> urls = new List<string>();
-        public string hash_str;
-        public string tags_string
-        {
-            get
-            {
-                string s = String.Empty;
-                for (int i = 0; i < tags.Count; i++)
-                {
-                    if (i > 0)
-                    {
-                        s = s + " ";
-                    }
-                    s = s + tags[i];
-                }
-                return s;
-            }
-            set
-            {
-                string[] t = value.Split(' ');
-                for (int i = 0; i < t.Length; i++)
-                {
-                    if (t[i].Length > 0)
-                    {
-                        tags.Add(t[i]);
-                    }
-                }
-            }
-        }
-        public override string ToString()
-        {
-            if (this.file != String.Empty)
-            {
-                return file.Substring(file.LastIndexOf('\\') + 1);
-            }
-            else
-            {
-                return "No File!";
-            }
         }
     }
 }

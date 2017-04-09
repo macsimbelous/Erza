@@ -84,6 +84,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ErzaLib\ErzaLib.csproj">
+      <Project>{5bd393d7-4fa7-4c1b-a791-b13d7e26e8e0}</Project>
+      <Name>ErzaLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetPath) C:\utils\Erza\$(TargetFileName) /Y</PostBuildEvent>

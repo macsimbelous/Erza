@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.Data;
 using System.IO;
+using ErzaLib;
 
 namespace Misaka
 {
@@ -40,22 +41,22 @@ namespace Misaka
             }
             //string connection_string = "data source=\"C:\\Temp\\erza.sqlite\"";
             string connection_string = "data source=C:\\utils\\Erza\\erza.sqlite";
-            List<CImage> img_list = new List<CImage>();
+            List<ImageInfo> img_list = new List<ImageInfo>();
             using (SQLiteConnection connection = new SQLiteConnection(connection_string))
             {
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
 
-                    command.CommandText = "SELECT id, file_name FROM hash_tags WHERE file_name IS NOT NULL ORDER BY file_name ASC";
+                    command.CommandText = "SELECT image_id, file_path FROM images WHERE file_path IS NOT NULL ORDER BY file_path ASC";
                     command.Connection = connection;
                     SQLiteDataReader reader = command.ExecuteReader();
                     int count = 0;
                     while (reader.Read())
                     {
-                        CImage img = new CImage();
-                        img.id = (long)reader["id"];
-                        img.file = (string)reader["file_name"];
+                        ImageInfo img = new ImageInfo();
+                        img.ImageID = (long)reader["image_id"];
+                        img.FilePath = (string)reader["file_path"];
                         img_list.Add(img);
                         count++;
                         Console.Write("\r" + count.ToString("#######"));
@@ -78,12 +79,12 @@ namespace Misaka
                 DateTime start = DateTime.Now;
                 connection.Open();
                 SQLiteTransaction transact = connection.BeginTransaction();
-                foreach (CImage img in img_list)
+                foreach (ImageInfo img in img_list)
                 {
                     count_file++;
-                    if (System.IO.File.Exists(img.file))
+                    if (System.IO.File.Exists(img.FilePath))
                     {
-                        Console.WriteLine("Фаил {0} есть. [{1}/{2}]", Path.GetFileName(img.file), count_file, all_files);
+                        Console.WriteLine("Фаил {0} есть. [{1}/{2}]", Path.GetFileName(img.FilePath), count_file, all_files);
                     }
                     else
                     {
@@ -91,12 +92,14 @@ namespace Misaka
                         switch (args[0])
                         {
                             case "-delete":
-                                DeleteImageDB(img.id, connection);
-                                Console.WriteLine("Фаил {0} отсутствует. Помечен удалённым. [{1}/{2}]", Path.GetFileName(img.file), count_file, all_files);
+                                //DeleteImageDB(img.id, connection);
+                                ErzaDB.DeleteImage(img.ImageID, connection);
+                                Console.WriteLine("Фаил {0} отсутствует. Помечен удалённым. [{1}/{2}]", Path.GetFileName(img.FilePath), count_file, all_files);
                                 break;
                             case "-vipe":
-                                VipeImageDB(img.id, connection);
-                                Console.WriteLine("Фаил {0} отсутствует. Данные о файле уничтожены! [{1}/{2}]", Path.GetFileName(img.file), count_file, all_files);
+                                //VipeImageDB(img.id, connection);
+                                ErzaDB.VipeImage(img.ImageID, connection);
+                                Console.WriteLine("Фаил {0} отсутствует. Данные о файле уничтожены! [{1}/{2}]", Path.GetFileName(img.FilePath), count_file, all_files);
                                 break;
                         }
                     }
@@ -128,56 +131,6 @@ namespace Misaka
                 update_command.CommandText = "DELETE FROM hash_tags WHERE id = @id";
                 update_command.Parameters.AddWithValue("id", id);
                 update_command.ExecuteNonQuery();
-            }
-        }
-    }
-    public class CImage
-    {
-        public long image_id;
-        public long file_id;
-        public bool is_new = true;
-        public bool is_deleted = false;
-        public long id;
-        public byte[] hash;
-        public string file = null;
-        public List<string> tags = new List<string>();
-        public string hash_str;
-        public string tags_string
-        {
-            get
-            {
-                string s = String.Empty;
-                for (int i = 0; i < tags.Count; i++)
-                {
-                    if (i > 0)
-                    {
-                        s = s + " ";
-                    }
-                    s = s + tags[i];
-                }
-                return s;
-            }
-            set
-            {
-                string[] t = value.Split(' ');
-                for (int i = 0; i < t.Length; i++)
-                {
-                    if (t[i].Length > 0)
-                    {
-                        tags.Add(t[i]);
-                    }
-                }
-            }
-        }
-        public override string ToString()
-        {
-            if (this.file != String.Empty)
-            {
-                return file.Substring(file.LastIndexOf('\\') + 1);
-            }
-            else
-            {
-                return "No File!";
             }
         }
     }

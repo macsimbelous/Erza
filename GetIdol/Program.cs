@@ -82,8 +82,8 @@ namespace GetIdol
 
             connection = new SQLiteConnection(Program.config.ConnectionString);
             connection.Open();
-            connection2 = new SQLiteConnection(@"data source=C:\temp\erza.sqlite");
-            connection2.Open();
+            //connection2 = new SQLiteConnection(@"data source=C:\temp\erza.sqlite");
+            //connection2.Open();
             Directory.CreateDirectory(".\\" + tags.ToString());
             for (int i = 0; i < post_ids.Count; i++)
             {
@@ -106,7 +106,7 @@ namespace GetIdol
             }
             Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
             connection.Close();
-            connection2.Close();
+            //connection2.Close();
             return;
         }
         static void LoadSettings()
@@ -238,10 +238,11 @@ namespace GetIdol
             if (IsImageFile(filename))
             {
                 Console.Write("Добавляем информацию в базу данных...");
-                DateTime start_db = DateTime.Now;
+                //DateTime start_db = DateTime.Now;
                 GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
-                DateTime stop_db = DateTime.Now;
-                Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
+                //DateTime stop_db = DateTime.Now;
+                //Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
+                Console.WriteLine("OK");
             }
             if (ExistImage(Path.GetFileNameWithoutExtension(url)))
             {
@@ -653,6 +654,25 @@ namespace GetIdol
         }
         static bool ExistImage(string hash_string)
         {
+            ImageInfo inf = ErzaDB.GetImageWithOutTags(hash_string, connection);
+            if(inf == null) { return false; }
+            if (inf.IsDeleted)
+            {
+                count_deleted++;
+                store_file = "Удалён!";
+                return true;
+            }
+            if(inf.FilePath == null)
+            {
+                return false;
+            }
+            else
+            {
+                store_file = inf.FilePath;
+                count_skip++;
+                return true;
+            }
+            /*
             if (hash_string == null)
             {
                 throw new ArgumentNullException("hexString");
@@ -702,7 +722,7 @@ namespace GetIdol
                     }
                 }
                 }
-            //}
+            //}*/
         }
         static void GetTagsFromSankaku(string md5, string post)
         {
@@ -792,8 +812,8 @@ namespace GetIdol
                 img.Hash = md5;
                 img.Tags.AddRange(tags);
                 img.IsDeleted = false;
-                SQLiteTransaction transact = Program.connection2.BeginTransaction();
-                ErzaDB.LoadImageToErza(img, Program.connection2);
+                SQLiteTransaction transact = Program.connection.BeginTransaction();
+                ErzaDB.LoadImageToErza(img, Program.connection);
                 transact.Commit();
             }
             catch (Exception ex)
@@ -817,7 +837,7 @@ namespace GetIdol
         static bool IsImageFile(string FilePath)
         {
             string ext = Path.GetExtension(FilePath);
-            switch (ext)
+            switch (ext.ToLower())
             {
                 case ".jpg":
                     return true;

@@ -197,7 +197,8 @@ namespace ErzaLib
             }
             else
             {
-                RemoveImageTags(id, Connection);
+                DeleteImage(id, Connection);
+                /*RemoveImageTags(id, Connection);
                 using (SQLiteCommand update_command = new SQLiteCommand(Connection))
                 {
                     update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path WHERE hash = @hash";
@@ -207,7 +208,21 @@ namespace ErzaLib
                     update_command.Parameters.AddWithValue("file_path", null);
                     update_command.Parameters.AddWithValue("is_deleted", true);
                     update_command.ExecuteNonQuery();
-                }
+                }*/
+            }
+        }
+        public static void DeleteImage(long ImageID, SQLiteConnection Connection)
+        {
+            RemoveImageTags(ImageID, Connection);
+            using (SQLiteCommand update_command = new SQLiteCommand(Connection))
+            {
+                update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path WHERE image_id = @image_id";
+                update_command.Parameters.AddWithValue("image_id", ImageID);
+                update_command.Parameters.AddWithValue("width", 0);
+                update_command.Parameters.AddWithValue("height", 0);
+                update_command.Parameters.AddWithValue("file_path", null);
+                update_command.Parameters.AddWithValue("is_deleted", true);
+                update_command.ExecuteNonQuery();
             }
         }
         public static void VipeImage(string Hash, SQLiteConnection Connection)
@@ -219,13 +234,24 @@ namespace ErzaLib
             }
             else
             {
-                RemoveImageTags(id, Connection);
+                VipeImage(id, Connection);
+                /*RemoveImageTags(id, Connection);
                 using (SQLiteCommand command = new SQLiteCommand(Connection))
                 {
                     command.CommandText = "DELETE FROM images WHERE hash = @hash";
                     command.Parameters.AddWithValue("hash", Hash);
                     command.ExecuteNonQuery();
-                }
+                }*/
+            }
+        }
+        public static void VipeImage(long ImageID, SQLiteConnection Connection)
+        {
+            RemoveImageTags(ImageID, Connection);
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "DELETE FROM images WHERE image_id = @image_id";
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.ExecuteNonQuery();
             }
         }
         public static void AddTag(string Tag, SQLiteConnection Connection)

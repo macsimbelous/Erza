@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace ErzaLib
 {
@@ -105,6 +106,28 @@ namespace ErzaLib
             {
                 return "No File!";
             }
+        }
+        public static bool IsImageFile(string FilePath)
+        {
+            string ext = Path.GetExtension(FilePath);
+            switch (ext.ToLower())
+            {
+                case ".jpg":
+                    return true;
+                case ".jpeg":
+                    return true;
+                case ".png":
+                    return true;
+                case ".bmp":
+                    return true;
+                case ".gif":
+                    return true;
+                case ".tif":
+                    return true;
+                case ".tiff":
+                    return true;
+            }
+            return false;
         }
     }
 }
