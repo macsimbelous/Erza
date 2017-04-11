@@ -44,15 +44,14 @@ namespace Shina
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
-                    command.CommandText = "select * from hash_tags";
+                    command.CommandText = "SELECT images.image_id, images.hash FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
                     command.Connection = connection;
                     SQLiteDataReader reader = command.ExecuteReader();
                     int count = 0;
                     while (reader.Read())
                     {
                         ImageInfo img = new ImageInfo();
-                        img.Hash = BitConverter.ToString((byte[])reader["hash"]).Replace("-", string.Empty).ToLower();
-                        img.IsDeleted = (bool)reader["is_deleted"];
+                        img.Hash = (string)reader["hash"];
                         il.Add(img);
                         count++;
                         Console.Write("\r" + count.ToString("#######"));
@@ -357,10 +356,6 @@ namespace Shina
             {
                 return;
             }
-        }
-        static void ProgressSQLiteCallBack(string hash, int Count, int Total)
-        {
-            Console.Write("Считано: {0} из {1}\r", Count, Total);
         }
     }
 }
