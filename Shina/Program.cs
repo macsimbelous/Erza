@@ -52,6 +52,7 @@ namespace Shina
                     {
                         ImageInfo img = new ImageInfo();
                         img.Hash = (string)reader["hash"];
+                        img.ImageID = (long)reader["image_id"];
                         il.Add(img);
                         count++;
                         Console.Write("\r" + count.ToString("#######"));
@@ -59,6 +60,7 @@ namespace Shina
                     reader.Close();
                     Console.WriteLine("\rВсего: " + (count++).ToString());
                 }
+                connection.Close();
             }
             timer.Stop();
             Console.WriteLine("\nСчитано хэшей: {0} за: {1} секунд ({2} в секунду)", il.Count.ToString(), (timer.ElapsedMilliseconds / 1000).ToString("0.00"), (il.Count / (timer.ElapsedMilliseconds / 1000)).ToString("0.00"));
@@ -91,10 +93,12 @@ namespace Shina
             using (SQLiteConnection connection = new SQLiteConnection(@"data source=C:\utils\Erza\erza.sqlite"))
             {
                 connection.Open();
+                SQLiteTransaction trans = connection.BeginTransaction();
                 foreach (string t in tags)
                 {
                     ErzaDB.AddTagToImage(hash, t, connection);
                 }
+                trans.Commit();
                 connection.Close();
              }
         }
