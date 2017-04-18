@@ -88,7 +88,7 @@ namespace ErzaLib
         }
         public static void AddTagToImage(string Hash, string Tag, SQLiteConnection Connection)
         {
-            string sql = "SELECT image_id FROM images inner join image_tags on images.image_id = image_tags.image_id inner join tags on image_tags.tag_id = tags.tag_id WHERE hash = @hash AND tag = @tag";
+            string sql = "SELECT images.image_id FROM images inner join image_tags on images.image_id = image_tags.image_id inner join tags on image_tags.tag_id = tags.tag_id WHERE images.hash = @hash AND tags.tag = @tag";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("hash", Hash);
