@@ -331,6 +331,58 @@ namespace ErzaLib
             }
             return ids;
         }
-        
+        public static List<ImageInfo> GetImagesByTag(string Tag, SQLiteConnection Connection)
+        {
+            List<ImageInfo> imgs = new List<ImageInfo>();
+            string sql = "select * from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag = @tag;";
+            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            {
+                command.Parameters.AddWithValue("tag", Tag);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    ImageInfo image = new ImageInfo();
+                    image.ImageID = (long)reader["image_id"];
+                    image.Hash = (string)reader["hash"];
+                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
+                    object o = reader["file_path"];
+                    if (o != DBNull.Value)
+                    {
+                        image.FilePath = (string)o;
+                    }
+                    imgs.Add(image);
+                }
+                reader.Close();
+                return imgs;
+            }
+        }
+        public static List<ImageInfo> GetAllImages(SQLiteConnection Connection)
+        {
+            List<ImageInfo> imgs = new List<ImageInfo>();
+            string sql = "select * from images where is_deleted = 0;";
+            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            {
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    ImageInfo image = new ImageInfo();
+                    image.ImageID = (long)reader["image_id"];
+                    image.Hash = (string)reader["hash"];
+                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
+                    object o = reader["file_path"];
+                    if (o != DBNull.Value)
+                    {
+                        image.FilePath = (string)o;
+                    }
+                    imgs.Add(image);
+                }
+                reader.Close();
+                return imgs;
+            }
+        }
     }
 }

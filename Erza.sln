@@ -51,6 +51,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetDanbooru", "GetDanbooru\
 		{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0} = {5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ange", "Ange\Ange.csproj", "{726B98AE-2C8D-4688-ADA5-B4678984A9DC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0} = {5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -238,6 +243,22 @@ Global
 		{26ACD7B5-2B6D-4A1F-957A-F4BB55E17A21}.Release|x64.Build.0 = Release|Any CPU
 		{26ACD7B5-2B6D-4A1F-957A-F4BB55E17A21}.Release|x86.ActiveCfg = Release|Any CPU
 		{26ACD7B5-2B6D-4A1F-957A-F4BB55E17A21}.Release|x86.Build.0 = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|x64.Build.0 = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Debug|x86.Build.0 = Debug|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|x64.ActiveCfg = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|x64.Build.0 = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|x86.ActiveCfg = Release|Any CPU
+		{726B98AE-2C8D-4688-ADA5-B4678984A9DC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
