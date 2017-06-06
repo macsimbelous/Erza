@@ -19,6 +19,7 @@ namespace Ange
         SQLiteConnection Previews;
         SQLiteConnection Erza;
         List<ImageInfo> Result;
+        SolidBrush brush;
         public Form1()
         {
             InitializeComponent();
@@ -39,9 +40,16 @@ namespace Ange
                 command.CommandText = "SELECT preview FROM previews WHERE hash = @hash;";
                 command.Parameters.AddWithValue("hash", hash);
                 byte[] tmp = (byte[])command.ExecuteScalar();
-                using (MemoryStream stream = new MemoryStream(tmp))
+                if (tmp != null)
                 {
-                    return Image.FromStream(stream);
+                    using (MemoryStream stream = new MemoryStream(tmp))
+                    {
+                        return Image.FromStream(stream);
+                    }
+                }
+                else
+                {
+                    return (Image)Properties.Resources.noimage;
                 }
             }
         }
@@ -71,12 +79,13 @@ namespace Ange
             else
             {
                 // Draw the background for an unselected item.
-                using (LinearGradientBrush brush =
+                /*using (LinearGradientBrush brush =
                     new LinearGradientBrush(e.Bounds, Color.Orange,
                     Color.Maroon, LinearGradientMode.Horizontal))
                 {
                     e.Graphics.FillRectangle(brush, e.Bounds);
-                }
+                }*/
+                e.Graphics.FillRectangle(this.brush, e.Bounds);
             }
             ListViewItem item = e.Item;
             Image img = (Image)item.Tag;
@@ -103,6 +112,7 @@ namespace Ange
             this.Previews = new SQLiteConnection("data source=" + Application.StartupPath + "\\Previews.sqlite");
             this.Previews.Open();
             this.Result = new List<ImageInfo>();
+            this.brush = new SolidBrush(Color.Orange);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -116,6 +126,15 @@ namespace Ange
             this.listView1.VirtualListSize = 0;
             this.Result = ErzaDB.GetAllImages(this.Erza);
             this.listView1.VirtualListSize = this.Result.Count;
+        }
+
+        private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            int i = ((ListView)sender).SelectedIndices[0];
+            //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
+            FullScreenForm form = new FullScreenForm();
+            form.FilePath = Result[i].FilePath;
+            form.ShowDialog();
         }
     }
 }
