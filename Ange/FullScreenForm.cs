@@ -25,5 +25,13 @@ namespace Ange
             this.WindowState = FormWindowState.Maximized;
             this.pictureBox1.ImageLocation = this.FilePath;
         }
+
+        private void FullScreenForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Escape)
+            {
+                this.Close();
+            }
+        }
     }
 }

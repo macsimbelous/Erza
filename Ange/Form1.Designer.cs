@@ -38,7 +38,11 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.просмортToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.редактироватьТегиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox1
@@ -102,6 +106,7 @@
             this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView1.ContextMenuStrip = this.contextMenuStrip1;
             this.listView1.LargeImageList = this.imageList1;
             this.listView1.Location = new System.Drawing.Point(0, 41);
             this.listView1.Name = "listView1";
@@ -137,6 +142,26 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.просмортToolStripMenuItem,
+            this.редактироватьТегиToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 48);
+            // 
+            // просмортToolStripMenuItem
+            // 
+            this.просмортToolStripMenuItem.Name = "просмортToolStripMenuItem";
+            this.просмортToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.просмортToolStripMenuItem.Text = "Просморт";
+            // 
+            // редактироватьТегиToolStripMenuItem
+            // 
+            this.редактироватьТегиToolStripMenuItem.Name = "редактироватьТегиToolStripMenuItem";
+            this.редактироватьТегиToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.редактироватьТегиToolStripMenuItem.Text = "Редактировать теги";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -155,6 +180,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -171,6 +197,9 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem просмортToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem редактироватьТегиToolStripMenuItem;
     }
 }
 
