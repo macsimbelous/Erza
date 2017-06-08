@@ -56,6 +56,11 @@ namespace Ange
         private void search_button_Click(object sender, EventArgs e)
         {
             listView1.VirtualListSize = 0;
+            if(this.textBox1.Text.Length == 0)
+            {
+                this.Result = ErzaDB.GetAllImages(this.Erza);
+                this.listView1.VirtualListSize = this.Result.Count;
+            }
             if (this.tag_radioButton.Checked)
             {
                 this.Result = ErzaDB.GetImagesByTag(this.textBox1.Text, this.Erza);
@@ -121,13 +126,6 @@ namespace Ange
             this.Erza.Close();
         }
 
-        private void all_button_Click(object sender, EventArgs e)
-        {
-            this.listView1.VirtualListSize = 0;
-            this.Result = ErzaDB.GetAllImages(this.Erza);
-            this.listView1.VirtualListSize = this.Result.Count;
-        }
-
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             int i = ((ListView)sender).SelectedIndices[0];
@@ -135,6 +133,11 @@ namespace Ange
             FullScreenForm form = new FullScreenForm();
             form.FilePath = Result[i].FilePath;
             form.ShowDialog();
+        }
+
+        private void slideshow_button_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
