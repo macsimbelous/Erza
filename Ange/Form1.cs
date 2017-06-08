@@ -131,13 +131,36 @@ namespace Ange
             int i = ((ListView)sender).SelectedIndices[0];
             //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
             FullScreenForm form = new FullScreenForm();
-            form.FilePath = Result[i].FilePath;
+            form.Result = Result;
+            form.Index = i;
             form.ShowDialog();
         }
 
         private void slideshow_button_Click(object sender, EventArgs e)
         {
+            SlideShowForm form = new SlideShowForm();
+            form.Result = this.Result;
+            form.Index = 0;
+            form.ShowDialog();
+        }
 
+        private void просмортToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int i = ((ListView)sender).SelectedIndices[0];
+            //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
+            FullScreenForm form = new FullScreenForm();
+            form.Result = Result;
+            form.Index = i;
+            form.ShowDialog();
+        }
+
+        private void слайдшоуToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int i = ((ListView)sender).SelectedIndices[0];
+            SlideShowForm form = new SlideShowForm();
+            form.Result = Result;
+            form.Index = i;
+            form.ShowDialog();
         }
     }
 }
