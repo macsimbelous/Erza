@@ -156,7 +156,7 @@ namespace Ange
 
         private void слайдшоуToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int i = ((ListView)sender).SelectedIndices[0];
+            int i = this.listView1.SelectedIndices[0];
             SlideShowForm form = new SlideShowForm();
             form.Result = Result;
             form.Index = i;
