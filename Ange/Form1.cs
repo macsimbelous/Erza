@@ -144,7 +144,7 @@ namespace Ange
             form.ShowDialog();
         }
 
-        private void просмортToolStripMenuItem_Click(object sender, EventArgs e)
+        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i = ((ListView)sender).SelectedIndices[0];
             //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
@@ -152,15 +152,31 @@ namespace Ange
             form.Result = Result;
             form.Index = i;
             form.ShowDialog();
+            this.listView1.EnsureVisible(form.Index);
         }
 
-        private void слайдшоуToolStripMenuItem_Click(object sender, EventArgs e)
+        private void slideshowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i = this.listView1.SelectedIndices[0];
             SlideShowForm form = new SlideShowForm();
             form.Result = Result;
             form.Index = i;
             form.ShowDialog();
+        }
+
+        private void edittagsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void copytowallToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
