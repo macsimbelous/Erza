@@ -28,6 +28,7 @@ namespace Maki
             SQLiteTransaction transact = conn.BeginTransaction();
             foreach (string file in files)
             {
+                if (!ImageInfo.IsImageFile(file)) { continue; }
                 string hash = Path.GetFileNameWithoutExtension(file);
                 if (ExistPreview(hash, conn))
                 {
