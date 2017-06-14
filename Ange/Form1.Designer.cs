@@ -44,6 +44,8 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.part_tag_radioButton = new System.Windows.Forms.RadioButton();
+            this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -54,7 +56,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Location = new System.Drawing.Point(10, 12);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(599, 20);
+            this.textBox1.Size = new System.Drawing.Size(554, 20);
             this.textBox1.TabIndex = 0;
             // 
             // tag_radioButton
@@ -62,7 +64,7 @@
             this.tag_radioButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.tag_radioButton.AutoSize = true;
             this.tag_radioButton.Checked = true;
-            this.tag_radioButton.Location = new System.Drawing.Point(615, 13);
+            this.tag_radioButton.Location = new System.Drawing.Point(570, 3);
             this.tag_radioButton.Name = "tag_radioButton";
             this.tag_radioButton.Size = new System.Drawing.Size(43, 17);
             this.tag_radioButton.TabIndex = 1;
@@ -74,7 +76,7 @@
             // 
             this.md5_radioButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.md5_radioButton.AutoSize = true;
-            this.md5_radioButton.Location = new System.Drawing.Point(664, 13);
+            this.md5_radioButton.Location = new System.Drawing.Point(626, 20);
             this.md5_radioButton.Name = "md5_radioButton";
             this.md5_radioButton.Size = new System.Drawing.Size(48, 17);
             this.md5_radioButton.TabIndex = 2;
@@ -132,7 +134,7 @@
             this.copytowallToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 136);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 114);
             // 
             // viewToolStripMenuItem
             // 
@@ -191,11 +193,36 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
+            // part_tag_radioButton
+            // 
+            this.part_tag_radioButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.part_tag_radioButton.AutoSize = true;
+            this.part_tag_radioButton.Location = new System.Drawing.Point(626, 3);
+            this.part_tag_radioButton.Name = "part_tag_radioButton";
+            this.part_tag_radioButton.Size = new System.Drawing.Size(81, 17);
+            this.part_tag_radioButton.TabIndex = 7;
+            this.part_tag_radioButton.TabStop = true;
+            this.part_tag_radioButton.Text = "Часть тега";
+            this.part_tag_radioButton.UseVisualStyleBackColor = true;
+            // 
+            // search_condition_checkBox
+            // 
+            this.search_condition_checkBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.search_condition_checkBox.AutoSize = true;
+            this.search_condition_checkBox.Location = new System.Drawing.Point(570, 21);
+            this.search_condition_checkBox.Name = "search_condition_checkBox";
+            this.search_condition_checkBox.Size = new System.Drawing.Size(50, 17);
+            this.search_condition_checkBox.TabIndex = 8;
+            this.search_condition_checkBox.Text = "ИЛИ";
+            this.search_condition_checkBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(883, 503);
+            this.Controls.Add(this.search_condition_checkBox);
+            this.Controls.Add(this.part_tag_radioButton);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.slideshow_button);
@@ -232,6 +259,8 @@
         private System.Windows.Forms.ToolStripMenuItem slideshowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copytowallToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.RadioButton part_tag_radioButton;
+        private System.Windows.Forms.CheckBox search_condition_checkBox;
     }
 }
 

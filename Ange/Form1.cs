@@ -60,16 +60,32 @@ namespace Ange
             {
                 this.Result = ErzaDB.GetAllImages(this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
+                return;
             }
             if (this.tag_radioButton.Checked)
             {
-                this.Result = ErzaDB.GetImagesByTag(this.textBox1.Text, this.Erza);
+                if (this.search_condition_checkBox.Checked)
+                {
+                }
+                else
+                {
+                    this.Result = ErzaDB.GetImagesByTag(this.textBox1.Text, this.Erza);
+                    this.listView1.VirtualListSize = this.Result.Count;
+                }
+                return;
+            }
+            if (this.part_tag_radioButton.Checked)
+            {
+                this.Result = ErzaDB.GetImagesByPartTag(this.textBox1.Text, this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
                 return;
             }
             if (this.md5_radioButton.Checked)
             {
-                //dsafasdfasd
+                this.Result.Clear();
+                this.Result.Add(ErzaDB.GetImageWithOutTags(this.textBox1.Text, this.Erza));
+                this.listView1.VirtualListSize = this.Result.Count;
+                return;
             }
         }
 
