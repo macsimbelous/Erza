@@ -56,14 +56,22 @@ namespace Maki
                 foreach (string hash in hashs)
                 {
                     ImageInfo img = ErzaDB.GetImageWithOutTags(hash, erza_conn);
-                    if (img.IsDeleted)
+                    if (img != null)
                     {
-                        RomovePreviewFromDB(hash, conn);
-                        Console.WriteLine("{0} Удалён!", hash);
+                        if (img.IsDeleted)
+                        {
+                            RomovePreviewFromDB(hash, conn);
+                            Console.WriteLine("{0} Удалён!", hash);
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0} Присутствует!", hash);
+                        }
                     }
                     else
                     {
-                        Console.WriteLine("{0} Присутствует!", hash);
+                        RomovePreviewFromDB(hash, conn);
+                        Console.WriteLine("{0} Удалён!", hash);
                     }
                 }
                 transact.Commit();
