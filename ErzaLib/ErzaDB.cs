@@ -417,14 +417,14 @@ namespace ErzaLib
             if (Or)
             {
                 StringBuilder sql = new StringBuilder();
-                sql.Append("select * from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in (");
+                sql.Append("select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in (");
                 for (int i = 0; i < Tags.Count; i++)
                 {
                     if (i > 0) sql.Append(", ");
                     sql.Append("'" + Tags[i] + "'");
                 }
                 sql.Append(") group by images.image_id;");
-                //string sql = "select * from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in ('bdsm', 'oral') group by images.image_id;";
+                //string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path, Count(images.image_id) as CountName from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in ('bdsm', 'oral') group by images.image_id Having CountName=2;";
                 using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
                 {
                     //command.Parameters.AddWithValue("tag", Tag);
@@ -449,8 +449,18 @@ namespace ErzaLib
             }
             else
             {
-                string sql = "select * from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag = @tag;";
-                using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+                StringBuilder sql = new StringBuilder();
+                sql.Append("select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path, Count(images.image_id) as CountName from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in (");
+                for (int i = 0; i < Tags.Count; i++)
+                {
+                    if (i > 0) sql.Append(", ");
+                    sql.Append("'" + Tags[i] + "'");
+                }
+                sql.Append(") group by images.image_id Having CountName=");
+                sql.Append(Tags.Count);
+                sql.Append(';');
+                //string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path, Count(images.image_id) as CountName from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in ('bdsm', 'oral') group by images.image_id Having CountName=2;";
+                using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
                 {
                     //command.Parameters.AddWithValue("tag", Tag);
                     SQLiteDataReader reader = command.ExecuteReader();
@@ -472,8 +482,7 @@ namespace ErzaLib
                     reader.Close();
                 }
             }
-                return imgs;
-            
+            return imgs;
         }
     }
 }

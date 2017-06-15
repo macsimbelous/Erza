@@ -60,24 +60,39 @@ namespace Ange
             {
                 this.Result = ErzaDB.GetAllImages(this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
             if (this.tag_radioButton.Checked)
             {
-                if (this.search_condition_checkBox.Checked)
+                string[] tags = this.textBox1.Text.Split(' ');
+                if (tags.Length > 1)
                 {
+                    if (this.search_condition_checkBox.Checked)
+                    {
+
+                        this.Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, this.Erza);
+                        this.listView1.VirtualListSize = this.Result.Count;
+                    }
+                    else
+                    {
+                        this.Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, this.Erza);
+                        this.listView1.VirtualListSize = this.Result.Count;
+                    }
                 }
                 else
                 {
                     this.Result = ErzaDB.GetImagesByTag(this.textBox1.Text, this.Erza);
                     this.listView1.VirtualListSize = this.Result.Count;
                 }
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
             if (this.part_tag_radioButton.Checked)
             {
                 this.Result = ErzaDB.GetImagesByPartTag(this.textBox1.Text, this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
             if (this.md5_radioButton.Checked)
@@ -85,6 +100,7 @@ namespace Ange
                 this.Result.Clear();
                 this.Result.Add(ErzaDB.GetImageWithOutTags(this.textBox1.Text, this.Erza));
                 this.listView1.VirtualListSize = this.Result.Count;
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
         }
@@ -193,6 +209,31 @@ namespace Ange
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void tag_radioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.tag_radioButton.Checked)
+            {
+                this.search_condition_checkBox.Enabled = true;
+            }
+            else
+            {
+                this.search_condition_checkBox.Enabled = false;
+            }
+        }
+
+        private void listView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                int i = ((ListView)sender).SelectedIndices[0];
+                //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
+                FullScreenForm form = new FullScreenForm();
+                form.Result = Result;
+                form.Index = i;
+                form.ShowDialog();
+            }
         }
     }
 }

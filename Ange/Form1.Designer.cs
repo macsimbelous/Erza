@@ -71,6 +71,7 @@
             this.tag_radioButton.TabStop = true;
             this.tag_radioButton.Text = "Тег";
             this.tag_radioButton.UseVisualStyleBackColor = true;
+            this.tag_radioButton.CheckedChanged += new System.EventHandler(this.tag_radioButton_CheckedChanged);
             // 
             // md5_radioButton
             // 
@@ -123,6 +124,7 @@
             this.listView1.VirtualMode = true;
             this.listView1.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.listView1_DrawItem);
             this.listView1.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.listView1_RetrieveVirtualItem);
+            this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
             this.listView1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDoubleClick);
             // 
             // contextMenuStrip1
