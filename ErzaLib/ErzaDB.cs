@@ -334,7 +334,7 @@ namespace ErzaLib
         public static List<ImageInfo> GetImagesByTag(string Tag, SQLiteConnection Connection)
         {
             List<ImageInfo> imgs = new List<ImageInfo>();
-            string sql = "select * from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag = @tag;";
+            string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag = @tag AND images.is_deleted = 0;";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("tag", Tag);
@@ -361,10 +361,10 @@ namespace ErzaLib
         public static List<ImageInfo> GetImagesByPartTag(string PartTag, SQLiteConnection Connection)
         {
             List<ImageInfo> imgs = new List<ImageInfo>();
-            string sql = "select * from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag like %@tag%;";
+            string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag like @tag AND images.is_deleted = 0 GROUP BY images.image_id";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
-                command.Parameters.AddWithValue("tag", PartTag);
+                command.Parameters.AddWithValue("tag", '%' + PartTag + '%');
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -423,7 +423,7 @@ namespace ErzaLib
                     if (i > 0) sql.Append(", ");
                     sql.Append("'" + Tags[i] + "'");
                 }
-                sql.Append(") group by images.image_id;");
+                sql.Append(") AND images.is_deleted = 0 group by images.image_id;");
                 //string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path, Count(images.image_id) as CountName from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in ('bdsm', 'oral') group by images.image_id Having CountName=2;";
                 using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
                 {
