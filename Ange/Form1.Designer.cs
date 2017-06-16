@@ -46,6 +46,9 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.part_tag_radioButton = new System.Windows.Forms.RadioButton();
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.copyhashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copytodirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -58,6 +61,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(554, 20);
             this.textBox1.TabIndex = 0;
+            this.toolTip1.SetToolTip(this.textBox1, "Поле для ввода тегов");
             // 
             // tag_radioButton
             // 
@@ -70,6 +74,7 @@
             this.tag_radioButton.TabIndex = 1;
             this.tag_radioButton.TabStop = true;
             this.tag_radioButton.Text = "Тег";
+            this.toolTip1.SetToolTip(this.tag_radioButton, "Поиск по одному или нескольким тегам");
             this.tag_radioButton.UseVisualStyleBackColor = true;
             this.tag_radioButton.CheckedChanged += new System.EventHandler(this.tag_radioButton_CheckedChanged);
             // 
@@ -83,6 +88,7 @@
             this.md5_radioButton.TabIndex = 2;
             this.md5_radioButton.TabStop = true;
             this.md5_radioButton.Text = "MD5";
+            this.toolTip1.SetToolTip(this.md5_radioButton, "Поиск по MD5 хэшу");
             this.md5_radioButton.UseVisualStyleBackColor = true;
             // 
             // search_button
@@ -93,6 +99,8 @@
             this.search_button.Size = new System.Drawing.Size(75, 23);
             this.search_button.TabIndex = 3;
             this.search_button.Text = "Поиск";
+            this.toolTip1.SetToolTip(this.search_button, "Найти изображения связанные с указанными тегами.\r\nЕсли поле ввода будет пустым то" +
+        " поиск вернёт все изображения.");
             this.search_button.UseVisualStyleBackColor = true;
             this.search_button.Click += new System.EventHandler(this.search_button_Click);
             // 
@@ -104,6 +112,7 @@
             this.slideshow_button.Size = new System.Drawing.Size(75, 23);
             this.slideshow_button.TabIndex = 4;
             this.slideshow_button.Text = "Слайдшоу";
+            this.toolTip1.SetToolTip(this.slideshow_button, "Запустить слайдшоу");
             this.slideshow_button.UseVisualStyleBackColor = true;
             this.slideshow_button.Click += new System.EventHandler(this.slideshow_button_Click);
             // 
@@ -117,6 +126,7 @@
             this.listView1.Location = new System.Drawing.Point(0, 41);
             this.listView1.Name = "listView1";
             this.listView1.OwnerDraw = true;
+            this.listView1.ShowItemToolTips = true;
             this.listView1.Size = new System.Drawing.Size(883, 437);
             this.listView1.SmallImageList = this.imageList1;
             this.listView1.TabIndex = 5;
@@ -133,43 +143,45 @@
             this.viewToolStripMenuItem,
             this.edittagsToolStripMenuItem,
             this.slideshowToolStripMenuItem,
+            this.copyhashToolStripMenuItem,
             this.copytowallToolStripMenuItem,
+            this.copytodirToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 114);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(194, 180);
             // 
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.viewToolStripMenuItem.Text = "Просморт";
             this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
             // 
             // edittagsToolStripMenuItem
             // 
             this.edittagsToolStripMenuItem.Name = "edittagsToolStripMenuItem";
-            this.edittagsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.edittagsToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.edittagsToolStripMenuItem.Text = "Редактировать теги";
             this.edittagsToolStripMenuItem.Click += new System.EventHandler(this.edittagsToolStripMenuItem_Click);
             // 
             // slideshowToolStripMenuItem
             // 
             this.slideshowToolStripMenuItem.Name = "slideshowToolStripMenuItem";
-            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.slideshowToolStripMenuItem.Text = "Слайдшоу";
             this.slideshowToolStripMenuItem.Click += new System.EventHandler(this.slideshowToolStripMenuItem_Click);
             // 
             // copytowallToolStripMenuItem
             // 
             this.copytowallToolStripMenuItem.Name = "copytowallToolStripMenuItem";
-            this.copytowallToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copytowallToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.copytowallToolStripMenuItem.Text = "Копировать в обои";
             this.copytowallToolStripMenuItem.Click += new System.EventHandler(this.copytowallToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.deleteToolStripMenuItem.Text = "Удалить";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -205,6 +217,7 @@
             this.part_tag_radioButton.TabIndex = 7;
             this.part_tag_radioButton.TabStop = true;
             this.part_tag_radioButton.Text = "Часть тега";
+            this.toolTip1.SetToolTip(this.part_tag_radioButton, "Поиск по части тега");
             this.part_tag_radioButton.UseVisualStyleBackColor = true;
             // 
             // search_condition_checkBox
@@ -216,7 +229,22 @@
             this.search_condition_checkBox.Size = new System.Drawing.Size(50, 17);
             this.search_condition_checkBox.TabIndex = 8;
             this.search_condition_checkBox.Text = "ИЛИ";
+            this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // copyhashToolStripMenuItem
+            // 
+            this.copyhashToolStripMenuItem.Name = "copyhashToolStripMenuItem";
+            this.copyhashToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.copyhashToolStripMenuItem.Text = "Копировать хэш";
+            this.copyhashToolStripMenuItem.Click += new System.EventHandler(this.copyhashToolStripMenuItem_Click);
+            // 
+            // copytodirToolStripMenuItem
+            // 
+            this.copytodirToolStripMenuItem.Name = "copytodirToolStripMenuItem";
+            this.copytodirToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.copytodirToolStripMenuItem.Text = "Копировать в каталог";
+            this.copytodirToolStripMenuItem.Click += new System.EventHandler(this.copytodirToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -263,6 +291,9 @@
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.RadioButton part_tag_radioButton;
         private System.Windows.Forms.CheckBox search_condition_checkBox;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ToolStripMenuItem copyhashToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copytodirToolStripMenuItem;
     }
 }
 

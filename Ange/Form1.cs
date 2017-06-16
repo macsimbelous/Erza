@@ -30,6 +30,17 @@ namespace Ange
             ListViewItem item = new ListViewItem();
             item.Tag = GetPreview(Result[e.ItemIndex].Hash);
             item.Text = Result[e.ItemIndex].Hash;
+            List<string> tags = ErzaDB.GetTagsByImageID(Result[e.ItemIndex].ImageID, Erza);
+            StringBuilder tag_string = new StringBuilder();
+            for (int i = 0; i < tags.Count; i++)
+            {
+                if (i > 0)
+                {
+                    tag_string.Append(' ');
+                }
+                tag_string.Append(tags[i]);
+            }
+            item.ToolTipText = String.Format("{0}\n{1}x{2}\n{3}", Result[e.ItemIndex].Hash, Result[e.ItemIndex].Width, Result[e.ItemIndex].Height, tag_string.ToString());
             e.Item = item;
             //e.Item = new ListViewItem(e.ItemIndex.ToString(), 0);
         }
@@ -173,6 +184,14 @@ namespace Ange
             SlideShowForm form = new SlideShowForm();
             form.Result = this.Result;
             form.Index = 0;
+            if (MessageBox.Show("Выводить слайды в случайном порядке?", "Слайдшоу", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+            {
+                form.RandomShow = true;
+            }
+            else
+            {
+                form.RandomShow = false;
+            }
             form.ShowDialog();
         }
 
@@ -234,6 +253,17 @@ namespace Ange
                 form.Index = i;
                 form.ShowDialog();
             }
+        }
+
+        private void copyhashToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int i = this.listView1.SelectedIndices[0];
+            Clipboard.SetText(this.Result[i].Hash);
+        }
+
+        private void copytodirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

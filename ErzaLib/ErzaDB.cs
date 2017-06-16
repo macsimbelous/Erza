@@ -484,5 +484,22 @@ namespace ErzaLib
             }
             return imgs;
         }
+        public static List<string> GetTagsByImageID(long ImageID, SQLiteConnection Connection)
+        {
+            List<string> tags = new List<string>();
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "select tags.tag from tags inner join image_tags on tags.tag_id = image_tags.tag_id where image_tags.image_id = @image_id";
+                command.Parameters.AddWithValue("image_id", ImageID);
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tags.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return tags;
+        }
     }
 }

@@ -15,6 +15,8 @@ namespace Ange
     {
         public List<ImageInfo> Result;
         public int Index = 0;
+        public bool RandomShow = false;
+        private Random rnd;
         public SlideShowForm()
         {
             InitializeComponent();
@@ -26,6 +28,7 @@ namespace Ange
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
             this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+            this.rnd = new Random();
             this.timer1.Enabled = true;
         }
 
@@ -57,15 +60,23 @@ namespace Ange
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (this.Index < (this.Result.Count - 1))
+            if (this.RandomShow)
             {
-                this.Index++;
+                this.Index = rnd.Next(this.Result.Count);
                 this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
             }
             else
             {
-                this.Index = 0;
-                this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                if (this.Index < (this.Result.Count - 1))
+                {
+                    this.Index++;
+                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                }
+                else
+                {
+                    this.Index = 0;
+                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                }
             }
         }
     }
