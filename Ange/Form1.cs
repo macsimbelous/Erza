@@ -76,8 +76,16 @@ namespace Ange
             }
             if (this.tag_radioButton.Checked)
             {
-                string[] tags = this.textBox1.Text.Split(' ');
-                if (tags.Length > 1)
+                string[] temp = this.textBox1.Text.Split(' ');
+                List<string> tags = new List<string>();
+                foreach(string tag in temp)
+                {
+                    if (!String.IsNullOrEmpty(tag))
+                    {
+                        tags.Add(tag);
+                    }
+                }
+                if (tags.Count > 1)
                 {
                     if (this.search_condition_checkBox.Checked)
                     {
@@ -93,7 +101,14 @@ namespace Ange
                 }
                 else
                 {
-                    this.Result = ErzaDB.GetImagesByTag(this.textBox1.Text, this.Erza);
+                    if (tags.Count == 1)
+                    {
+                        this.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
+                    }
+                    else
+                    {
+                        this.Result = ErzaDB.GetAllImages(this.Erza);
+                    }
                     this.listView1.VirtualListSize = this.Result.Count;
                 }
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
@@ -177,6 +192,7 @@ namespace Ange
             form.Result = Result;
             form.Index = i;
             form.ShowDialog();
+            this.listView1.EnsureVisible(form.Index);
         }
 
         private void slideshow_button_Click(object sender, EventArgs e)
@@ -252,6 +268,7 @@ namespace Ange
                 form.Result = Result;
                 form.Index = i;
                 form.ShowDialog();
+                this.listView1.EnsureVisible(form.Index);
             }
         }
 
@@ -263,7 +280,30 @@ namespace Ange
 
         private void copytodirToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if(this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                int i = this.listView1.SelectedIndices[0];
+                string dest_path = this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(this.Result[i].FilePath);
+                try
+                {
+                    if (File.Exists(dest_path))
+                    {
+                        if (MessageBox.Show("Целевой фаил уже сушествует, перезаписать?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                        {
+                            File.Delete(dest_path);
+                            File.Copy(this.Result[i].FilePath, dest_path);
+                        }
+                    }
+                    else
+                    {
+                        File.Copy(this.Result[i].FilePath, dest_path);
+                    }
+                }
+                catch(IOException ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }
