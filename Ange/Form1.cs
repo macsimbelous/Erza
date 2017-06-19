@@ -247,7 +247,7 @@ namespace Ange
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int i = ((ListView)sender).SelectedIndices[0];
+            int i = this.listView1.SelectedIndices[0];
             ErzaDB.DeleteImage(this.Result[i].ImageID, Erza);
             File.Delete(this.Result[i].FilePath);
             this.listView1.VirtualListSize--;
@@ -272,7 +272,7 @@ namespace Ange
         {
             if(e.KeyCode == Keys.Enter)
             {
-                int i = ((ListView)sender).SelectedIndices[0];
+                int i = this.listView1.SelectedIndices[0];
                 //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
                 FullScreenForm form = new FullScreenForm();
                 form.Result = Result;
