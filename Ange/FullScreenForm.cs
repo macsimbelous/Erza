@@ -25,7 +25,9 @@ namespace Ange
             this.TopMost = true;
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
-            this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+            //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+            if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+            this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
         }
 
         private void FullScreenForm_KeyDown(object sender, KeyEventArgs e)
@@ -39,7 +41,9 @@ namespace Ange
                 if(this.Index < (this.Result.Count - 1))
                 {
                     this.Index++;
-                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                 }
                 return;
             }
@@ -48,9 +52,21 @@ namespace Ange
                 if (this.Index > 0)
                 {
                     this.Index--;
-                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                 }
                 return;
+            }
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            if (this.pictureBox1.Image != null)
+            {
+                g.DrawString(String.Format("Ширина: {0}\nВысота: {1}", this.pictureBox1.Image.Width, this.pictureBox1.Image.Height),
+                    new Font("Arial", 10), System.Drawing.Brushes.White, new Point(0, 0));
             }
         }
     }

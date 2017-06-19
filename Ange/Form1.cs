@@ -71,6 +71,7 @@ namespace Ange
             {
                 this.Result = ErzaDB.GetAllImages(this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
+                this.listView1.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
@@ -111,6 +112,7 @@ namespace Ange
                     }
                     this.listView1.VirtualListSize = this.Result.Count;
                 }
+                this.listView1.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
@@ -118,6 +120,7 @@ namespace Ange
             {
                 this.Result = ErzaDB.GetImagesByPartTag(this.textBox1.Text, this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
+                this.listView1.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
@@ -126,6 +129,7 @@ namespace Ange
                 this.Result.Clear();
                 this.Result.Add(ErzaDB.GetImageWithOutTags(this.textBox1.Text, this.Erza));
                 this.listView1.VirtualListSize = this.Result.Count;
+                this.listView1.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
@@ -243,7 +247,13 @@ namespace Ange
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            int i = ((ListView)sender).SelectedIndices[0];
+            ErzaDB.DeleteImage(this.Result[i].ImageID, Erza);
+            File.Delete(this.Result[i].FilePath);
+            this.listView1.VirtualListSize--;
+            this.Result.RemoveAt(i);
+            this.listView1.Refresh();
+            this.listView1.EnsureVisible(i-1);
         }
 
         private void tag_radioButton_CheckedChanged(object sender, EventArgs e)
