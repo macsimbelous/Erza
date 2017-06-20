@@ -70,8 +70,11 @@ namespace Ange
             if(this.textBox1.Text.Length == 0)
             {
                 this.Result = ErzaDB.GetAllImages(this.Erza);
-                this.listView1.VirtualListSize = this.Result.Count;
-                this.listView1.EnsureVisible(0);
+                if (this.Result.Count > 0)
+                {
+                    this.listView1.VirtualListSize = this.Result.Count;
+                    this.listView1.EnsureVisible(0);
+                }
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
@@ -112,7 +115,10 @@ namespace Ange
                     }
                     this.listView1.VirtualListSize = this.Result.Count;
                 }
-                this.listView1.EnsureVisible(0);
+                if (this.Result.Count > 0)
+                {
+                    this.listView1.EnsureVisible(0);
+                }
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
@@ -120,7 +126,10 @@ namespace Ange
             {
                 this.Result = ErzaDB.GetImagesByPartTag(this.textBox1.Text, this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
-                this.listView1.EnsureVisible(0);
+                if (this.Result.Count > 0)
+                {
+                    this.listView1.EnsureVisible(0);
+                }
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
@@ -129,7 +138,10 @@ namespace Ange
                 this.Result.Clear();
                 this.Result.Add(ErzaDB.GetImageWithOutTags(this.textBox1.Text, this.Erza));
                 this.listView1.VirtualListSize = this.Result.Count;
-                this.listView1.EnsureVisible(0);
+                if (this.Result.Count > 0)
+                {
+                    this.listView1.EnsureVisible(0);
+                }
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
                 return;
             }
