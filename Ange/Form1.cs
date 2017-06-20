@@ -139,31 +139,19 @@ namespace Ange
         {
             if ((e.State & ListViewItemStates.Selected) != 0)
             {
-                // Draw the background and focus rectangle for a selected item.
                 e.Graphics.FillRectangle(Brushes.Maroon, e.Bounds);
                 e.DrawFocusRectangle();
             }
             else
             {
-                // Draw the background for an unselected item.
-                /*using (LinearGradientBrush brush =
-                    new LinearGradientBrush(e.Bounds, Color.Orange,
-                    Color.Maroon, LinearGradientMode.Horizontal))
-                {
-                    e.Graphics.FillRectangle(brush, e.Bounds);
-                }*/
                 e.Graphics.FillRectangle(this.brush, e.Bounds);
             }
             ListViewItem item = e.Item;
             Image img = (Image)item.Tag;
-            //Image img = Image.FromFile(files[e.ItemIndex]);
             float x = (e.Bounds.Width / 2f) - ((float)img.Width / 2f);
             float y = (e.Bounds.Height / 2f) - ((float)img.Height / 2f);
-            //e.Graphics.DrawImage(Image.FromFile(@"D:\prev\изображение 111_result.jpg"), new PointF(0F, 0f));
             e.Graphics.DrawImage(img, new RectangleF(e.Bounds.X + x, e.Bounds.Y + y, (float)img.Width, (float)img.Height));
-            // Draw the item text for views other than the Details view.
             StringFormat drawFormat = new StringFormat();
-            //drawFormat.FormatFlags = StringFormatFlags.DirectionVertical;
             drawFormat.Alignment = StringAlignment.Center;
             e.Graphics.DrawString(e.Item.Text, new Font("Arial", 8f), new SolidBrush(Color.Black), e.Bounds.X + (e.Bounds.Width / 2f), e.Bounds.Y + 156f, drawFormat);
             if (listView1.View != View.Details)
@@ -196,6 +184,7 @@ namespace Ange
             form.Result = Result;
             form.Index = i;
             form.ShowDialog();
+            this.listView1.Refresh();
             this.listView1.EnsureVisible(form.Index);
         }
 
@@ -223,6 +212,7 @@ namespace Ange
             form.Result = Result;
             form.Index = i;
             form.ShowDialog();
+            this.listView1.Refresh();
             this.listView1.EnsureVisible(form.Index);
         }
 
@@ -247,13 +237,7 @@ namespace Ange
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int i = this.listView1.SelectedIndices[0];
-            ErzaDB.DeleteImage(this.Result[i].ImageID, Erza);
-            File.Delete(this.Result[i].FilePath);
-            this.listView1.VirtualListSize--;
-            this.Result.RemoveAt(i);
-            this.listView1.Refresh();
-            this.listView1.EnsureVisible(i-1);
+            DeleteImage(this.listView1.SelectedIndices[0]);
         }
 
         private void tag_radioButton_CheckedChanged(object sender, EventArgs e)
@@ -314,6 +298,19 @@ namespace Ange
                     MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+        public void DeleteImage(int Index)
+        {
+            ErzaDB.DeleteImage(this.Result[Index].ImageID, Erza);
+            File.Delete(this.Result[Index].FilePath);
+            this.listView1.VirtualListSize--;
+            this.Result.RemoveAt(Index);
+            this.listView1.Refresh();
+            if(Index >= this.listView1.VirtualListSize && this.listView1.VirtualListSize > 0)
+            {
+                Index = this.listView1.VirtualListSize - 1;
+            }
+            this.listView1.EnsureVisible(Index);
         }
     }
 }

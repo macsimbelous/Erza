@@ -15,6 +15,7 @@ namespace Ange
     {
         public List<ImageInfo> Result;
         public int Index = 0;
+        Form1 main_form;
         public FullScreenForm()
         {
             InitializeComponent();
@@ -32,31 +33,39 @@ namespace Ange
 
         private void FullScreenForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Escape)
+            switch (e.KeyCode)
             {
-                this.Close();
-            }
-            if(e.KeyCode == Keys.Right)
-            {
-                if(this.Index < (this.Result.Count - 1))
-                {
-                    this.Index++;
-                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
-                    if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-                }
-                return;
-            }
-            if (e.KeyCode == Keys.Left)
-            {
-                if (this.Index > 0)
-                {
-                    this.Index--;
-                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
-                    if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-                }
-                return;
+                case Keys.Escape:
+                    this.Close();
+                    break;
+                case Keys.Right:
+                    if (this.Index < (this.Result.Count - 1))
+                    {
+                        this.Index++;
+                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    }
+                    break;
+                case Keys.Left:
+                    if (this.Index > 0)
+                    {
+                        this.Index--;
+                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    }
+                    break;
+                case Keys.Delete:
+                    main_form.DeleteImage(this.Index);
+                    if (this.Result.Count > 0)
+                    {
+                        if (this.Index >= this.Result.Count)
+                        {
+                            this.Index = this.Result.Count - 1;
+                        }
+                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    }
+                    break;
             }
         }
 
