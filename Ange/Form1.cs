@@ -166,10 +166,6 @@ namespace Ange
             StringFormat drawFormat = new StringFormat();
             drawFormat.Alignment = StringAlignment.Center;
             e.Graphics.DrawString(e.Item.Text, new Font("Arial", 8f), new SolidBrush(Color.Black), e.Bounds.X + (e.Bounds.Width / 2f), e.Bounds.Y + 156f, drawFormat);
-            if (listView1.View != View.Details)
-            {
-                //e.DrawText();
-            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
