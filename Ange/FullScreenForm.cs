@@ -15,7 +15,7 @@ namespace Ange
     {
         public List<ImageInfo> Result;
         public int Index = 0;
-        Form1 main_form;
+        public Form1 main_form;
         public FullScreenForm()
         {
             InitializeComponent();

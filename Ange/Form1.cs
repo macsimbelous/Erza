@@ -183,6 +183,7 @@ namespace Ange
             FullScreenForm form = new FullScreenForm();
             form.Result = Result;
             form.Index = i;
+            form.main_form = this;
             form.ShowDialog();
             this.listView1.Refresh();
             this.listView1.EnsureVisible(form.Index);
@@ -211,6 +212,7 @@ namespace Ange
             FullScreenForm form = new FullScreenForm();
             form.Result = Result;
             form.Index = i;
+            form.main_form = this;
             form.ShowDialog();
             this.listView1.Refresh();
             this.listView1.EnsureVisible(form.Index);
@@ -257,10 +259,10 @@ namespace Ange
             if(e.KeyCode == Keys.Enter)
             {
                 int i = this.listView1.SelectedIndices[0];
-                //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
                 FullScreenForm form = new FullScreenForm();
                 form.Result = Result;
                 form.Index = i;
+                form.main_form = this;
                 form.ShowDialog();
                 this.listView1.EnsureVisible(form.Index);
             }
