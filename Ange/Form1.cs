@@ -186,15 +186,18 @@ namespace Ange
 
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            int i = ((ListView)sender).SelectedIndices[0];
-            //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
-            FullScreenForm form = new FullScreenForm();
-            form.Result = Result;
-            form.Index = i;
-            form.main_form = this;
-            form.ShowDialog();
-            this.listView1.Refresh();
-            this.listView1.EnsureVisible(form.Index);
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                int i = ((ListView)sender).SelectedIndices[0];
+                //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
+                FullScreenForm form = new FullScreenForm();
+                form.Result = Result;
+                form.Index = i;
+                form.main_form = this;
+                form.ShowDialog();
+                this.listView1.Refresh();
+                this.listView1.EnsureVisible(form.Index);
+            }
         }
 
         private void slideshow_button_Click(object sender, EventArgs e)
@@ -215,15 +218,18 @@ namespace Ange
 
         private void viewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int i = ((ListView)sender).SelectedIndices[0];
-            //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
-            FullScreenForm form = new FullScreenForm();
-            form.Result = Result;
-            form.Index = i;
-            form.main_form = this;
-            form.ShowDialog();
-            this.listView1.Refresh();
-            this.listView1.EnsureVisible(form.Index);
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                int i = this.listView1.SelectedIndices[0];
+                //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
+                FullScreenForm form = new FullScreenForm();
+                form.Result = Result;
+                form.Index = i;
+                form.main_form = this;
+                form.ShowDialog();
+                this.listView1.Refresh();
+                this.listView1.EnsureVisible(form.Index);
+            }
         }
 
         private void slideshowToolStripMenuItem_Click(object sender, EventArgs e)
@@ -247,7 +253,10 @@ namespace Ange
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DeleteImage(this.listView1.SelectedIndices[0]);
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                DeleteImage(this.listView1.SelectedIndices[0]);
+            }
         }
 
         private void tag_radioButton_CheckedChanged(object sender, EventArgs e)
@@ -264,7 +273,7 @@ namespace Ange
 
         private void listView1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
+            if(e.KeyCode == Keys.Enter && this.listView1.SelectedIndices.Count > 0)
             {
                 int i = this.listView1.SelectedIndices[0];
                 FullScreenForm form = new FullScreenForm();
@@ -284,28 +293,31 @@ namespace Ange
 
         private void copytodirToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            if (this.listView1.SelectedIndices.Count > 0)
             {
-                int i = this.listView1.SelectedIndices[0];
-                string dest_path = this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(this.Result[i].FilePath);
-                try
+                if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
                 {
-                    if (File.Exists(dest_path))
+                    int i = this.listView1.SelectedIndices[0];
+                    string dest_path = this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(this.Result[i].FilePath);
+                    try
                     {
-                        if (MessageBox.Show("Целевой фаил уже сушествует, перезаписать?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                        if (File.Exists(dest_path))
                         {
-                            File.Delete(dest_path);
+                            if (MessageBox.Show("Целевой фаил уже сушествует, перезаписать?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                            {
+                                File.Delete(dest_path);
+                                File.Copy(this.Result[i].FilePath, dest_path);
+                            }
+                        }
+                        else
+                        {
                             File.Copy(this.Result[i].FilePath, dest_path);
                         }
                     }
-                    else
+                    catch (IOException ex)
                     {
-                        File.Copy(this.Result[i].FilePath, dest_path);
+                        MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                }
-                catch(IOException ex)
-                {
-                    MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -320,7 +332,10 @@ namespace Ange
             {
                 Index = this.listView1.VirtualListSize - 1;
             }
-            this.listView1.EnsureVisible(Index);
+            if (this.listView1.VirtualListSize > 0)
+            {
+                this.listView1.EnsureVisible(Index);
+            }
         }
     }
 }

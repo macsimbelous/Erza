@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Erza", "Erza\Erza.csproj", "{FB05786A-9BF6-4909-97DA-03529030812B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -72,8 +72,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|x64.ActiveCfg = Debug|x64
 		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|x64.Build.0 = Debug|x64
 		{FB05786A-9BF6-4909-97DA-03529030812B}.Debug|x86.ActiveCfg = Debug|x86
