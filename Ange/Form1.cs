@@ -243,12 +243,42 @@ namespace Ange
 
         private void edittagsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                EditTagsForm form = new EditTagsForm();
+                form.Connection = Erza;
+                int i = this.listView1.SelectedIndices[0];
+                form.EditImage = this.Result[i];
+                form.ShowDialog();
+            }
         }
 
         private void copytowallToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                int i = this.listView1.SelectedIndices[0];
+                string dest_path = "I:\\Wallpapers\\" + Path.GetFileName(this.Result[i].FilePath);
+                try
+                {
+                    if (File.Exists(dest_path))
+                    {
+                        if (MessageBox.Show("Целевой фаил уже сушествует, перезаписать?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                        {
+                            File.Delete(dest_path);
+                            File.Copy(this.Result[i].FilePath, dest_path);
+                        }
+                    }
+                    else
+                    {
+                        File.Copy(this.Result[i].FilePath, dest_path);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -335,6 +365,14 @@ namespace Ange
             if (this.listView1.VirtualListSize > 0)
             {
                 this.listView1.EnsureVisible(Index);
+            }
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                this.search_button.PerformClick();
             }
         }
     }

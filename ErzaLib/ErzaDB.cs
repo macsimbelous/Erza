@@ -501,5 +501,21 @@ namespace ErzaLib
             }
             return tags;
         }
+        public static List<string> GetAllTags(SQLiteConnection Connection)
+        {
+            List<string> tags = new List<string>();
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "SELECT tag FROM tags";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tags.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return tags;
+        }
     }
 }

@@ -63,6 +63,7 @@
             this.textBox1.Size = new System.Drawing.Size(554, 20);
             this.textBox1.TabIndex = 0;
             this.toolTip1.SetToolTip(this.textBox1, "Поле для ввода тегов");
+            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
             // tag_radioButton
             // 
