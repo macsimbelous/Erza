@@ -50,6 +50,7 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.openOuterSoftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -143,6 +144,7 @@
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewToolStripMenuItem,
+            this.openOuterSoftToolStripMenuItem,
             this.edittagsToolStripMenuItem,
             this.slideshowToolStripMenuItem,
             this.copyhashToolStripMenuItem,
@@ -150,54 +152,54 @@
             this.copytodirToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(194, 158);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 202);
             // 
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.viewToolStripMenuItem.Text = "Просморт";
             this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
             // 
             // edittagsToolStripMenuItem
             // 
             this.edittagsToolStripMenuItem.Name = "edittagsToolStripMenuItem";
-            this.edittagsToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.edittagsToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.edittagsToolStripMenuItem.Text = "Редактировать теги";
             this.edittagsToolStripMenuItem.Click += new System.EventHandler(this.edittagsToolStripMenuItem_Click);
             // 
             // slideshowToolStripMenuItem
             // 
             this.slideshowToolStripMenuItem.Name = "slideshowToolStripMenuItem";
-            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.slideshowToolStripMenuItem.Text = "Слайдшоу";
             this.slideshowToolStripMenuItem.Click += new System.EventHandler(this.slideshowToolStripMenuItem_Click);
             // 
             // copyhashToolStripMenuItem
             // 
             this.copyhashToolStripMenuItem.Name = "copyhashToolStripMenuItem";
-            this.copyhashToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.copyhashToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.copyhashToolStripMenuItem.Text = "Копировать хэш";
             this.copyhashToolStripMenuItem.Click += new System.EventHandler(this.copyhashToolStripMenuItem_Click);
             // 
             // copytowallToolStripMenuItem
             // 
             this.copytowallToolStripMenuItem.Name = "copytowallToolStripMenuItem";
-            this.copytowallToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.copytowallToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.copytowallToolStripMenuItem.Text = "Копировать в обои";
             this.copytowallToolStripMenuItem.Click += new System.EventHandler(this.copytowallToolStripMenuItem_Click);
             // 
             // copytodirToolStripMenuItem
             // 
             this.copytodirToolStripMenuItem.Name = "copytodirToolStripMenuItem";
-            this.copytodirToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.copytodirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.copytodirToolStripMenuItem.Text = "Копировать в каталог";
             this.copytodirToolStripMenuItem.Click += new System.EventHandler(this.copytodirToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.deleteToolStripMenuItem.Text = "Удалить";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -248,6 +250,13 @@
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
             // 
+            // openOuterSoftToolStripMenuItem
+            // 
+            this.openOuterSoftToolStripMenuItem.Name = "openOuterSoftToolStripMenuItem";
+            this.openOuterSoftToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.openOuterSoftToolStripMenuItem.Text = "Открыть во внешней программе";
+            this.openOuterSoftToolStripMenuItem.Click += new System.EventHandler(this.openOuterSoftToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -297,6 +306,7 @@
         private System.Windows.Forms.ToolStripMenuItem copyhashToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copytodirToolStripMenuItem;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.ToolStripMenuItem openOuterSoftToolStripMenuItem;
     }
 }
 

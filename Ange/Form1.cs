@@ -375,5 +375,15 @@ namespace Ange
                 this.search_button.PerformClick();
             }
         }
+
+        private void openOuterSoftToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                int i = this.listView1.SelectedIndices[0];
+                System.Diagnostics.Process.Start(Result[i].FilePath);
+            }
+            
+        }
     }
 }
