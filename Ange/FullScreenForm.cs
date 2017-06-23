@@ -55,6 +55,7 @@ namespace Ange
                     }
                     break;
                 case Keys.Delete:
+                    if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                     main_form.DeleteImage(this.Index);
                     if (this.Result.Count > 0)
                     {
@@ -62,7 +63,6 @@ namespace Ange
                         {
                             this.Index = this.Result.Count - 1;
                         }
-                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                         this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                     }
                     break;
