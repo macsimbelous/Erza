@@ -285,7 +285,10 @@ namespace Ange
         {
             if (this.listView1.SelectedIndices.Count > 0)
             {
-                DeleteImage(this.listView1.SelectedIndices[0]);
+                if (MessageBox.Show("Удалить изображение " + this.Result[this.listView1.SelectedIndices[0]].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                {
+                    DeleteImage(this.listView1.SelectedIndices[0]);
+                }
             }
         }
 

@@ -55,15 +55,18 @@ namespace Ange
                     }
                     break;
                 case Keys.Delete:
-                    if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-                    main_form.DeleteImage(this.Index);
-                    if (this.Result.Count > 0)
+                    if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                     {
-                        if (this.Index >= this.Result.Count)
+                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        main_form.DeleteImage(this.Index);
+                        if (this.Result.Count > 0)
                         {
-                            this.Index = this.Result.Count - 1;
+                            if (this.Index >= this.Result.Count)
+                            {
+                                this.Index = this.Result.Count - 1;
+                            }
+                            this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                         }
-                        this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                     }
                     break;
             }
