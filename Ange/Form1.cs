@@ -357,7 +357,8 @@ namespace Ange
         public void DeleteImage(int Index)
         {
             ErzaDB.DeleteImage(this.Result[Index].ImageID, Erza);
-            File.Delete(this.Result[Index].FilePath);
+            //File.Delete(this.Result[Index].FilePath);
+            RecybleBin.Send(this.Result[Index].FilePath);
             this.listView1.VirtualListSize--;
             this.Result.RemoveAt(Index);
             this.listView1.Refresh();

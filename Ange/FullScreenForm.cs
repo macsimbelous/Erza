@@ -55,7 +55,7 @@ namespace Ange
                     }
                     break;
                 case Keys.Delete:
-                    if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                    if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
                     {
                         if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                         main_form.DeleteImage(this.Index);

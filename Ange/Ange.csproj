@@ -88,6 +88,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecybleBin.cs" />
     <Compile Include="SlideShowForm.cs">
       <SubType>Form</SubType>
     </Compile>
