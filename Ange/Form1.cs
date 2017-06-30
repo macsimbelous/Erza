@@ -17,7 +17,7 @@ namespace Ange
     public partial class Form1 : Form
     {
         SQLiteConnection Previews;
-        SQLiteConnection Erza;
+        public SQLiteConnection Erza;
         List<ImageInfo> Result;
         SolidBrush brush;
         public Form1()
@@ -30,15 +30,15 @@ namespace Ange
             ListViewItem item = new ListViewItem();
             item.Tag = GetPreview(Result[e.ItemIndex].Hash);
             item.Text = Result[e.ItemIndex].Hash;
-            List<string> tags = ErzaDB.GetTagsByImageID(Result[e.ItemIndex].ImageID, Erza);
+            Result[e.ItemIndex].Tags = ErzaDB.GetTagsByImageID(Result[e.ItemIndex].ImageID, Erza);
             StringBuilder tag_string = new StringBuilder();
-            for (int i = 0; i < tags.Count; i++)
+            for (int i = 0; i < Result[e.ItemIndex].Tags.Count; i++)
             {
                 if (i > 0)
                 {
                     tag_string.Append(' ');
                 }
-                tag_string.Append(tags[i]);
+                tag_string.Append(Result[e.ItemIndex].Tags[i]);
             }
             item.ToolTipText = String.Format("{0}\n{1}x{2}\n{3}", Result[e.ItemIndex].Hash, Result[e.ItemIndex].Width, Result[e.ItemIndex].Height, tag_string.ToString());
             e.Item = item;

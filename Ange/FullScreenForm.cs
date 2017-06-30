@@ -16,6 +16,9 @@ namespace Ange
         public List<ImageInfo> Result;
         public int Index = 0;
         public Form1 main_form;
+        public long FileSize = 0;
+        public string ImageFormat = null;
+        public string TagString;
         public FullScreenForm()
         {
             InitializeComponent();
@@ -77,9 +80,79 @@ namespace Ange
             Graphics g = e.Graphics;
             if (this.pictureBox1.Image != null)
             {
-                g.DrawString(String.Format("Ширина: {0}\nВысота: {1}", this.pictureBox1.Image.Width, this.pictureBox1.Image.Height),
-                    new Font("Arial", 10), System.Drawing.Brushes.White, new Point(0, 0));
+                string s = String.Format("Ширина: {0}\nВысота: {1}\nРазмер: {2:N0}\nФормат: {3}\nТеги:\n{4}", this.pictureBox1.Image.Width, this.pictureBox1.Image.Height, FileSize, ImageFormat, TagString);
+                g.DrawString(s, new Font("Arial", 10), System.Drawing.Brushes.White, new Point(0, 0));
             }
+        }
+        private void LoadImage(int Index)
+        {
+            if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+            this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+            ImageFormat = GetImageFormat(this.pictureBox1.Image);
+            if(this.Result[this.Index].Tags.Count == 0)
+            {
+                Result[this.Index].Tags = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, main_form.Erza);
+            }
+            StringBuilder tag_string = new StringBuilder();
+            for (int i = 0; i < Result[this.Index].Tags.Count; i++)
+            {
+                
+                tag_string.Append(Result[this.Index].Tags[i]);
+                if (i < Result[this.Index].Tags.Count - 1)
+                {
+                    tag_string.Append('\n');
+                }
+            }
+            TagString = tag_string.ToString();
+            FileSize = new System.IO.FileInfo(this.Result[this.Index].FilePath).Length;
+        }
+        private string GetImageFormat(Image image)
+        {
+            string imageFormat = String.Empty;
+            if (System.Drawing.Imaging.ImageFormat.Bmp.Equals(image.RawFormat))
+            {
+                imageFormat = "BMP";
+            }
+
+            if (System.Drawing.Imaging.ImageFormat.Emf.Equals(image.RawFormat))
+            {
+                imageFormat = "EMF";
+            }
+
+            if (System.Drawing.Imaging.ImageFormat.Gif.Equals(image.RawFormat))
+            {
+                imageFormat = "GIF";
+            }
+
+            if (System.Drawing.Imaging.ImageFormat.Icon.Equals(image.RawFormat))
+            {
+                imageFormat = "ICON";
+            }
+
+            if (System.Drawing.Imaging.ImageFormat.Jpeg.Equals(image.RawFormat))
+            {
+                imageFormat = "JPEG";
+            }
+
+            if (System.Drawing.Imaging.ImageFormat.Png.Equals(image.RawFormat))
+            {
+                imageFormat = "PNG";
+            }
+
+            if (System.Drawing.Imaging.ImageFormat.Tiff.Equals(image.RawFormat))
+            {
+                imageFormat = "TIFF";
+            }
+
+            if (System.Drawing.Imaging.ImageFormat.Wmf.Equals(image.RawFormat))
+            {
+                imageFormat = "WMF";
+            }
+            if (imageFormat.Length == 0)
+            {
+                imageFormat = "Unknown";
+            }
+            return imageFormat;
         }
     }
 }
