@@ -331,6 +331,11 @@ namespace GetIdol
                 Console.WriteLine(ex.Message);
                 return false;
             }
+            catch (Exception)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
             finally
             {
                 if (wrp != null)
