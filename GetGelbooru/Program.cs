@@ -332,6 +332,14 @@ namespace GetGelbooru
                     {
                         mImgDescriptor.ImageID = System.Convert.ToInt64(node.Attributes[j].Value);
                     }
+                    if (node.Attributes[j].Name == "height")
+                    {
+                        mImgDescriptor.Height = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
+                    if (node.Attributes[j].Name == "width")
+                    {
+                        mImgDescriptor.Width = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
                 }
                 list.Add(mImgDescriptor);
             }

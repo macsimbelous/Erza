@@ -714,6 +714,14 @@ namespace Erza
                     {
                         mImgDescriptor.konachan_post_id = System.Convert.ToInt32(node.Attributes[j].Value);
                     }
+                    if (node.Attributes[j].Name == "height")
+                    {
+                        mImgDescriptor.Height = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
+                    if (node.Attributes[j].Name == "width")
+                    {
+                        mImgDescriptor.Width = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
                 }
                 list.Add(mImgDescriptor); //Добавляем в список
             }
@@ -761,6 +769,14 @@ namespace Erza
                     {
                         mImgDescriptor.gelbooru_post_id = System.Convert.ToInt32(node.Attributes[j].Value);
                     }
+                    if (node.Attributes[j].Name == "height")
+                    {
+                        mImgDescriptor.Height = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
+                    if (node.Attributes[j].Name == "width")
+                    {
+                        mImgDescriptor.Width = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
                 }
                 list.Add(mImgDescriptor);
             }
@@ -807,6 +823,14 @@ namespace Erza
                     {
                         mImgDescriptor.yandere_post_id = System.Convert.ToInt32(node.Attributes[j].Value);
                     }
+                    if (node.Attributes[j].Name == "height")
+                    {
+                        mImgDescriptor.Height = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
+                    if (node.Attributes[j].Name == "width")
+                    {
+                        mImgDescriptor.Width = System.Convert.ToInt32(node.Attributes[j].Value);
+                    }
                 }
                 list.Add(mImgDescriptor);
             }
@@ -843,8 +867,16 @@ namespace Erza
                 if (ext.InnerText.ToLower() == "txt") { break; }
                 if (ext.InnerText.ToLower().Length > 4) { break; }
                 if (ext.InnerText.ToLower().LastIndexOf('?') > -1) { break; }
-                mImgDescriptor.urls.Add("http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText);
-                mImgDescriptor.danbooru_url = "http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
+                //mImgDescriptor.urls.Add("http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText);
+                //mImgDescriptor.danbooru_url = "http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
+                XmlElement url = node["file-url"];
+                //mImgDescriptor.FilePath = "http://danbooru.donmai.us" + url.InnerText;
+                mImgDescriptor.urls.Add("http://danbooru.donmai.us" + url.InnerText);
+                mImgDescriptor.danbooru_url = "http://danbooru.donmai.us" + url.InnerText;
+                XmlElement height = node["image-height"];
+                XmlElement width = node["image-width"];
+                mImgDescriptor.Height = System.Convert.ToInt32(height.InnerText);
+                mImgDescriptor.Width = System.Convert.ToInt32(width.InnerText);
                 list.Add(mImgDescriptor);
             }
             return list;
