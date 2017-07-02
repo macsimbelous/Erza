@@ -42,7 +42,7 @@ namespace GetIdol
         static List<string> Tags = null;
         static GetidolConfig config = null;
         static SQLiteConnection connection = null;
-        static SQLiteConnection connection2 = null;
+        //static SQLiteConnection connection2 = null;
         static int count_complit = 0;
         static int count_deleted = 0;
         static int count_error = 0;
@@ -331,7 +331,7 @@ namespace GetIdol
                 Console.WriteLine(ex.Message);
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return false;
@@ -734,7 +734,7 @@ namespace GetIdol
             try
             {
                 List<string> tags = new List<string>();
-                string tags_string = null;
+                //string tags_string = null;
                 Regex rx = new Regex("<input id=post_old_tags name=\"post\\[old_tags\\]\" type=hidden value=\"(.+)\">");
                 Match match = rx.Match(post);
                 if (match.Success)
