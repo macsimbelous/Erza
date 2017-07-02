@@ -30,8 +30,9 @@ namespace Ange
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
             //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
-            if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-            this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+            //if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+            //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+            LoadImage(this.Index);
         }
 
         private void FullScreenForm_KeyDown(object sender, KeyEventArgs e)
@@ -45,16 +46,18 @@ namespace Ange
                     if (this.Index < (this.Result.Count - 1))
                     {
                         this.Index++;
-                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-                        this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                        //if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                        LoadImage(this.Index);
                     }
                     break;
                 case Keys.Left:
                     if (this.Index > 0)
                     {
                         this.Index--;
-                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-                        this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                        //if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                        LoadImage(this.Index);
                     }
                     break;
                 case Keys.Delete:
