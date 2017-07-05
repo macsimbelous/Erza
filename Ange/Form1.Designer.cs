@@ -37,6 +37,7 @@
             this.listView1 = new System.Windows.Forms.ListView();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openOuterSoftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.edittagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyhashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,7 +51,8 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.openOuterSoftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MoveAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -150,9 +152,11 @@
             this.copyhashToolStripMenuItem,
             this.copytowallToolStripMenuItem,
             this.copytodirToolStripMenuItem,
+            this.copyAllToDirToolStripMenuItem,
+            this.MoveAllToDirToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 202);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 224);
             // 
             // viewToolStripMenuItem
             // 
@@ -160,6 +164,13 @@
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.viewToolStripMenuItem.Text = "Просморт";
             this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
+            // 
+            // openOuterSoftToolStripMenuItem
+            // 
+            this.openOuterSoftToolStripMenuItem.Name = "openOuterSoftToolStripMenuItem";
+            this.openOuterSoftToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.openOuterSoftToolStripMenuItem.Text = "Открыть во внешней программе";
+            this.openOuterSoftToolStripMenuItem.Click += new System.EventHandler(this.openOuterSoftToolStripMenuItem_Click);
             // 
             // edittagsToolStripMenuItem
             // 
@@ -250,12 +261,19 @@
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
             // 
-            // openOuterSoftToolStripMenuItem
+            // copyAllToDirToolStripMenuItem
             // 
-            this.openOuterSoftToolStripMenuItem.Name = "openOuterSoftToolStripMenuItem";
-            this.openOuterSoftToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
-            this.openOuterSoftToolStripMenuItem.Text = "Открыть во внешней программе";
-            this.openOuterSoftToolStripMenuItem.Click += new System.EventHandler(this.openOuterSoftToolStripMenuItem_Click);
+            this.copyAllToDirToolStripMenuItem.Name = "copyAllToDirToolStripMenuItem";
+            this.copyAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.copyAllToDirToolStripMenuItem.Text = "Копировать всё в каталог";
+            this.copyAllToDirToolStripMenuItem.Click += new System.EventHandler(this.copyAllToDirToolStripMenuItem_Click);
+            // 
+            // MoveAllToDirToolStripMenuItem
+            // 
+            this.MoveAllToDirToolStripMenuItem.Name = "MoveAllToDirToolStripMenuItem";
+            this.MoveAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.MoveAllToDirToolStripMenuItem.Text = "Переместить всё в каталог";
+            this.MoveAllToDirToolStripMenuItem.Click += new System.EventHandler(this.MoveAllToDirToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -307,6 +325,8 @@
         private System.Windows.Forms.ToolStripMenuItem copytodirToolStripMenuItem;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.ToolStripMenuItem openOuterSoftToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyAllToDirToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MoveAllToDirToolStripMenuItem;
     }
 }
 

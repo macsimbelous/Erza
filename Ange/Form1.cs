@@ -389,5 +389,27 @@ namespace Ange
             }
             
         }
+
+        private void MoveAllToDirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                foreach (ImageInfo img in this.Result)
+                {
+                    File.Move(img.FilePath, this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath));
+                }
+            }
+        }
+
+        private void copyAllToDirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                foreach (ImageInfo img in this.Result)
+                {
+                    File.Copy(img.FilePath, this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath));
+                }
+            }
+        }
     }
 }
