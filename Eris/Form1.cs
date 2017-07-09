@@ -43,5 +43,12 @@ namespace Eris
             adapter.Update(this.table);
             connection.Clone();
         }
+
+        private void edit_toolStripButton_Click(object sender, EventArgs e)
+        {
+            EditForm form = new EditForm();
+            form.TagID = (long)this.dataGridView1.SelectedRows[0].Cells[0].Value;
+            form.ShowDialog();
+        }
     }
 }

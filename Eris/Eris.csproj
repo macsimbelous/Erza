@@ -65,6 +65,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditForm.Designer.cs">
+      <DependentUpon>EditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,24 +79,27 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="EditForm.resx">
+      <DependentUpon>EditForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -113,19 +122,28 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\VSO_NewFile_40x.png" />
+    <None Include="Resources\Add Green256.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\VSO_EditForm_16x.png" />
+    <None Include="Resources\Edit256.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\delete_40x.png" />
+    <None Include="Resources\Remove %28Delete%29 Red256.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\CountDictionary_16x.png" />
+    <None Include="Resources\Search256.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\CountDynamicValue_16x.png" />
+    <None Include="Resources\Charting Blue New256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Charting Blue Add256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ErzaLib\ErzaLib.csproj">
+      <Project>{5bd393d7-4fa7-4c1b-a791-b13d7e26e8e0}</Project>
+      <Name>ErzaLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" />

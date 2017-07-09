@@ -63,9 +63,9 @@ namespace Eris.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CountDictionary_16x {
+        internal static System.Drawing.Bitmap Add_Green256 {
             get {
-                object obj = ResourceManager.GetObject("CountDictionary_16x", resourceCulture);
+                object obj = ResourceManager.GetObject("Add Green256", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace Eris.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap CountDynamicValue_16x {
+        internal static System.Drawing.Bitmap Charting_Blue_Add256 {
             get {
-                object obj = ResourceManager.GetObject("CountDynamicValue_16x", resourceCulture);
+                object obj = ResourceManager.GetObject("Charting Blue Add256", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace Eris.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap delete_40x {
+        internal static System.Drawing.Bitmap Charting_Blue_New256 {
             get {
-                object obj = ResourceManager.GetObject("delete_40x", resourceCulture);
+                object obj = ResourceManager.GetObject("Charting Blue New256", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace Eris.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap VSO_EditForm_16x {
+        internal static System.Drawing.Bitmap Edit256 {
             get {
-                object obj = ResourceManager.GetObject("VSO_EditForm_16x", resourceCulture);
+                object obj = ResourceManager.GetObject("Edit256", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,19 @@ namespace Eris.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap VSO_NewFile_40x {
+        internal static System.Drawing.Bitmap Remove__Delete__Red256 {
             get {
-                object obj = ResourceManager.GetObject("VSO_NewFile_40x", resourceCulture);
+                object obj = ResourceManager.GetObject("Remove (Delete) Red256", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Search256 {
+            get {
+                object obj = ResourceManager.GetObject("Search256", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

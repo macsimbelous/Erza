@@ -29,16 +29,17 @@
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.new_toolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.edit_toolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.delete_toolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.count_toolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.count_all_toolStripButton = new System.Windows.Forms.ToolStripButton();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.new_toolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.edit_toolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.delete_toolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.find_toolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.count_toolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.count_all_toolStripButton = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -54,73 +55,14 @@
             this.Column2,
             this.Column3,
             this.Column4});
-            this.dataGridView1.Location = new System.Drawing.Point(0, 28);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 42);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(890, 508);
+            this.dataGridView1.Size = new System.Drawing.Size(890, 494);
             this.dataGridView1.TabIndex = 0;
-            // 
-            // toolStrip1
-            // 
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.new_toolStripButton,
-            this.edit_toolStripButton,
-            this.delete_toolStripButton,
-            this.count_toolStripButton,
-            this.count_all_toolStripButton});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(890, 25);
-            this.toolStrip1.TabIndex = 1;
-            this.toolStrip1.Text = "toolStrip1";
-            // 
-            // new_toolStripButton
-            // 
-            this.new_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.new_toolStripButton.Image = global::Eris.Properties.Resources.VSO_NewFile_40x;
-            this.new_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.new_toolStripButton.Name = "new_toolStripButton";
-            this.new_toolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.new_toolStripButton.Text = "Новый тег";
-            // 
-            // edit_toolStripButton
-            // 
-            this.edit_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.edit_toolStripButton.Image = global::Eris.Properties.Resources.VSO_EditForm_16x;
-            this.edit_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.edit_toolStripButton.Name = "edit_toolStripButton";
-            this.edit_toolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.edit_toolStripButton.Text = "Редактировать тег";
-            // 
-            // delete_toolStripButton
-            // 
-            this.delete_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.delete_toolStripButton.Image = global::Eris.Properties.Resources.delete_40x;
-            this.delete_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.delete_toolStripButton.Name = "delete_toolStripButton";
-            this.delete_toolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.delete_toolStripButton.Text = "Удалить тег";
-            // 
-            // count_toolStripButton
-            // 
-            this.count_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.count_toolStripButton.Image = global::Eris.Properties.Resources.CountDynamicValue_16x;
-            this.count_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.count_toolStripButton.Name = "count_toolStripButton";
-            this.count_toolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.count_toolStripButton.Text = "Подсчитать ссылки на тег";
-            // 
-            // count_all_toolStripButton
-            // 
-            this.count_all_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.count_all_toolStripButton.Image = global::Eris.Properties.Resources.CountDictionary_16x;
-            this.count_all_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.count_all_toolStripButton.Name = "count_all_toolStripButton";
-            this.count_all_toolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.count_all_toolStripButton.Text = "Подсчитать ссылки на все теги";
             // 
             // Column1
             // 
@@ -154,6 +96,77 @@
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.new_toolStripButton,
+            this.edit_toolStripButton,
+            this.delete_toolStripButton,
+            this.find_toolStripButton,
+            this.count_toolStripButton,
+            this.count_all_toolStripButton});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(890, 39);
+            this.toolStrip1.TabIndex = 1;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // new_toolStripButton
+            // 
+            this.new_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.new_toolStripButton.Image = global::Eris.Properties.Resources.Add_Green256;
+            this.new_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.new_toolStripButton.Name = "new_toolStripButton";
+            this.new_toolStripButton.Size = new System.Drawing.Size(36, 36);
+            this.new_toolStripButton.Text = "Новый тег";
+            // 
+            // edit_toolStripButton
+            // 
+            this.edit_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.edit_toolStripButton.Image = global::Eris.Properties.Resources.Edit256;
+            this.edit_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.edit_toolStripButton.Name = "edit_toolStripButton";
+            this.edit_toolStripButton.Size = new System.Drawing.Size(36, 36);
+            this.edit_toolStripButton.Text = "Редактировать тег";
+            this.edit_toolStripButton.Click += new System.EventHandler(this.edit_toolStripButton_Click);
+            // 
+            // delete_toolStripButton
+            // 
+            this.delete_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.delete_toolStripButton.Image = global::Eris.Properties.Resources.Remove__Delete__Red256;
+            this.delete_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.delete_toolStripButton.Name = "delete_toolStripButton";
+            this.delete_toolStripButton.Size = new System.Drawing.Size(36, 36);
+            this.delete_toolStripButton.Text = "Удалить тег";
+            // 
+            // find_toolStripButton
+            // 
+            this.find_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.find_toolStripButton.Image = global::Eris.Properties.Resources.Search256;
+            this.find_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.find_toolStripButton.Name = "find_toolStripButton";
+            this.find_toolStripButton.Size = new System.Drawing.Size(36, 36);
+            this.find_toolStripButton.Text = "Поиск";
+            // 
+            // count_toolStripButton
+            // 
+            this.count_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.count_toolStripButton.Image = global::Eris.Properties.Resources.Charting_Blue_New256;
+            this.count_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.count_toolStripButton.Name = "count_toolStripButton";
+            this.count_toolStripButton.Size = new System.Drawing.Size(36, 36);
+            this.count_toolStripButton.Text = "Подсчитать ссылки на тег";
+            // 
+            // count_all_toolStripButton
+            // 
+            this.count_all_toolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.count_all_toolStripButton.Image = global::Eris.Properties.Resources.Charting_Blue_Add256;
+            this.count_all_toolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.count_all_toolStripButton.Name = "count_all_toolStripButton";
+            this.count_all_toolStripButton.Size = new System.Drawing.Size(36, 36);
+            this.count_all_toolStripButton.Text = "Подсчитать ссылки на все теги";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -186,6 +199,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
+        private System.Windows.Forms.ToolStripButton find_toolStripButton;
     }
 }
 
