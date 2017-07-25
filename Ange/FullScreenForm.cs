@@ -104,25 +104,42 @@ namespace Ange
         }
         private void LoadImage(int Index)
         {
-            if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-            this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-            ImageFormat = GetImageFormat(this.pictureBox1.Image);
-            if(this.Result[this.Index].Tags.Count == 0)
+            try
             {
-                Result[this.Index].Tags = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, main_form.Erza);
-            }
-            StringBuilder tag_string = new StringBuilder();
-            for (int i = 0; i < Result[this.Index].Tags.Count; i++)
-            {
-                
-                tag_string.Append(Result[this.Index].Tags[i]);
-                if (i < Result[this.Index].Tags.Count - 1)
+                if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {
-                    tag_string.Append('\n');
+                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    ImageFormat = GetImageFormat(this.pictureBox1.Image);
+                    if (this.Result[this.Index].Tags.Count == 0)
+                    {
+                        Result[this.Index].Tags = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, main_form.Erza);
+                    }
+                    StringBuilder tag_string = new StringBuilder();
+                    for (int i = 0; i < Result[this.Index].Tags.Count; i++)
+                    {
+
+                        tag_string.Append(Result[this.Index].Tags[i]);
+                        if (i < Result[this.Index].Tags.Count - 1)
+                        {
+                            tag_string.Append('\n');
+                        }
+                    }
+                    TagString = tag_string.ToString();
+                    FileSize = new System.IO.FileInfo(this.Result[this.Index].FilePath).Length;
+                }
+                else
+                {
+                    this.pictureBox1.Image = (Image)Properties.Resources.noimage;
+                    ImageFormat = String.Empty;
+                    TagString = String.Empty;
+                    FileSize = 0;
                 }
             }
-            TagString = tag_string.ToString();
-            FileSize = new System.IO.FileInfo(this.Result[this.Index].FilePath).Length;
+            catch (Exception ex)
+            {
+                TagString = ex.Message;
+            }
         }
         private string GetImageFormat(Image image)
         {
