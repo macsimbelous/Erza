@@ -761,7 +761,7 @@ namespace Erza
                     }
                     if (node.Attributes[j].Name == "file_url")
                     {
-                        mImgDescriptor.gelbooru_url = "http:" + node.Attributes[j].Value;
+                        mImgDescriptor.gelbooru_url = "http:" + node.Attributes[j].Value.Replace("simg4.", String.Empty);
                         mImgDescriptor.urls.Add(mImgDescriptor.gelbooru_url);
                         
                     }
