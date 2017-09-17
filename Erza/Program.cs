@@ -114,6 +114,7 @@ namespace Erza
             catch (Exception ex)
             {
                 Console.WriteLine("НЕ ОБРАБОТАННОЕ ИСКЛЮЧЕНИЕ: " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
         }
         static void ProgressSQLiteCallBack(string hash, int Count, int Total)
@@ -875,8 +876,11 @@ namespace Erza
                 mImgDescriptor.danbooru_url = "http://danbooru.donmai.us" + url.InnerText;
                 XmlElement height = node["image-height"];
                 XmlElement width = node["image-width"];
-                mImgDescriptor.Height = System.Convert.ToInt32(height.InnerText);
-                mImgDescriptor.Width = System.Convert.ToInt32(width.InnerText);
+                if (!String.IsNullOrEmpty(height.InnerText) & !String.IsNullOrEmpty(width.InnerText))
+                {
+                    mImgDescriptor.Height = System.Convert.ToInt32(height.InnerText);
+                    mImgDescriptor.Width = System.Convert.ToInt32(width.InnerText);
+                }
                 list.Add(mImgDescriptor);
             }
             return list;
