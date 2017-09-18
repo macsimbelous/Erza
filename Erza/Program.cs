@@ -117,10 +117,6 @@ namespace Erza
                 Console.WriteLine(ex.StackTrace);
             }
         }
-        static void ProgressSQLiteCallBack(string hash, int Count, int Total)
-        {
-            Console.Write("Обрабатываю хэш {0} ({1}/{2})\r", hash, Count, Total);
-        }
         static void LoadSettings()
         {
             Program.config = new ErzaConfig();
@@ -441,7 +437,10 @@ namespace Erza
         }
         static List<ImageInfo2> get_hash_gelbooru(string tag)
         {
-            gelbooru_cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
+            if (gelbooru_cookies == null)
+            {
+                gelbooru_cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
+            }
             if(gelbooru_cookies == null)
             {
                 Console.WriteLine("Не удалось авторизоваться на Gelbooru!");
