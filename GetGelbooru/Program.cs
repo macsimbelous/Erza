@@ -23,12 +23,12 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
 using System.Xml;
-//using System.Data.SQLite;
 using System.IO;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Text.RegularExpressions;
+using System.Data.SQLite;
 
 namespace GetGelbooru
 {
@@ -40,6 +40,8 @@ namespace GetGelbooru
         static int count_deleted = 0;
         static int count_error = 0;
         static int count_skip = 0;
+        static SQLiteConnection connection = null;
+        static string store_file = null;
         static void Main(string[] args)
         {
             LoadSettings();
@@ -50,7 +52,8 @@ namespace GetGelbooru
                 Console.WriteLine("Не заданы теги!");
                 return;
             }
-            foreach(string tag in args)
+            ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
+            foreach (string tag in args)
             {
                 Console.WriteLine("Импортируем тег " + tag + " с гелбуры");
                 //il = SliyanieLists(il, get_hash_gelbooru(WebUtility.UrlEncode(tag)));
@@ -62,7 +65,8 @@ namespace GetGelbooru
                 return;
             }
             Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
-            
+            connection = new SQLiteConnection(Program.config.ConnectionString);
+            connection.Open();
             Program.config.DownloadPath = Program.config.DownloadPath + "\\" + args[0];
             Directory.CreateDirectory(Program.config.DownloadPath);
             for (int i = 0; i < post_ids.Count; i++)
@@ -77,6 +81,8 @@ namespace GetGelbooru
                     count_error++;
                 }
             }
+            Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
+            connection.Close();
         }
         static List<int> get_hash_gelbooru(string tag)
         {
@@ -141,7 +147,7 @@ namespace GetGelbooru
                     else
                     {
                         img_list.AddRange(list);
-                        nPage++;
+                        nPage = nPage + list.Count;
                     }
                     MyWait(start, 5000);
                 }
@@ -170,26 +176,20 @@ namespace GetGelbooru
             {
                 Console.Write("Добавляем информацию в базу данных...");
                 //DateTime start_db = DateTime.Now;
-                //GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
+                GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
                 //DateTime stop_db = DateTime.Now;
                 //Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
                 Console.WriteLine("OK");
             }
-            /*if (ExistImage(Path.GetFileNameWithoutExtension(url)))
+            if (ExistImage(Path.GetFileNameWithoutExtension(url)))
             {
                 Console.WriteLine("Уже скачан: {0}", store_file);
                 //count_skip++;
                 return true;
-            }*/
+            }
             Console.WriteLine("Начинаем закачку {0}.", url);
             FileInfo fi = new FileInfo(filename);
-            //ВРЕМЕННО!!!!!!!!
-            //if (fi.Exists)
-            //{
-            //Console.WriteLine("Уже скачан.");
-            //return true;
-            //}
-            //Thread.Sleep(Program.config.TimeOut - 2000);
+
             HttpWebRequest httpWRQ = (HttpWebRequest)HttpWebRequest.Create(new Uri(url));
             if (Program.config.UseProxy)
             {
@@ -201,7 +201,7 @@ namespace GetGelbooru
             Stream rStream = null;
             try
             {
-                httpWRQ.Referer = "https://gelbooru.com/";
+                httpWRQ.Referer = "https://gelbooru.com/index.php?page=post&s=view&id=" + post_id.ToString();
                 httpWRQ.UserAgent = Program.config.UserAgent;
                 httpWRQ.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
                 httpWRQ.Headers.Add("Accept-Encoding: identity");
@@ -248,7 +248,7 @@ namespace GetGelbooru
                 else
                 {
                     Console.WriteLine("\nЗакачка завершена.");
-                    count_complit++;
+                    //count_complit++;
                     return true;
                 }
             }
@@ -304,7 +304,9 @@ namespace GetGelbooru
             string file_url = "<li>Original: <a href=\"";
             string prefix = "<a href=\"";
             string postfix = "\" style=\"font-weight: bold;\">Original image</a>";
-            Regex rx = new Regex(prefix + @"\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?" + postfix, RegexOptions.Compiled);
+            string postfix2 = "\" target=\"_blank\" style=\"font-weight: bold;\">Original image</a>";
+            Regex rx = new Regex(prefix + @"(?<protocol>http(s)?)://(?<server>([A-Za-z0-9-]+\.)*(?<basedomain>[A-Za-z0-9-]+\.[A-Za-z0-9]+))+((:)?(?<port>[0-9]+)?(/?)(?<path>(?<dir>[A-Za-z0-9\._\-/]+)(/){0,1}[A-Za-z0-9.-/_]*)){0,1}" + postfix, RegexOptions.Compiled);
+            Regex rx2 = new Regex(prefix + @"(?<protocol>http(s)?)://(?<server>([A-Za-z0-9-]+\.)*(?<basedomain>[A-Za-z0-9-]+\.[A-Za-z0-9]+))+((:)?(?<port>[0-9]+)?(/?)(?<path>(?<dir>[A-Za-z0-9\._\-/]+)(/){0,1}[A-Za-z0-9.-/_]*)){0,1}" + postfix2, RegexOptions.Compiled);
             Regex url_rx = new Regex(@"(?<protocol>http(s)?)://(?<server>([A-Za-z0-9-]+\.)*(?<basedomain>[A-Za-z0-9-]+\.[A-Za-z0-9]+))+((:)?(?<port>[0-9]+)?(/?)(?<path>(?<dir>[A-Za-z0-9\._\-/]+)(/){0,1}[A-Za-z0-9.-/_]*)){0,1}", RegexOptions.Compiled);
             try
             {
@@ -312,6 +314,15 @@ namespace GetGelbooru
                 if (match.Success)
                 {
                     Match url_match = url_rx.Match(match.Value);
+                    if (url_match.Success)
+                    {
+                        return url_match.Value;
+                    }
+                }
+                Match match2 = rx2.Match(post);
+                if (match2.Success)
+                {
+                    Match url_match = url_rx.Match(match2.Value);
                     if (url_match.Success)
                     {
                         return url_match.Value;
@@ -341,7 +352,47 @@ namespace GetGelbooru
                 return dir + "\\" + Path.GetFileName(url);
             }
         }
-        
+        static void GetTagsFromSankaku(string md5, string post)
+        {
+            try
+            {
+                List<string> tags = new List<string>();
+                //string tags_string = null;
+                Regex rx = new Regex("<textarea cols=\"[0-9]+\" id=\"tags\" name=\"tags\" rows=\"[0-9]+\" tabindex=\"[0-9]+\">(.+)</textarea>");
+                Regex rx2 = new Regex(">(.+)<");
+                Match match = rx.Match(post);
+                if (match.Success)
+                {
+                    Match match2 = rx2.Match(match.Value);
+                    if (match2.Success)
+                    {
+                        string temp = match2.Value.Substring(1, match2.Value.Length - 2);
+                        tags.AddRange(temp.Split(' '));
+                    }
+                }
+                else
+                {
+                    return;
+                }
+                if (tags.Count <= 0) { return; }
+
+                ImageInfo img = new ImageInfo();
+                img.Hash = md5;
+                img.Tags.AddRange(tags);
+                img.IsDeleted = false;
+                SQLiteTransaction transact = Program.connection.BeginTransaction();
+                ErzaDB.LoadImageToErza(img, Program.connection);
+                transact.Commit();
+            }
+            catch (Exception ex)
+            {
+                //Thread.Sleep(60000);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                return;
+            }
+            return;
+        }
         static CookieCollection GetGelbooruCookies(string user, string password)
         {
             try
@@ -449,6 +500,27 @@ namespace GetGelbooru
                 source = reader.ReadToEnd();
             }
             return source;
+        }
+        static bool ExistImage(string hash_string)
+        {
+            ImageInfo inf = ErzaDB.GetImageWithOutTags(hash_string, connection);
+            if (inf == null) { return false; }
+            if (inf.IsDeleted)
+            {
+                count_deleted++;
+                store_file = "Удалён!";
+                return true;
+            }
+            if (inf.FilePath == null)
+            {
+                return false;
+            }
+            else
+            {
+                store_file = inf.FilePath;
+                count_skip++;
+                return true;
+            }
         }
         static void LoadSettings()
         {
@@ -579,7 +651,10 @@ namespace GetGelbooru
             }
             return -1;
         }
-        
+        static bool ValidationCallback(Object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
+        }
         static string GetReferer(string url, long PostID)
         {
             if (url.LastIndexOf("gelbooru.com/") >= 0)
