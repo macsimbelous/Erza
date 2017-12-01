@@ -201,7 +201,7 @@ namespace GetGelbooru
             if (IsImageFile(filename))
             {
                 Console.Write("Добавляем информацию в базу данных...");
-                GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
+                UpdateDB(Path.GetFileNameWithoutExtension(url), post);
                 Console.WriteLine("OK");
             }
             if (ExistImage(Path.GetFileNameWithoutExtension(url)))
@@ -260,32 +260,23 @@ namespace GetGelbooru
                 return dir + "\\" + Path.GetFileName(url);
             }
         }
-        static void GetTagsFromSankaku(string md5, string post)
+        static void UpdateDB(string Md5, string Page)
         {
             try
             {
                 List<string> tags = new List<string>();
-                //string tags_string = null;
-                Regex rx = new Regex("<textarea cols=\"[0-9]+\" id=\"tags\" name=\"tags\" rows=\"[0-9]+\" tabindex=\"[0-9]+\">(.+)</textarea>");
-                Regex rx2 = new Regex(">(.+)<");
-                Match match = rx.Match(post);
-                if (match.Success)
+                var parser = new HtmlParser();
+                var document = parser.Parse(Page);
+                foreach (IElement element in document.QuerySelectorAll("textarea"))
                 {
-                    Match match2 = rx2.Match(match.Value);
-                    if (match2.Success)
+                    if (element.GetAttribute("name") == "tags")
                     {
-                        string temp = match2.Value.Substring(1, match2.Value.Length - 2);
-                        tags.AddRange(temp.Split(' '));
+                        tags.AddRange(element.InnerHtml.Split(' '));
                     }
                 }
-                else
-                {
-                    return;
-                }
                 if (tags.Count <= 0) { return; }
-
                 ImageInfo img = new ImageInfo();
-                img.Hash = md5;
+                img.Hash = Md5;
                 img.Tags.AddRange(tags);
                 img.IsDeleted = false;
                 SQLiteTransaction transact = Program.connection.BeginTransaction();
@@ -294,7 +285,6 @@ namespace GetGelbooru
             }
             catch (Exception ex)
             {
-                //Thread.Sleep(60000);
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
                 return;
