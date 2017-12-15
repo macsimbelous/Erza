@@ -33,6 +33,7 @@ namespace Sagiri
             string dest_path = "I:\\AnimeArt";
             string[] Hex = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
             List<string> error_files = new List<string>();
+            Regex rx = new Regex("^[a-f0-9]{32}$", RegexOptions.Compiled);
 
             ParseArgs(args);
             foreach (string first in Hex)
@@ -67,7 +68,7 @@ namespace Sagiri
                 if (IsImageFile(files[i]))
                 {
                     string dest_file;
-                    if (Program.AllComputeHash || !IsMD5(Path.GetFileNameWithoutExtension(files[i])))
+                    if (Program.AllComputeHash || !IsMD5(Path.GetFileNameWithoutExtension(files[i]), rx))
                     {
                         string hash = ComputeMD5(files[i]);
                         string sub_dir = "\\" + hash[0] + "\\" + hash[1];
@@ -144,9 +145,8 @@ namespace Sagiri
             }
             return false;
         }
-        public static bool IsMD5(string Text)
+        public static bool IsMD5(string Text, Regex rx)
         {
-            Regex rx = new Regex("/^[a-f0-9]{32}$/", RegexOptions.Compiled);
             Match match = rx.Match(Text);
             if (match.Success)
             {
