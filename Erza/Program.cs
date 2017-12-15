@@ -707,7 +707,8 @@ namespace Erza
                     }
                     if (node.Attributes[j].Name == "file_url")
                     {
-                        mImgDescriptor.konachan_url = "http:" + node.Attributes[j].Value;
+                        //mImgDescriptor.konachan_url = "http:" + node.Attributes[j].Value;
+                        mImgDescriptor.konachan_url = node.Attributes[j].Value;
                         mImgDescriptor.urls.Add(mImgDescriptor.konachan_url);
                     }
                     if (node.Attributes[j].Name == "id")
@@ -761,7 +762,9 @@ namespace Erza
                     }
                     if (node.Attributes[j].Name == "file_url")
                     {
-                        mImgDescriptor.gelbooru_url = "http:" + node.Attributes[j].Value.Replace("simg4.", String.Empty);
+                        //mImgDescriptor.gelbooru_url = "http:" + node.Attributes[j].Value.Replace("simg4.", String.Empty);
+                        mImgDescriptor.gelbooru_url = node.Attributes[j].Value.Replace("simg4.", String.Empty);
+                        mImgDescriptor.gelbooru_url = mImgDescriptor.gelbooru_url.Replace("simg3.", String.Empty);
                         mImgDescriptor.urls.Add(mImgDescriptor.gelbooru_url);
                         
                     }

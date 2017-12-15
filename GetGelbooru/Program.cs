@@ -23,104 +23,108 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
 using System.Xml;
-//using System.Data.SQLite;
 using System.IO;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Data.SQLite;
+using AngleSharp;
+using AngleSharp.Parser.Html;
+using AngleSharp.Dom;
 
 namespace GetGelbooru
 {
     class Program
     {
-        static CookieCollection gelbooru_cookies = null;
         static ErzaConfig config = null;
+        static int count_complit = 0;
+        static int count_deleted = 0;
+        static int count_error = 0;
+        static int count_skip = 0;
+        static SQLiteConnection connection = null;
         static void Main(string[] args)
         {
             LoadSettings();
-            List<ImageInfo> il = new List<ImageInfo>();
+            List<string> post_links = new List<string>();
             if (args.Length <= 0)
             {
                 Console.WriteLine("Не заданы теги!");
                 return;
             }
-            foreach(string tag in args)
+            ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
+            StringBuilder tags = new StringBuilder();
+            for (int i = 0; i < args.Length; i++)
             {
-                Console.WriteLine("Импортируем тег " + tag + " с гелбуры");
-                il = SliyanieLists(il, get_hash_gelbooru(WebUtility.UrlEncode(tag)));
+                if (i == 0)
+                {
+                    tags.Append(WebUtility.UrlEncode(args[i]));
+                }
+                else
+                {
+                    tags.Append("+");
+                    tags.Append(WebUtility.UrlEncode(args[i]));
+                }
             }
-            if (il.Count <= 0)
+            CookieCollection cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
+            if (cookies == null)
+            {
+                Console.WriteLine("Не удалось авторизоваться на Gelbooru!");
+                return;
+            }
+            Console.WriteLine("Получаем ссылки на порсты.");
+            post_links.AddRange(GetPosts(tags.ToString(), cookies));
+            if (post_links.Count <= 0)
             {
                 Console.WriteLine("Ничего ненайдено.");
                 return;
             }
-            Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
-            int count_complit = 0;
-            int count_deleted = 0;
-            int count_error = 0;
-            int count_skip = 0;
-            Program.config.DownloadPath = Program.config.DownloadPath + "\\" + args[0];
-            Directory.CreateDirectory(Program.config.DownloadPath);
-            for (int i = 0; i < il.Count; i++)
+            Console.Write("\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n");
+            connection = new SQLiteConnection(Program.config.ConnectionString);
+            connection.Open();
+            string path = Program.config.DownloadPath + "\\" + args[0];
+            Directory.CreateDirectory(path);
+            for (int i = 0; i < post_links.Count; i++)
             {
-                Console.WriteLine("\n###### {0}/{1} ######", (i + 1), il.Count);
-                long r = DownloadImage(il[i], Program.config.DownloadPath);
-                if (r == 0)
+                Console.WriteLine("###### {0}/{1} ######", (i + 1), post_links.Count);
+                for (int ie = 0; ie < Program.config.LimitError; ie++)
                 {
-                    count_complit++;
-                }
-                else
-                {
-                    count_error++;
+                    if (DownloadImage(post_links[i], path, "http://gelbooru.com/index.php?page=post&s=list&tags=" + tags.ToString(), cookies))
+                    {
+                        count_complit++;
+                        Thread.Sleep(2500);
+                        break;
+                    }
+                    else
+                    {
+                        if (ie == Program.config.LimitError - 1)
+                        {
+                            count_error++;
+                        }
+                        Thread.Sleep(2500);
+                    }
                 }
             }
+            Console.WriteLine($"\nУспешно скачано: {count_complit}\nСкачано ренее: {count_skip}\nУдалено ранее: {count_deleted}\nОшибочно: {count_error}\nВсего: {post_links.Count}");
+            connection.Close();
         }
-        static List<ImageInfo> get_hash_gelbooru(string tag)
+        static List<string> GetPosts(string Tag, CookieCollection Cookies)
         {
-            gelbooru_cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
-            if (gelbooru_cookies == null)
+            int pid = 0;                //Счетчик постов
+            List<string> post_list = new List<string>();
+            int errors = 0;
+            for (; ; )
             {
-                Console.WriteLine("Не удалось авторизоваться на Gelbooru!");
-                return null;
-            }
-            const int GELBOORU_LIMIT_POSTS = 100;
-            int nPostsCount = 0;          //Счетчик постов для скачивания
-            int nPage = 0;                //Счетчик страниц
-            List<ImageInfo> img_list = new List<ImageInfo>();
-            int count = 0;
-            while (true)
-            {
-                nPostsCount = posts_count_gelbooru(String.Format("http://gelbooru.com/index.php?page=dapi&s=post&q=index&tags={0}&pid=0&limit=1", tag));
-                if (nPostsCount >= 0)
-                {
-                    break;
-                }
-                count++;
-                if (count >= Program.config.LimitError)
-                {
-                    Console.WriteLine("Не удалось получить количество постов!");
-                }
-            }
-            if (nPostsCount == 0)
-            {
-                Console.WriteLine("Ничего ненайдено!");
-                return img_list;
-            }
-            int count_errors = 0;
-            for (;;)
-            {
-                string strURL = String.Format("http://gelbooru.com/index.php?page=dapi&s=post&q=index&tags={0}&pid={1}&limit={2}", tag, nPage, GELBOORU_LIMIT_POSTS);
-                Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
+                string url = String.Format("http://gelbooru.com/index.php?page=post&s=list&tags={0}&pid={1}", Tag, pid);
+                Console.WriteLine($"({pid}) Загружаем и парсим: {url}");
                 try
                 {
-                    Uri uri = new Uri(strURL);
-                    DateTime start = DateTime.Now;
-                    string xml = DownloadStringFromGelbooru(strURL, "http://gelbooru.com/", gelbooru_cookies);
-                    if (xml == null)
+                    string page = DownloadStringFromGelbooru(url, "http://gelbooru.com/", Cookies);
+                    if (page == null)
                     {
-                        if (count_errors < Program.config.LimitError)
+                        if (errors < Program.config.LimitError)
                         {
-                            count_errors++;
+                            errors++;
                             continue;
                         }
                         else
@@ -128,17 +132,17 @@ namespace GetGelbooru
                             break;
                         }
                     }
-                    List<ImageInfo> list = ParseXMLGelBooru(xml);
+                    List<string> list = ParseListPage(page);
                     if (list.Count <= 0)
                     {
                         break;
                     }
                     else
                     {
-                        img_list.AddRange(list);
-                        nPage++;
+                        post_list.AddRange(list);
+                        pid = pid + list.Count;
                     }
-                    MyWait(start, 5000);
+                    Thread.Sleep(2500);
                 }
                 catch (WebException we)
                 {
@@ -147,7 +151,145 @@ namespace GetGelbooru
                     continue;
                 }
             }
-            return img_list;
+            return post_list;
+        }
+        static List<string> ParseListPage(string Page)
+        {
+            List<string> links = new List<string>();
+            var parser = new HtmlParser();
+            var document = parser.Parse(Page);
+            foreach (IElement element in document.QuerySelectorAll("div"))
+            {
+                if (element.GetAttribute("class") == "thumbnail-preview")
+                {
+                    foreach (IElement link_element in element.QuerySelectorAll("a"))
+                    {
+                        links.Add("https:" + link_element.GetAttribute("href"));
+                    }
+                }
+            }
+            return links;
+        }
+        static string ParsePostPage(string Page)
+        {
+            var parser = new HtmlParser();
+            var document = parser.Parse(Page);
+            foreach (IElement element in document.QuerySelectorAll("a"))
+            {
+                if ("Original image" == element.InnerHtml)
+                {
+                    return element.GetAttribute("href");
+                }
+            }
+            return null;
+        }
+        static bool DownloadImage(string PostUrl, string Directory, string Referer, CookieCollection Cookies)
+        {
+            string post = DownloadString(PostUrl, Referer, Cookies, Program.config.UserAgent);
+            if (post == null)
+            {
+                Console.WriteLine("Пост не получен!");
+                return false;
+            }
+            string url = ParsePostPage(post);
+            if (url == null)
+            {
+                Console.WriteLine("URL Картинки не получен!");
+                return false;
+            }
+            string filename = GetFileName(Directory, url);
+            if (IsImageFile(filename))
+            {
+                Console.Write("Добавляем информацию в базу данных...");
+                UpdateDB(Path.GetFileNameWithoutExtension(url), post);
+                Console.WriteLine("OK");
+            }
+            if (ExistImage(Path.GetFileNameWithoutExtension(url)))
+            {
+                //Console.WriteLine("Уже скачан: {0}", store_file);
+                //count_skip++;
+                return true;
+            }
+            Console.WriteLine("Начинаем закачку {0}.", url);
+            return DownloadFile(url, filename, Referer, Cookies, Program.config.UserAgent);
+        }
+        public static string DownloadString(string Url, string Referer, CookieCollection Cookies, string UserAgent)
+        {
+            try
+            {
+                HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(Url);
+                if (Program.config.UseProxy)
+                {
+                    WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                    myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                    downloadRequest.Proxy = myProxy;
+                }
+                downloadRequest.UserAgent = UserAgent;
+                downloadRequest.CookieContainer = new CookieContainer();
+                downloadRequest.CookieContainer.Add(Cookies);
+                if (Referer != null)
+                {
+                    downloadRequest.Referer = Referer;
+                }
+                string source;
+                using (StreamReader reader = new StreamReader(downloadRequest.GetResponse().GetResponseStream()))
+                {
+                    source = reader.ReadToEnd();
+                }
+                return source;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        static string GetFileName(string dir, string url)
+        {
+            int temp = url.IndexOf('?');
+            if (temp >= 0)
+            {
+                url = url.Substring(0, temp);
+            }
+            string extension = Path.GetExtension(url);
+            if (extension == ".jpeg")
+            {
+                return dir + "\\" + Path.GetFileNameWithoutExtension(url) + ".jpg";
+            }
+            else
+            {
+                return dir + "\\" + Path.GetFileName(url);
+            }
+        }
+        static void UpdateDB(string Md5, string Page)
+        {
+            try
+            {
+                List<string> tags = new List<string>();
+                var parser = new HtmlParser();
+                var document = parser.Parse(Page);
+                foreach (IElement element in document.QuerySelectorAll("textarea"))
+                {
+                    if (element.GetAttribute("name") == "tags")
+                    {
+                        tags.AddRange(element.InnerHtml.Split(' '));
+                    }
+                }
+                if (tags.Count <= 0) { return; }
+                ImageInfo img = new ImageInfo();
+                img.Hash = Md5;
+                img.Tags.AddRange(tags);
+                img.IsDeleted = false;
+                SQLiteTransaction transact = Program.connection.BeginTransaction();
+                ErzaDB.LoadImageToErza(img, Program.connection);
+                transact.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                return;
+            }
+            return;
         }
         static CookieCollection GetGelbooruCookies(string user, string password)
         {
@@ -178,6 +320,7 @@ namespace GetGelbooru
                 //{
                 //string s = reader.ReadToEnd();
                 //}
+                //string RawCookies = httpWebResponse.Headers["Set-Cookie"];
                 return httpWebResponse.Cookies;
             }
             catch (WebException we)
@@ -185,51 +328,6 @@ namespace GetGelbooru
                 Console.WriteLine(we.Message);
                 return null;
             }
-        }
-        static int posts_count_gelbooru(string url)
-        {
-            int nLocalPostsCount = 0;
-            try
-            {
-                Uri uri = new Uri(url);
-                //Client.Headers.Add("Cookie", "user_id = 42820; pass_hash = 12b71a982c0c189c7a0c9ac25d9713213296f616");
-                //string xml = Client.DownloadString(uri);
-                string xml = DownloadStringFromGelbooru(url, "http://gelbooru.com/", gelbooru_cookies);
-                if (xml == null)
-                {
-                    return -1;
-                }
-                XmlDocument mXML = new XmlDocument();
-                mXML.LoadXml(xml);
-                XmlNodeList nodeList = mXML.GetElementsByTagName("posts");
-                XmlNode node = nodeList.Item(0);
-                //Определяем число постов
-                for (int i = 0; i < node.Attributes.Count; i++)
-                {
-                    if (node.Attributes[i].Name == "count") nLocalPostsCount = Convert.ToInt32(node.Attributes[i].Value);
-                }
-            }
-            catch (WebException ex)
-            {
-                Console.WriteLine(ex.Message);
-                nLocalPostsCount = -1;
-            }
-            catch (NullReferenceException ex)
-            {
-                Console.WriteLine(ex.Message);
-                nLocalPostsCount = -1;
-            }
-            catch (ArgumentNullException ex)
-            {
-                Console.WriteLine(ex.Message);
-                nLocalPostsCount = -1;
-            }
-            catch (XmlException ex)
-            {
-                Console.WriteLine(ex.Message);
-                nLocalPostsCount = -1;
-            }
-            return nLocalPostsCount;
         }
         public static string DownloadStringFromGelbooru(string url, string referer, CookieCollection cookies)
         {
@@ -255,6 +353,27 @@ namespace GetGelbooru
                 source = reader.ReadToEnd();
             }
             return source;
+        }
+        static bool ExistImage(string hash_string)
+        {
+            ImageInfo inf = ErzaDB.GetImageWithOutTags(hash_string, connection);
+            if (inf == null) { return false; }
+            if (inf.IsDeleted)
+            {
+                count_deleted++;
+                Console.WriteLine("Скачан ранее: Удалён!");
+                return true;
+            }
+            if (inf.FilePath == null)
+            {
+                return false;
+            }
+            else
+            {
+                count_skip++;
+                Console.WriteLine($"Скачан ранее: {inf.FilePath}");
+                return true;
+            }
         }
         static void LoadSettings()
         {
@@ -291,170 +410,36 @@ namespace GetGelbooru
             }
             Console.WriteLine("Конфигурационный файл не найден!\nЗагружены настройки по умолчанью.");
         }
-        static List<ImageInfo> ParseXMLGelBooru(string strXML)
+        static bool ValidationCallback(Object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            List<ImageInfo> list = new List<ImageInfo>();
-            XmlDocument mXML = new XmlDocument();
-            try
-            {
-                mXML.LoadXml(strXML);
-            }
-            catch (XmlException e)
-            {
-                Console.WriteLine(e.Message);
-                return list;
-            }
-            XmlNodeList nodeList = mXML.GetElementsByTagName("post");
-            //Парсим посты
-            for (int i = 0; i < nodeList.Count; i++)
-            {
-                ImageInfo mImgDescriptor = new ImageInfo();
-                XmlNode node = nodeList.Item(i);
-                for (int j = 0; j < node.Attributes.Count; j++)
-                {
-                    //Тэги
-                    if (node.Attributes[j].Name == "tags")
-                    {
-                        mImgDescriptor.AddStringOfTags(node.Attributes[j].Value);
-                        //mImgDescriptor.tags = new List<string>(mImgDescriptor.tags_string.Split(' ')); //Получаем массив тэгов
-                    }
-                    if (node.Attributes[j].Name == "md5")
-                    {
-                        mImgDescriptor.Hash = node.Attributes[j].Value;
-                        //mImgDescriptor.hash = HexStringToBytes(node.Attributes[j].Value);
-                    }
-                    if (node.Attributes[j].Name == "file_url")
-                    {
-                        mImgDescriptor.FilePath = "http:" + node.Attributes[j].Value;
-
-                    }
-                    if (node.Attributes[j].Name == "id")
-                    {
-                        mImgDescriptor.ImageID = System.Convert.ToInt64(node.Attributes[j].Value);
-                    }
-                    if (node.Attributes[j].Name == "height")
-                    {
-                        mImgDescriptor.Height = System.Convert.ToInt32(node.Attributes[j].Value);
-                    }
-                    if (node.Attributes[j].Name == "width")
-                    {
-                        mImgDescriptor.Width = System.Convert.ToInt32(node.Attributes[j].Value);
-                    }
-                }
-                list.Add(mImgDescriptor);
-            }
-            return list;
+            return true;
         }
-        private static void MyWait(DateTime start, int delay)
+        static bool DownloadFile(string Url, string FilePath, string Referer, CookieCollection Cookies, string UserAgent)
         {
-            int current = (int)((DateTime.Now - start).TotalMilliseconds);
-            //Console.Write("TIME {0}, ", current);
-            if (current < delay)
-            {
-#if DEBUG
-                Console.WriteLine("TIME {0}, WAIT {1}", current, delay - current);
-#endif
-                Thread.Sleep(delay - current);
-                return;
-            }
-            else
-            {
-                return;
-            }
-        }
-        static List<ImageInfo> SliyanieLists(List<ImageInfo> list, List<ImageInfo> temp)
-        {
-            for (int temp_i = 0; temp_i < temp.Count; temp_i++)
-            {
-                int t = FindHash(list, temp[temp_i]);
-                if (t < 0)
-                {
-                    list.Add(temp[temp_i]);
-                }
-            }
-            return list;
-        }
-        static int FindHash(List<ImageInfo> list, ImageInfo img)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].Hash.SequenceEqual(img.Hash))
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-        static long DownloadImage(ImageInfo img, string dir)
-        {
-            int cnt;
-            if (Program.config.LimitError < 1)
-            {
-                cnt = 1;
-            }
-            else
-            {
-                cnt = Program.config.LimitError;
-            }
-            for (int index = 0; index < cnt; index++)
-            {
-                string extension = Path.GetExtension(img.FilePath);
-                DateTime start = DateTime.Now;
-                if (extension == ".jpeg")
-                {
-                    long result = DownloadFile(img.FilePath, dir + "\\" + img.Hash + ".jpg", GetReferer(img.FilePath, img.ImageID));
-                    if (result == 0)
-                    {
-                        MyWait(start, 2500);
-                        return 0;
-                    }
-                }
-                else
-                {
-                    long result = DownloadFile(img.FilePath, dir + "\\" + img.Hash + extension, GetReferer(img.FilePath, img.ImageID));
-                    if (result == 0)
-                    {
-                        MyWait(start, 2500);
-                        return 0;
-                    }
-                }
-            }
-            return 1;
-        }
-        static string GetReferer(string url, long PostID)
-        {
-            if (url.LastIndexOf("gelbooru.com/") >= 0)
-            {
-                Uri uri = new Uri("http://gelbooru.com/index.php?page=post&s=view&id=" + PostID.ToString());
-                return uri.AbsoluteUri;
-            }
-            return String.Empty;
-        }
-        static long DownloadFile(string url, string filename, string referer)
-        {
-            Console.WriteLine("Начинаем закачку {0}.", url);
-            FileInfo fi = new FileInfo(filename);
-            HttpWebRequest httpWRQ = (HttpWebRequest)HttpWebRequest.Create(new Uri(url));
+            FileInfo fi = new FileInfo(FilePath);
+            HttpWebRequest httpWRQ = (HttpWebRequest)HttpWebRequest.Create(new Uri(Url));
             if (Program.config.UseProxy)
             {
                 WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
                 myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
                 httpWRQ.Proxy = myProxy;
             }
+            httpWRQ.Referer = Referer;
+            httpWRQ.UserAgent = UserAgent;
+            httpWRQ.Timeout = 60 * 1000;
+            httpWRQ.CookieContainer = new CookieContainer();
+            httpWRQ.CookieContainer.Add(Cookies);
             WebResponse wrp = null;
             Stream rStream = null;
             try
             {
-                httpWRQ.Referer = referer;
-                httpWRQ.UserAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)";
-                httpWRQ.Timeout = 60 * 1000;
                 wrp = httpWRQ.GetResponse();
                 if (fi.Exists)
                 {
                     if (wrp.ContentLength == fi.Length)
                     {
                         Console.WriteLine("Уже скачан.");
-                        return 0;
+                        return true;
                     }
                     else
                     {
@@ -464,7 +449,7 @@ namespace GetGelbooru
                 long cnt = 0;
                 rStream = wrp.GetResponseStream();
                 rStream.ReadTimeout = 60 * 1000;
-                using (FileStream fs = new FileStream(filename, FileMode.Create))
+                using (FileStream fs = new FileStream(FilePath, FileMode.Create))
                 {
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -474,29 +459,30 @@ namespace GetGelbooru
                         fs.Write(buffer, 0, bytesRead);
                         cnt += bytesRead;
                         DateTime pred = DateTime.Now;
-                        Console.Write("\rСкачано " + cnt.ToString("#,###,###") + " из " + wrp.ContentLength.ToString("#,###,###") + " байт Скорость: " + ((cnt / (pred - start).TotalSeconds) / 1024).ToString("0.00") + " Килобайт в секунду.");
+                        //Console.Write("\rСкачано " + cnt.ToString("#,###,###") + " из " + wrp.ContentLength.ToString("#,###,###") + " байт Скорость: " + ((cnt / (pred - start).TotalSeconds) / 1024).ToString("0.00") + " Килобайт в секунду.");
+                        Console.Write($"\rСкачано {cnt, 9} из {wrp.ContentLength, 9} байт Скорость: {((cnt / (pred - start).TotalSeconds) / 1024), 6:f2} Килобайт в секунду.");
                     }
                 }
                 if (cnt < wrp.ContentLength)
                 {
                     Console.WriteLine("\nОбрыв! Закачка не завершена!");
-                    return 1;
+                    return false;
                 }
                 else
                 {
                     Console.WriteLine("\nЗакачка завершена.");
-                    return 0;
+                    return true;
                 }
             }
             catch (WebException ex)
             {
                 Console.WriteLine(ex.Message);
-                return 1;
+                return false;
             }
             catch (IOException ex)
             {
                 Console.WriteLine(ex.Message);
-                return 1;
+                return false;
             }
             finally
             {
@@ -509,6 +495,28 @@ namespace GetGelbooru
                     rStream.Close();
                 }
             }
+        }
+        static bool IsImageFile(string FilePath)
+        {
+            string ext = Path.GetExtension(FilePath);
+            switch (ext.ToLower())
+            {
+                case ".jpg":
+                    return true;
+                case ".jpeg":
+                    return true;
+                case ".png":
+                    return true;
+                case ".bmp":
+                    return true;
+                case ".gif":
+                    return true;
+                case ".tif":
+                    return true;
+                case ".tiff":
+                    return true;
+            }
+            return false;
         }
     }
     [DataContract]
