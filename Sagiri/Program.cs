@@ -34,7 +34,7 @@ namespace Sagiri
         static void Main(string[] args)
         {
             LoadSettings();
-            string dest_path = "I:\\AnimeArt";
+            string dest_path = config.TargetPath;
             string[] Hex = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
             List<string> error_files = new List<string>();
             Regex rx = new Regex("^[a-f0-9]{32}$", RegexOptions.Compiled);
@@ -60,11 +60,11 @@ namespace Sagiri
             //if (args.Length > 0 && String.Compare(args[0], "-r", false) == 0)
             if (Program.Recurse)
             {
-                files = Directory.GetFiles("I:\\AnimeArt\\UnSorted", "*.*", SearchOption.AllDirectories);
+                files = Directory.GetFiles(config.SourcePath, "*.*", SearchOption.AllDirectories);
             }
             else
             {
-                files = Directory.GetFiles("I:\\AnimeArt\\UnSorted", "*.*", SearchOption.TopDirectoryOnly);
+                files = Directory.GetFiles(config.SourcePath, "*.*", SearchOption.TopDirectoryOnly);
             }
             //string[] files = Directory.GetFiles("I:\\AnimeArt\\UnSorted", "*.*", SearchOption.AllDirectories);
             for(int i = 0; i < files.Length; i++)
@@ -171,16 +171,36 @@ namespace Sagiri
         }
         public static void ParseArgs(string[] args)
         {
+            List<string> temp = new List<string>();
             foreach(string s in args)
             {
                 if(String.Compare(s, "-r", false) == 0)
                 {
                     Program.Recurse = true;
+                    continue;
                 }
                 if (String.Compare(s, "-a", false) == 0)
                 {
                     Program.AllComputeHash = true;
+                    continue;
                 }
+                temp.Add(s);
+            }
+            switch (temp.Count)
+            {
+                case 0:
+                    break;
+                case 1:
+                    Program.config.SourcePath = temp[0];
+                    break;
+                case 2:
+                    Program.config.SourcePath = temp[0];
+                    Program.config.TargetPath = temp[1];
+                    break;
+                default:
+                    Program.config.SourcePath = temp[0];
+                    Program.config.TargetPath = temp[1];
+                    break;
             }
         }
         static void LoadSettings()
