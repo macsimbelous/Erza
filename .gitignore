@@ -154,7 +154,14 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+<<<<<<< HEAD
+.vs/slnx.sqlite
+=======
 *.lock
 *.ide
 *.ide-shm
 *.ide-wal
+>>>>>>> d14e92939ab3e69ac39ff3a0933938d73457f6f3
+.vs/Erza/v15/sqlite3/storage.ide
+.vs/Erza/v15/sqlite3/storage.ide
+.vs/
