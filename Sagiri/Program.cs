@@ -21,15 +21,19 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
+using System.Runtime.Serialization.Json;
+using System.Runtime.Serialization;
 
 namespace Sagiri
 {
     class Program
     {
+        static Config config = null;
         static bool AllComputeHash = false;
         static bool Recurse = false;
         static void Main(string[] args)
         {
+            LoadSettings();
             string dest_path = "I:\\AnimeArt";
             string[] Hex = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
             List<string> error_files = new List<string>();
@@ -178,6 +182,34 @@ namespace Sagiri
                     Program.AllComputeHash = true;
                 }
             }
+        }
+        static void LoadSettings()
+        {
+            Program.config = new Config();
+            //Параметры по умолчанию
+            Program.config.SourcePath = @"I:\AnimeArt\Unsorted";
+            Program.config.TargetPath = @"I:\AnimeArt";
+            DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Config));
+            if (File.Exists("C:\\utils\\Erza\\Sagiri.json"))
+            {
+                using (FileStream fs = new FileStream("C:\\utils\\Erza\\Sagiri.json", FileMode.Open))
+                {
+                    Program.config = (Config)jsonFormatter.ReadObject(fs);
+                }
+                return;
+            }
+            Console.WriteLine("Конфигурационный файл не найден!\nЗагружены настройки по умолчанью.");
+        }
+    }
+    [DataContract]
+    public class Config
+    {
+        [DataMember]
+        public string SourcePath;
+        [DataMember]
+        public string TargetPath;
+        public Config()
+        {
         }
     }
 }
