@@ -23,23 +23,69 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
+using NMaier.GetOptNet;
 
 namespace Sagiri
 {
     class Program
     {
         static Config config = null;
-        static bool AllComputeHash = false;
-        static bool Recurse = false;
+        
         static void Main(string[] args)
         {
             LoadSettings();
+
+            Opts opts = new Opts();
+            try
+            {
+                opts.Parse(args);
+                switch (opts.Parameters.Count)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        Program.config.SourcePath = opts.Parameters[0];
+                        break;
+                    case 2:
+                        Program.config.SourcePath = opts.Parameters[0];
+                        Program.config.TargetPath = opts.Parameters[1];
+                        break;
+                    default:
+                        Program.config.SourcePath = opts.Parameters[0];
+                        Program.config.TargetPath = opts.Parameters[1];
+                        break;
+                }
+                if(opts.SourcePath != null)
+                {
+                    Program.config.SourcePath = opts.SourcePath;
+                }
+                if (opts.TargetPath != null)
+                {
+                    Program.config.TargetPath = opts.TargetPath;
+                }
+                if (opts.AllComputeHash)
+                {
+                    Program.config.AllComputeHash = true;
+                }
+                if (opts.Recurse)
+                {
+                    Program.config.Recurse = true;
+                }
+            }
+            catch (GetOptException ex)
+            {
+                Console.WriteLine("Ошибка при парсинге опций!");
+                Console.WriteLine("--> {0}", ex.Message);
+                Console.WriteLine();
+                opts.PrintUsage();
+            }
+
             string dest_path = config.TargetPath;
             string[] Hex = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
             List<string> error_files = new List<string>();
             Regex rx = new Regex("^[a-f0-9]{32}$", RegexOptions.Compiled);
 
-            ParseArgs(args);
+            //ParseArgs(args);
             foreach (string first in Hex)
             {
                 foreach (string second in Hex)
@@ -58,7 +104,7 @@ namespace Sagiri
             int error = 0;
             string[] files;
             //if (args.Length > 0 && String.Compare(args[0], "-r", false) == 0)
-            if (Program.Recurse)
+            if (Program.config.Recurse)
             {
                 files = Directory.GetFiles(config.SourcePath, "*.*", SearchOption.AllDirectories);
             }
@@ -72,7 +118,7 @@ namespace Sagiri
                 if (IsImageFile(files[i]))
                 {
                     string dest_file;
-                    if (Program.AllComputeHash || !IsMD5(Path.GetFileNameWithoutExtension(files[i]), rx))
+                    if (Program.config.AllComputeHash || !IsMD5(Path.GetFileNameWithoutExtension(files[i]), rx))
                     {
                         string hash = ComputeMD5(files[i]);
                         string sub_dir = "\\" + hash[0] + "\\" + hash[1];
@@ -176,12 +222,12 @@ namespace Sagiri
             {
                 if(String.Compare(s, "-r", false) == 0)
                 {
-                    Program.Recurse = true;
+                    Program.config.Recurse = true;
                     continue;
                 }
                 if (String.Compare(s, "-a", false) == 0)
                 {
-                    Program.AllComputeHash = true;
+                    Program.config.AllComputeHash = true;
                     continue;
                 }
                 temp.Add(s);
@@ -228,8 +274,37 @@ namespace Sagiri
         public string SourcePath;
         [DataMember]
         public string TargetPath;
+        [DataMember]
+        public bool AllComputeHash = false;
+        [DataMember]
+        public bool Recurse = false;
         public Config()
         {
         }
+    }
+    [GetOptOptions(OnUnknownArgument = UnknownArgumentsAction.Throw, UsageEpilog = "END!")]
+    class Opts : GetOpt
+    {
+        [Parameters(Min = 0, Max = 2)]
+        public List<String> Parameters = new List<string>();
+
+        [Argument(HelpText = "All Compute Hash")]
+        [ShortArgument('a')]
+        [ArgumentAlias("all-compute-hash")]
+        public bool AllComputeHash = false;
+
+        [Argument(HelpText = "Recurse")]
+        [ShortArgument('r')]
+        public bool Recurse = false;
+
+        [Argument(HelpText = "Source Path")]
+        [ShortArgument('s')]
+        [ArgumentAlias("source-path")]
+        public string SourcePath = null;
+
+        [Argument(HelpText = "Target Path")]
+        [ShortArgument('t')]
+        [ArgumentAlias("target-path")]
+        public string TargetPath = null;
     }
 }
