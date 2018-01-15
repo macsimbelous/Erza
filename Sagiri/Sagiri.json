@@ -1,4 +1,6 @@
 ﻿{
   "SourcePath": "I:\\AnimeArt\\Unsorted",
   "TargetPath": "I:\\AnimeArt",
+  "AllComputeHash": false,
+  "Recurse": false
 }
