@@ -874,8 +874,16 @@ namespace Erza
                 //mImgDescriptor.danbooru_url = "http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
                 XmlElement url = node["file-url"];
                 //mImgDescriptor.FilePath = "http://danbooru.donmai.us" + url.InnerText;
-                mImgDescriptor.urls.Add("http://danbooru.donmai.us" + url.InnerText);
-                mImgDescriptor.danbooru_url = "http://danbooru.donmai.us" + url.InnerText;
+                if (url.InnerText.IndexOf("https://raikou1.donmai.us") == 0)
+                {
+                    mImgDescriptor.urls.Add(url.InnerText);
+                    mImgDescriptor.danbooru_url = url.InnerText;
+                }
+                else
+                {
+                    mImgDescriptor.urls.Add("http://danbooru.donmai.us" + url.InnerText);
+                    mImgDescriptor.danbooru_url = "http://danbooru.donmai.us" + url.InnerText;
+                }
                 XmlElement height = node["image-height"];
                 XmlElement width = node["image-width"];
                 if (!String.IsNullOrEmpty(height.InnerText) & !String.IsNullOrEmpty(width.InnerText))
