@@ -185,9 +185,11 @@ namespace Ange
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Erza = new SQLiteConnection("data source="+ Application.StartupPath + "\\Erza.sqlite");
+            //this.Erza = new SQLiteConnection("data source="+ Application.StartupPath + "\\Erza.sqlite");
+            this.Erza = new SQLiteConnection("data source=C:\\utils\\data\\Erza.sqlite");
             this.Erza.Open();
-            this.Previews = new SQLiteConnection("data source=" + Application.StartupPath + "\\Previews.sqlite");
+            //this.Previews = new SQLiteConnection("data source=" + Application.StartupPath + "\\Previews.sqlite");
+            this.Previews = new SQLiteConnection("data source=C:\\utils\\data\\Previews.sqlite");
             this.Previews.Open();
             this.Result = new List<ImageInfo>();
             this.brush = new SolidBrush(Color.Orange);

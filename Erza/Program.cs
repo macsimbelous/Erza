@@ -121,7 +121,7 @@ namespace Erza
         {
             Program.config = new ErzaConfig();
             //Параметры по умолчанию
-            Program.config.ConnectionString = @"data source=C:\utils\erza\erza.sqlite";
+            Program.config.ConnectionString = @"data source=C:\utils\data\erza.sqlite";
             Program.config.UseDanbooru = true;
             Program.config.UseDB = true;
             Program.config.UseGelbooru = true;
@@ -142,9 +142,9 @@ namespace Erza
             Program.config.ProxyLogin = null;
             Program.config.ProxyPassword = null;
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(ErzaConfig));
-            if (File.Exists(".\\Erza.json"))
+            if (File.Exists(@"C:\utils\cfg\Erza.json"))
             {
-                using (FileStream fs = new FileStream(".\\Erza.json", FileMode.Open))
+                using (FileStream fs = new FileStream(@"C:\utils\cfg\Erza.json", FileMode.Open))
                 {
                     Program.config = (ErzaConfig)jsonFormatter.ReadObject(fs);
                 }

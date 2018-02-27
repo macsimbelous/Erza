@@ -30,7 +30,7 @@ namespace Euphemia
     {
         static public bool FullMode = false;
         //static string connection_string = "data source=\"C:\\Temp\\erza.sqlite\"";
-        static string connection_string = "data source=C:\\utils\\Erza\\erza.sqlite";
+        static string connection_string = "data source=C:\\utils\\data\\erza.sqlite";
         static string dir = null;
         static void Main(string[] args)
         {

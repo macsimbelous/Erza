@@ -116,7 +116,7 @@ namespace GetIdol
             Program.config.BaseURL = "https://chan.sankakucomplex.com/";
             Program.config.TimeOut = 5 * 1000;
             Program.config.TimeOutError = (5 * 60) * 1000;
-            Program.config.ConnectionString = @"data source=C:\utils\erza\erza.sqlite";
+            Program.config.ConnectionString = @"data source=C:\utils\data\erza.sqlite";
             Program.config.UseDB = false;
             Program.config.UserAgent = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
             Program.config.LimitErrors = 2;
@@ -130,9 +130,9 @@ namespace GetIdol
             Program.config.DownloadPath = ".";
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(GetidolConfig));
             //jsonFormatter.WriteObject(System.IO.File.Create(".\\test.json"), Program.config);
-            if (File.Exists(".\\Getidol.json"))
+            if (File.Exists(@"C:\utils\cfg\Getidol.json"))
             {
-                using (FileStream fs = new FileStream(".\\Getidol.json", FileMode.Open))
+                using (FileStream fs = new FileStream(@"C:\utils\cfg\Getidol.json", FileMode.Open))
                 {
                     Program.config = (GetidolConfig)jsonFormatter.ReadObject(fs);
                 }

@@ -258,7 +258,7 @@ namespace Sagiri
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Config));
             if (File.Exists("C:\\utils\\Erza\\Sagiri.json"))
             {
-                using (MemoryStream fs = new MemoryStream(Encoding.UTF8.GetBytes(File.ReadAllText(".\\Sagiri.json", Encoding.UTF8))))
+                using (MemoryStream fs = new MemoryStream(Encoding.UTF8.GetBytes(File.ReadAllText("C:\\utils\\Erza\\Sagiri.json", Encoding.UTF8))))
                 //using (FileStream fs = new FileStream("C:\\utils\\Erza\\Sagiri.json", FileMode.Open))
                 {
                     Program.config = (Config)jsonFormatter.ReadObject(fs);

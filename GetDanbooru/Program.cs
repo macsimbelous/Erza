@@ -82,7 +82,7 @@ namespace GetDanbooru
         {
             Program.config = new ErzaConfig();
             //Параметры по умолчанию
-            Program.config.ConnectionString = @"data source=C:\utils\erza\erza.sqlite";
+            Program.config.ConnectionString = @"data source=C:\utils\data\erza.sqlite";
             Program.config.UseDB = true;
             Program.config.UserAgent = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
             Program.config.LimitError = 4;
@@ -96,9 +96,9 @@ namespace GetDanbooru
             Program.config.ProxyLogin = null;
             Program.config.ProxyPassword = null;
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(ErzaConfig));
-            if (File.Exists(".\\GetDanbooru.json"))
+            if (File.Exists(@"C:\utils\cfg\GetDanbooru.json"))
             {
-                using (FileStream fs = new FileStream(".\\GetDanbooru.json", FileMode.Open))
+                using (FileStream fs = new FileStream(@"C:\utils\cfg\GetDanbooru.json", FileMode.Open))
                 {
                     Program.config = (ErzaConfig)jsonFormatter.ReadObject(fs);
                 }

@@ -31,7 +31,7 @@ namespace Maki
     {
         static void Main(string[] args)
         {
-            string previews = "data source=C:\\utils\\erza\\previews.sqlite";
+            string previews = "data source=C:\\utils\\data\\previews.sqlite";
             //string previews = @"data source=C:\Users\maksim\Source\Repos\Erza\Ange\bin\Debug\Previews.sqlite";
             SQLiteConnection conn = new SQLiteConnection(previews);
             conn.Open();
@@ -63,7 +63,7 @@ namespace Maki
             transact.Commit();
             List<string> hashs = ReadAllHashFromPrewiewsDB(conn);
             Console.WriteLine();
-            string erzadb = "data source=C:\\utils\\erza\\erza.sqlite";
+            string erzadb = "data source=C:\\utils\\data\\erza.sqlite";
             using (SQLiteConnection erza_conn = new SQLiteConnection(erzadb))
             {
                 erza_conn.Open();

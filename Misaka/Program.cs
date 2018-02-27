@@ -40,7 +40,7 @@ namespace Misaka
                 return;
             }
             //string connection_string = "data source=\"C:\\Temp\\erza.sqlite\"";
-            string connection_string = "data source=C:\\utils\\Erza\\erza.sqlite";
+            string connection_string = "data source=C:\\utils\\data\\erza.sqlite";
             List<ImageInfo> img_list = new List<ImageInfo>();
             using (SQLiteConnection connection = new SQLiteConnection(connection_string))
             {

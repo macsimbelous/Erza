@@ -30,7 +30,7 @@ namespace Shina
 {
     class Program
     {
-        static string ConnectionString = @"data source=C:\utils\Erza\erza.sqlite";
+        static string ConnectionString = @"data source=C:\utils\data\erza.sqlite";
         static string UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
         static string LoginForDanbooru = "macsimbelous";
         static string ApiKeyForDanbooru = "F5eC.ADAOFChEkOwVA1x.BUES0S9GaRqSoohs7wO";
@@ -39,7 +39,7 @@ namespace Shina
             List<ImageInfo> il = new List<ImageInfo>();
             Console.WriteLine("Считываем хэши из базы данных");
             var timer = Stopwatch.StartNew();
-            using (SQLiteConnection connection = new SQLiteConnection(@"data source=C:\utils\Erza\erza.sqlite"))
+            using (SQLiteConnection connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite"))
             {
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand())
