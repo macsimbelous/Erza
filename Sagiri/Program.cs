@@ -256,9 +256,9 @@ namespace Sagiri
             Program.config.SourcePath = @"I:\AnimeArt\Unsorted";
             Program.config.TargetPath = @"I:\AnimeArt";
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Config));
-            if (File.Exists("C:\\utils\\Erza\\Sagiri.json"))
+            if (File.Exists("C:\\utils\\cfg\\Sagiri.json"))
             {
-                using (MemoryStream fs = new MemoryStream(Encoding.UTF8.GetBytes(File.ReadAllText("C:\\utils\\Erza\\Sagiri.json", Encoding.UTF8))))
+                using (MemoryStream fs = new MemoryStream(Encoding.UTF8.GetBytes(File.ReadAllText("C:\\utils\\cfg\\Sagiri.json", Encoding.UTF8))))
                 //using (FileStream fs = new FileStream("C:\\utils\\Erza\\Sagiri.json", FileMode.Open))
                 {
                     Program.config = (Config)jsonFormatter.ReadObject(fs);
