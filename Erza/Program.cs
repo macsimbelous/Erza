@@ -879,6 +879,11 @@ namespace Erza
                     mImgDescriptor.urls.Add(url.InnerText);
                     mImgDescriptor.danbooru_url = url.InnerText;
                 }
+                else if (url.InnerText.IndexOf("https://hijiribe.donmai.us") == 0)
+                {
+                    mImgDescriptor.urls.Add(url.InnerText);
+                    mImgDescriptor.danbooru_url = url.InnerText;
+                }
                 else
                 {
                     mImgDescriptor.urls.Add("http://danbooru.donmai.us" + url.InnerText);
