@@ -131,7 +131,19 @@ namespace Maki
                 if (loBMP.Width < lnWidth && loBMP.Height < lnHeight)
                     return loBMP;
 
-                if (loBMP.Width > loBMP.Height)
+                float temp = (float)loBMP.Width / (float)lnWidth;
+                if ((int)((float)loBMP.Height / temp) > lnHeight)
+                {
+                    temp = (float)loBMP.Height / (float)lnHeight;
+                    lnNewWidth = (int)((float)loBMP.Width / temp);
+                    lnNewHeight = 150;
+                }
+                else
+                {
+                    lnNewWidth = 200;
+                    lnNewHeight = (int)((float)loBMP.Height / temp);
+                }
+                /*if (loBMP.Width > loBMP.Height)
                 {
                     lnRatio = (decimal)lnWidth / loBMP.Width;
                     lnNewWidth = lnWidth;
@@ -144,7 +156,7 @@ namespace Maki
                     lnNewHeight = lnHeight;
                     decimal lnTemp = loBMP.Width * lnRatio;
                     lnNewWidth = (int)lnTemp;
-                }
+                }*/
                 bmpOut = new Bitmap(lnNewWidth, lnNewHeight);
                 Graphics g = Graphics.FromImage(bmpOut);
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
