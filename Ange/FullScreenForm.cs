@@ -111,10 +111,7 @@ namespace Ange
                 {
                     this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                     ImageFormat = GetImageFormat(this.pictureBox1.Image);
-                    if (this.Result[this.Index].Tags.Count == 0)
-                    {
-                        Result[this.Index].Tags = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, main_form.Erza);
-                    }
+                    Result[this.Index].Tags = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, main_form.Erza);
                     StringBuilder tag_string = new StringBuilder();
                     for (int i = 0; i < Result[this.Index].Tags.Count; i++)
                     {

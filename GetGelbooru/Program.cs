@@ -198,12 +198,13 @@ namespace GetGelbooru
                 return false;
             }
             string filename = GetFileName(Directory, url);
-            if (IsImageFile(filename))
+            if (!IsImageFile(filename))
             {
-                Console.Write("Добавляем информацию в базу данных...");
-                UpdateDB(Path.GetFileNameWithoutExtension(url), post);
-                Console.WriteLine("OK");
+                return true;
             }
+            Console.Write("Добавляем информацию в базу данных...");
+            UpdateDB(Path.GetFileNameWithoutExtension(url), post);
+            Console.WriteLine("OK");
             if (ExistImage(Path.GetFileNameWithoutExtension(url)))
             {
                 //Console.WriteLine("Уже скачан: {0}", store_file);

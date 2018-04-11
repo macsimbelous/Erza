@@ -36,13 +36,15 @@
             this.slideshow_button = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.view_fullscreen_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openOuterSoftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.edittagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyhashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copytowallToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copytodirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MoveAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -51,8 +53,7 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.copyAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MoveAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.view_in_window_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -145,7 +146,8 @@
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewToolStripMenuItem,
+            this.view_in_window_ToolStripMenuItem,
+            this.view_fullscreen_ToolStripMenuItem,
             this.openOuterSoftToolStripMenuItem,
             this.edittagsToolStripMenuItem,
             this.slideshowToolStripMenuItem,
@@ -156,14 +158,14 @@
             this.MoveAllToDirToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 224);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 268);
             // 
-            // viewToolStripMenuItem
+            // view_fullscreen_ToolStripMenuItem
             // 
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
-            this.viewToolStripMenuItem.Text = "Просморт";
-            this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
+            this.view_fullscreen_ToolStripMenuItem.Name = "view_fullscreen_ToolStripMenuItem";
+            this.view_fullscreen_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.view_fullscreen_ToolStripMenuItem.Text = "Просморт на полный экран";
+            this.view_fullscreen_ToolStripMenuItem.Click += new System.EventHandler(this.view_fullscreen_ToolStripMenuItem_Click);
             // 
             // openOuterSoftToolStripMenuItem
             // 
@@ -206,6 +208,20 @@
             this.copytodirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.copytodirToolStripMenuItem.Text = "Копировать в каталог";
             this.copytodirToolStripMenuItem.Click += new System.EventHandler(this.copytodirToolStripMenuItem_Click);
+            // 
+            // copyAllToDirToolStripMenuItem
+            // 
+            this.copyAllToDirToolStripMenuItem.Name = "copyAllToDirToolStripMenuItem";
+            this.copyAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.copyAllToDirToolStripMenuItem.Text = "Копировать всё в каталог";
+            this.copyAllToDirToolStripMenuItem.Click += new System.EventHandler(this.copyAllToDirToolStripMenuItem_Click);
+            // 
+            // MoveAllToDirToolStripMenuItem
+            // 
+            this.MoveAllToDirToolStripMenuItem.Name = "MoveAllToDirToolStripMenuItem";
+            this.MoveAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.MoveAllToDirToolStripMenuItem.Text = "Переместить всё в каталог";
+            this.MoveAllToDirToolStripMenuItem.Click += new System.EventHandler(this.MoveAllToDirToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
@@ -261,19 +277,12 @@
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
             // 
-            // copyAllToDirToolStripMenuItem
+            // view_in_window_ToolStripMenuItem
             // 
-            this.copyAllToDirToolStripMenuItem.Name = "copyAllToDirToolStripMenuItem";
-            this.copyAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
-            this.copyAllToDirToolStripMenuItem.Text = "Копировать всё в каталог";
-            this.copyAllToDirToolStripMenuItem.Click += new System.EventHandler(this.copyAllToDirToolStripMenuItem_Click);
-            // 
-            // MoveAllToDirToolStripMenuItem
-            // 
-            this.MoveAllToDirToolStripMenuItem.Name = "MoveAllToDirToolStripMenuItem";
-            this.MoveAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
-            this.MoveAllToDirToolStripMenuItem.Text = "Переместить всё в каталог";
-            this.MoveAllToDirToolStripMenuItem.Click += new System.EventHandler(this.MoveAllToDirToolStripMenuItem_Click);
+            this.view_in_window_ToolStripMenuItem.Name = "view_in_window_ToolStripMenuItem";
+            this.view_in_window_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.view_in_window_ToolStripMenuItem.Text = "Просмотр в окне";
+            this.view_in_window_ToolStripMenuItem.Click += new System.EventHandler(this.view_in_window_ToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -313,7 +322,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem view_fullscreen_ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem edittagsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem slideshowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copytowallToolStripMenuItem;
@@ -327,6 +336,7 @@
         private System.Windows.Forms.ToolStripMenuItem openOuterSoftToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyAllToDirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem MoveAllToDirToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem view_in_window_ToolStripMenuItem;
     }
 }
 

@@ -235,15 +235,16 @@ namespace GetIdol
                 return false;
             }
             string filename = GetFileName(dir, url);
-            if (IsImageFile(filename))
+            if (!IsImageFile(filename))
             {
-                Console.Write("Добавляем информацию в базу данных...");
-                //DateTime start_db = DateTime.Now;
-                GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
-                //DateTime stop_db = DateTime.Now;
-                //Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
-                Console.WriteLine("OK");
+                return true;
             }
+            Console.Write("Добавляем информацию в базу данных...");
+            //DateTime start_db = DateTime.Now;
+            GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
+            //DateTime stop_db = DateTime.Now;
+            //Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
+            Console.WriteLine("OK");
             if (ExistImage(Path.GetFileNameWithoutExtension(url)))
             {
                 Console.WriteLine("Уже скачан: {0}", store_file);

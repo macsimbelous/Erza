@@ -203,7 +203,7 @@ namespace Ange
 
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (this.listView1.SelectedIndices.Count > 0)
+            /*if (this.listView1.SelectedIndices.Count > 0)
             {
                 int i = ((ListView)sender).SelectedIndices[0];
                 //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
@@ -214,7 +214,8 @@ namespace Ange
                 form.ShowDialog();
                 this.listView1.Refresh();
                 this.listView1.EnsureVisible(form.Index);
-            }
+            }*/
+            ViewImageInWindow();
         }
 
         private void slideshow_button_Click(object sender, EventArgs e)
@@ -233,12 +234,11 @@ namespace Ange
             form.ShowDialog();
         }
 
-        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        private void view_fullscreen_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.listView1.SelectedIndices.Count > 0)
             {
                 int i = this.listView1.SelectedIndices[0];
-                //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
                 FullScreenForm form = new FullScreenForm();
                 form.Result = Result;
                 form.Index = i;
@@ -323,7 +323,7 @@ namespace Ange
 
         private void listView1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter && this.listView1.SelectedIndices.Count > 0)
+            /*if(e.KeyCode == Keys.Enter && this.listView1.SelectedIndices.Count > 0)
             {
                 int i = this.listView1.SelectedIndices[0];
                 FullScreenForm form = new FullScreenForm();
@@ -332,6 +332,10 @@ namespace Ange
                 form.main_form = this;
                 form.ShowDialog();
                 this.listView1.EnsureVisible(form.Index);
+            }*/
+            if (e.KeyCode == Keys.Enter)
+            {
+                ViewImageInWindow();
             }
         }
 
@@ -425,6 +429,35 @@ namespace Ange
                 foreach (ImageInfo img in this.Result)
                 {
                     File.Copy(img.FilePath, this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath));
+                }
+            }
+        }
+
+        private void view_in_window_ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ViewImageInWindow();
+        }
+        private void ViewImageInWindow()
+        {
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                int i = this.listView1.SelectedIndices[0];
+                //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
+                ViewImageForm form = new ViewImageForm();
+                form.Result = Result;
+                form.Index = i;
+                form.Erza = this.Erza;
+                form.main_form = this;
+                form.ShowDialog();
+                if (form.SelectedTag != null)
+                {
+                    this.textBox1.Text = form.SelectedTag;
+                    this.search_button.PerformClick();
+                }
+                else
+                {
+                    this.listView1.Refresh();
+                    this.listView1.EnsureVisible(form.Index);
                 }
             }
         }

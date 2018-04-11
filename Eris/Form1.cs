@@ -40,7 +40,7 @@ namespace Eris
         {
             //dataGridView1.AutoGenerateColumns = true;
             table = new DataTable();
-            connection = new SQLiteConnection(@"data source=C:\utils\Erza\Erza.sqlite");
+            connection = new SQLiteConnection(@"data source=C:\utils\data\Erza.sqlite");
             connection.Open();
             adapter = new SQLiteDataAdapter();
             adapter.SelectCommand = new SQLiteCommand("SELECT * FROM tags", connection);
