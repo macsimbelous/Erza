@@ -29,10 +29,10 @@ namespace Eris
     {
         public long TagID;
         public string TagName;
-        public string TagLocation;
+        public string TagNameRus;
         public string TagDescription;
-        public string TagType;
-        public int TagCount;
+        public long TagType;
+        public long TagCount;
         public EditForm()
         {
             InitializeComponent();
@@ -46,7 +46,24 @@ namespace Eris
 
         private void EditForm_Load(object sender, EventArgs e)
         {
-            this.TagID__textBox.Text = TagID.ToString();
+            this.id_tag_textBox.Text = TagID.ToString();
+            this.count_links_textBox.Text = TagCount.ToString();
+            this.tag_textBox.Text = TagName;
+            this.tag_rus_textBox.Text = TagNameRus;
+            this.type_tag_comboBox.Text = TagType.ToString();
+            this.description_tag_textBox.Text = TagDescription;
+        }
+
+        private void save_button_Click(object sender, EventArgs e)
+        {
+            long.TryParse(this.id_tag_textBox.Text, out this.TagID);
+            long.TryParse(this.count_links_textBox.Text, out this.TagCount);
+            this.TagName = this.tag_textBox.Text;
+            this.TagNameRus = this.tag_rus_textBox.Text;
+            long.TryParse(this.type_tag_comboBox.Text, out this.TagType);
+            this.TagDescription = this.description_tag_textBox.Text;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
     }
 }

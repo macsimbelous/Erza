@@ -31,6 +31,7 @@ namespace Eris
         SQLiteDataAdapter adapter;
         DataTable table;
         SQLiteConnection connection;
+        int index_search = 0;
         public Form1()
         {
             InitializeComponent();
@@ -61,9 +62,141 @@ namespace Eris
 
         private void edit_toolStripButton_Click(object sender, EventArgs e)
         {
+            if (this.dataGridView1.SelectedRows.Count > 0)
+            {
+                DataGridViewRow row = this.dataGridView1.SelectedRows[0];
+                EditForm form = new EditForm();
+                form.TagID = (long)row.Cells["tag_id"].Value;
+                form.TagName = (string)row.Cells["tag"].Value;
+                form.TagCount = (long)row.Cells["count"].Value;
+                form.TagType = (long)row.Cells["type"].Value;
+                if (!System.DBNull.Value.Equals(row.Cells["localization"].Value))
+                {
+                    form.TagNameRus = (string)row.Cells["localization"].Value;
+                }
+                else
+                {
+                    form.TagNameRus = String.Empty;
+                }
+                if (!System.DBNull.Value.Equals(row.Cells["description"].Value))
+                {
+                    form.TagDescription = (string)row.Cells["description"].Value;
+                }
+                else
+                {
+                    form.TagDescription = String.Empty;
+                }
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    row.Cells["tag"].Value = form.TagName;
+                    //row.Cells["count"].Value = form.TagCount;
+                    row.Cells["type"].Value = form.TagType;
+                    if (String.IsNullOrEmpty(form.TagNameRus))
+                    {
+                        row.Cells["localization"].Value = System.DBNull.Value;
+                    }
+                    else
+                    {
+                        row.Cells["localization"].Value = form.TagNameRus;
+                    }
+                    if (String.IsNullOrEmpty(form.TagDescription))
+                    {
+                        row.Cells["description"].Value = System.DBNull.Value;
+                    }
+                    else
+                    {
+                        row.Cells["description"].Value = form.TagDescription;
+                    }
+                    this.adapter.Update(this.table);
+                }
+            }
+        }
+
+        private void delete_toolStripButton_Click(object sender, EventArgs e)
+        {
+            if(dataGridView1.SelectedRows.Count <= 0) { return; }
+            foreach (DataGridViewRow row in dataGridView1.SelectedRows)
+            {
+                dataGridView1.Rows.Remove(row);
+            }
+            this.adapter.Update(this.table);
+        }
+
+        private void new_toolStripButton_Click(object sender, EventArgs e)
+        {
             EditForm form = new EditForm();
-            form.TagID = (long)this.dataGridView1.SelectedRows[0].Cells[0].Value;
-            form.ShowDialog();
+            form.TagID = -1;
+            form.TagName = String.Empty;
+            form.TagCount = 0;
+            form.TagType = 0;
+            form.TagNameRus = String.Empty;
+            form.TagDescription = String.Empty;
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                DataRow row = this.table.NewRow();
+                row["tag"] = form.TagName;
+                row["count"] = 0;
+                row["type"] = form.TagType;
+                if (String.IsNullOrEmpty(form.TagNameRus))
+                {
+                    row["localization"] = System.DBNull.Value;
+                }
+                else
+                {
+                    row["localization"] = form.TagNameRus;
+                }
+                if (String.IsNullOrEmpty(form.TagDescription))
+                {
+                    row["description"] = System.DBNull.Value;
+                }
+                else
+                {
+                    row["description"] = form.TagDescription;
+                }
+                this.table.Rows.Add(row);
+                this.adapter.Update(this.table);
+            }
+        }
+
+        private void find_toolStripButton_Click(object sender, EventArgs e)
+        {
+            for (; index_search < dataGridView1.RowCount;)
+            {
+                if (dataGridView1["tag", index_search].FormattedValue.ToString().Contains(this.search_toolStripTextBox.Text.Trim()))
+                {
+                    dataGridView1.CurrentCell = dataGridView1[0, index_search];
+                    if (index_search < dataGridView1.RowCount - 1)
+                        index_search++;
+                    else
+                        index_search = 0;
+                    return;
+                }
+                else
+                {
+                    if (index_search < dataGridView1.RowCount - 1)
+                        index_search++;
+                    else
+                        index_search = 0;
+                }
+            }
+        }
+
+        private void count_toolStripButton_Click(object sender, EventArgs e)
+        {
+            if (this.dataGridView1.SelectedRows.Count > 0)
+            {
+                long count_rows;
+                DataGridViewRow row = this.dataGridView1.SelectedRows[0];
+                using (SQLiteCommand command = new SQLiteCommand())
+                {
+                    command.CommandText = "SELECT count(*) FROM image_tags WHERE image_tags.tag_id = @tag_id;";
+                    command.Parameters.AddWithValue("tag_id", row.Cells["tag_id"].Value);
+                    command.Connection = connection;
+                    count_rows = System.Convert.ToInt64(command.ExecuteScalar());
+                }
+                row.Cells["count"].Value = count_rows;
+                this.adapter.Update(this.table);
+            }
         }
     }
 }

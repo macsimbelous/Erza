@@ -140,12 +140,6 @@
     <None Include="Resources\Charting Blue Add256.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ErzaLib\ErzaLib.csproj">
-      <Project>{5bd393d7-4fa7-4c1b-a791-b13d7e26e8e0}</Project>
-      <Name>ErzaLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

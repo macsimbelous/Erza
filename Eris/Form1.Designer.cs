@@ -29,10 +29,6 @@
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.new_toolStripButton = new System.Windows.Forms.ToolStripButton();
             this.edit_toolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -40,6 +36,13 @@
             this.find_toolStripButton = new System.Windows.Forms.ToolStripButton();
             this.count_toolStripButton = new System.Windows.Forms.ToolStripButton();
             this.count_all_toolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.tag_id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tag = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.localization = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.type = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.count = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.description = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.search_toolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -51,10 +54,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column1,
-            this.Column2,
-            this.Column3,
-            this.Column4});
+            this.tag_id,
+            this.tag,
+            this.localization,
+            this.type,
+            this.count,
+            this.description});
             this.dataGridView1.Location = new System.Drawing.Point(0, 42);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
@@ -64,38 +69,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(890, 494);
             this.dataGridView1.TabIndex = 0;
             // 
-            // Column1
-            // 
-            this.Column1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column1.DataPropertyName = "tag_id";
-            this.Column1.HeaderText = "Идентификатор тега";
-            this.Column1.Name = "Column1";
-            this.Column1.ReadOnly = true;
-            // 
-            // Column2
-            // 
-            this.Column2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column2.DataPropertyName = "tag";
-            this.Column2.HeaderText = "Тег";
-            this.Column2.Name = "Column2";
-            this.Column2.ReadOnly = true;
-            // 
-            // Column3
-            // 
-            this.Column3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column3.DataPropertyName = "count";
-            this.Column3.HeaderText = "Количество ссылок на тег";
-            this.Column3.Name = "Column3";
-            this.Column3.ReadOnly = true;
-            // 
-            // Column4
-            // 
-            this.Column4.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column4.DataPropertyName = "type";
-            this.Column4.HeaderText = "Тип тега";
-            this.Column4.Name = "Column4";
-            this.Column4.ReadOnly = true;
-            // 
             // toolStrip1
             // 
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
@@ -103,6 +76,7 @@
             this.new_toolStripButton,
             this.edit_toolStripButton,
             this.delete_toolStripButton,
+            this.search_toolStripTextBox,
             this.find_toolStripButton,
             this.count_toolStripButton,
             this.count_all_toolStripButton});
@@ -120,6 +94,7 @@
             this.new_toolStripButton.Name = "new_toolStripButton";
             this.new_toolStripButton.Size = new System.Drawing.Size(36, 36);
             this.new_toolStripButton.Text = "Новый тег";
+            this.new_toolStripButton.Click += new System.EventHandler(this.new_toolStripButton_Click);
             // 
             // edit_toolStripButton
             // 
@@ -139,6 +114,7 @@
             this.delete_toolStripButton.Name = "delete_toolStripButton";
             this.delete_toolStripButton.Size = new System.Drawing.Size(36, 36);
             this.delete_toolStripButton.Text = "Удалить тег";
+            this.delete_toolStripButton.Click += new System.EventHandler(this.delete_toolStripButton_Click);
             // 
             // find_toolStripButton
             // 
@@ -148,6 +124,7 @@
             this.find_toolStripButton.Name = "find_toolStripButton";
             this.find_toolStripButton.Size = new System.Drawing.Size(36, 36);
             this.find_toolStripButton.Text = "Поиск";
+            this.find_toolStripButton.Click += new System.EventHandler(this.find_toolStripButton_Click);
             // 
             // count_toolStripButton
             // 
@@ -157,6 +134,7 @@
             this.count_toolStripButton.Name = "count_toolStripButton";
             this.count_toolStripButton.Size = new System.Drawing.Size(36, 36);
             this.count_toolStripButton.Text = "Подсчитать ссылки на тег";
+            this.count_toolStripButton.Click += new System.EventHandler(this.count_toolStripButton_Click);
             // 
             // count_all_toolStripButton
             // 
@@ -167,6 +145,69 @@
             this.count_all_toolStripButton.Size = new System.Drawing.Size(36, 36);
             this.count_all_toolStripButton.Text = "Подсчитать ссылки на все теги";
             // 
+            // tag_id
+            // 
+            this.tag_id.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.tag_id.DataPropertyName = "tag_id";
+            this.tag_id.FillWeight = 80F;
+            this.tag_id.HeaderText = "ИД";
+            this.tag_id.MinimumWidth = 80;
+            this.tag_id.Name = "tag_id";
+            this.tag_id.ReadOnly = true;
+            this.tag_id.ToolTipText = "Идентификатор тега";
+            this.tag_id.Width = 80;
+            // 
+            // tag
+            // 
+            this.tag.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.tag.DataPropertyName = "tag";
+            this.tag.FillWeight = 58.14433F;
+            this.tag.HeaderText = "Тег";
+            this.tag.Name = "tag";
+            this.tag.ReadOnly = true;
+            this.tag.ToolTipText = "Название тега";
+            // 
+            // localization
+            // 
+            this.localization.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.localization.DataPropertyName = "localization";
+            this.localization.FillWeight = 58.14433F;
+            this.localization.HeaderText = "Тег на русском";
+            this.localization.Name = "localization";
+            this.localization.ReadOnly = true;
+            // 
+            // type
+            // 
+            this.type.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.type.DataPropertyName = "type";
+            this.type.FillWeight = 29.07216F;
+            this.type.HeaderText = "Тип";
+            this.type.Name = "type";
+            this.type.ReadOnly = true;
+            this.type.ToolTipText = "Тип тега";
+            // 
+            // count
+            // 
+            this.count.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.count.DataPropertyName = "count";
+            this.count.HeaderText = "Ссылки";
+            this.count.Name = "count";
+            this.count.ReadOnly = true;
+            this.count.ToolTipText = "Количество ссылок на тег";
+            // 
+            // description
+            // 
+            this.description.DataPropertyName = "description";
+            this.description.HeaderText = "Описание";
+            this.description.Name = "description";
+            this.description.ReadOnly = true;
+            this.description.Visible = false;
+            // 
+            // search_toolStripTextBox
+            // 
+            this.search_toolStripTextBox.Name = "search_toolStripTextBox";
+            this.search_toolStripTextBox.Size = new System.Drawing.Size(150, 39);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -175,6 +216,7 @@
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.dataGridView1);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Эрис - редактор тегов";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -195,11 +237,14 @@
         private System.Windows.Forms.ToolStripButton delete_toolStripButton;
         private System.Windows.Forms.ToolStripButton count_toolStripButton;
         private System.Windows.Forms.ToolStripButton count_all_toolStripButton;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
         private System.Windows.Forms.ToolStripButton find_toolStripButton;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tag_id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tag;
+        private System.Windows.Forms.DataGridViewTextBoxColumn localization;
+        private System.Windows.Forms.DataGridViewTextBoxColumn type;
+        private System.Windows.Forms.DataGridViewTextBoxColumn count;
+        private System.Windows.Forms.DataGridViewTextBoxColumn description;
+        private System.Windows.Forms.ToolStripTextBox search_toolStripTextBox;
     }
 }
 
