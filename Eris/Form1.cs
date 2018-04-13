@@ -155,6 +155,13 @@ namespace Eris
                 }
                 this.table.Rows.Add(row);
                 this.adapter.Update(this.table);
+                int f = 0;
+                f = dataGridView1.CurrentRow.Index;
+                table.Clear();
+                this.adapter.Fill(this.table);
+                dataGridView1.ClearSelection();
+                dataGridView1.Rows[f].Selected = true;
+                dataGridView1.FirstDisplayedScrollingRowIndex = f;
             }
         }
 
@@ -196,6 +203,20 @@ namespace Eris
                 }
                 row.Cells["count"].Value = count_rows;
                 this.adapter.Update(this.table);
+            }
+        }
+
+        private void count_all_toolStripButton_Click(object sender, EventArgs e)
+        {
+            if(MessageBox.Show("Произвести подсчёт ссылок на все теги?","Подтверждение",MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                CalculateAllLinksForm form = new CalculateAllLinksForm();
+                form.table = table;
+                form.connection = connection;
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    this.adapter.Update(this.table);
+                }
             }
         }
     }
