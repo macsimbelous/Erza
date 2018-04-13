@@ -52,6 +52,24 @@ namespace Eris
             this.tag_rus_textBox.Text = TagNameRus;
             this.type_tag_comboBox.Text = TagType.ToString();
             this.description_tag_textBox.Text = TagDescription;
+
+            List<TypeTag> types = new List<TypeTag>();
+            types.Add(new TypeTag(0, "General"));
+            types.Add(new TypeTag(1, "Artist"));
+            types.Add(new TypeTag(3, "Copyright"));
+            types.Add(new TypeTag(4, "Character"));
+            types.Add(new TypeTag(5, "Circle"));
+            types.Add(new TypeTag(6, "Faults"));
+            this.type_tag_comboBox.DataSource = types;
+            //this.type_tag_comboBox.DisplayMember = "Name";
+            //this.type_tag_comboBox.ValueMember = "Name";
+            foreach (TypeTag t in types)
+            {
+                if (t.Type == TagType)
+                {
+                    this.type_tag_comboBox.SelectedItem = t;
+                }
+            }
         }
 
         private void save_button_Click(object sender, EventArgs e)
@@ -60,10 +78,33 @@ namespace Eris
             long.TryParse(this.count_links_textBox.Text, out this.TagCount);
             this.TagName = this.tag_textBox.Text;
             this.TagNameRus = this.tag_rus_textBox.Text;
-            long.TryParse(this.type_tag_comboBox.Text, out this.TagType);
+            //long.TryParse(this.type_tag_comboBox.Text, out this.TagType);
+            TypeTag t = (TypeTag)this.type_tag_comboBox.SelectedItem;
+            this.TagType = t.Type;
             this.TagDescription = this.description_tag_textBox.Text;
             this.DialogResult = DialogResult.OK;
             this.Close();
+        }
+    }
+    public class TypeTag
+    {
+        public long Type;
+        public string Name;
+        public string NameRus;
+        public TypeTag(long Type, string Name)
+        {
+            this.Type = Type;
+            this.Name = Name;
+        }
+        public TypeTag(long Type, string Name, string NameRus)
+        {
+            this.Type = Type;
+            this.Name = Name;
+            this.NameRus = NameRus;
+        }
+        override public string ToString()
+        {
+            return this.Name;
         }
     }
 }

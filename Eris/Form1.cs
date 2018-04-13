@@ -219,5 +219,17 @@ namespace Eris
                 }
             }
         }
+
+        private void dataGridView1_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        {
+            if (e.RowIndex > -1 && e.RowIndex < dataGridView1.RowCount)
+            {
+                if ((long)dataGridView1.Rows[e.RowIndex].Cells["type"].Value == 1)
+                    ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightBlue;
+
+                if ((long)dataGridView1.Rows[e.RowIndex].Cells["type"].Value == 2)
+                    ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightCyan;
+            }
+        }
     }
 }

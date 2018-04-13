@@ -121,6 +121,7 @@
             // 
             // type_tag_comboBox
             // 
+            this.type_tag_comboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.type_tag_comboBox.FormattingEnabled = true;
             this.type_tag_comboBox.Location = new System.Drawing.Point(230, 25);
             this.type_tag_comboBox.Name = "type_tag_comboBox";
