@@ -60,6 +60,9 @@ namespace Eris
             types.Add(new TypeTag(4, "Character"));
             types.Add(new TypeTag(5, "Circle"));
             types.Add(new TypeTag(6, "Faults"));
+            types.Add(new TypeTag(8, "Medium"));
+            types.Add(new TypeTag(9, "Meta"));
+            types.Add(new TypeTag(2, "Studio"));
             this.type_tag_comboBox.DataSource = types;
             //this.type_tag_comboBox.DisplayMember = "Name";
             //this.type_tag_comboBox.ValueMember = "Name";

@@ -25,24 +25,41 @@ namespace Eris
         }
         private void LongRunningTask(object o)
         {
+            SQLiteTransaction transact = connection.BeginTransaction();
             int count_rows = this.table.Rows.Count;
             for (int i = 0; i < count_rows; i++)
             {
                 if (Abort)
                 {
+                    transact.Rollback();
                     synchronizationContext.Post(EndProgress, false);
                     return;
                 }
                 DataRow row = table.Rows[i];
+                long tag_id = (long)row["tag_id"];
+                long count_links = 0;
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
                     command.CommandText = "SELECT count(*) FROM image_tags WHERE image_tags.tag_id = @tag_id;";
-                    command.Parameters.AddWithValue("tag_id", row["tag_id"]);
+                    command.Parameters.AddWithValue("tag_id", tag_id);
                     command.Connection = connection;
-                    row["count"] = System.Convert.ToInt64(command.ExecuteScalar());
+                    //row["count"] = System.Convert.ToInt64(command.ExecuteScalar());
+                    count_links = System.Convert.ToInt64(command.ExecuteScalar());
+                }
+                if (count_links > 0)
+                {
+                    using (SQLiteCommand command = new SQLiteCommand())
+                    {
+                        command.CommandText = "UPDATE tags SET count = @count WHERE tag_id = @tag_id;";
+                        command.Parameters.AddWithValue("count", count_links);
+                        command.Parameters.AddWithValue("tag_id", tag_id);
+                        command.Connection = connection;
+                        command.ExecuteNonQuery();
+                    }
                 }
                 synchronizationContext.Post(RefreshProgress, i+1);
             }
+            transact.Commit();
             synchronizationContext.Post(EndProgress, true);
         }
         private void RefreshProgress(object progress) // это для вызова  через Пост/Сенд

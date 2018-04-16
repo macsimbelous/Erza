@@ -215,7 +215,8 @@ namespace Eris
                 form.connection = connection;
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    this.adapter.Update(this.table);
+                    this.table.Clear();
+                    this.adapter.Fill(this.table);
                 }
             }
         }
@@ -224,11 +225,75 @@ namespace Eris
         {
             if (e.RowIndex > -1 && e.RowIndex < dataGridView1.RowCount)
             {
-                if ((long)dataGridView1.Rows[e.RowIndex].Cells["type"].Value == 1)
-                    ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightBlue;
+                /*if ((long)dataGridView1.Rows[e.RowIndex].Cells["type"].Value == 1)
+                    ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Yellow;
 
                 if ((long)dataGridView1.Rows[e.RowIndex].Cells["type"].Value == 2)
-                    ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightCyan;
+                    ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Magenta;*/
+                switch ((long)dataGridView1.Rows[e.RowIndex].Cells["type"].Value)
+                {
+                    case 1:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                        break;
+                    case 2:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Magenta;
+                        break;
+                    case 3:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.DarkMagenta;
+                        break;
+                    case 4:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Green;
+                        break;
+                    case 5:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Aquamarine;
+                        break;
+                    case 6:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Red;
+                        break;
+                    case 8:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Blue;
+                        break;
+                    case 9:
+                        ((DataGridView)sender).Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Violet;
+                        break;
+                }
+            }
+        }
+
+        private void dataGridView1_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                switch ((long)dataGridView1.Rows[e.RowIndex].Cells["type"].Value)
+                {
+                    case 0:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "General";
+                        break;
+                    case 1:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Artist";
+                        break;
+                    case 2:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Studio";
+                        break;
+                    case 3:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Copyright";
+                        break;
+                    case 4:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Character";
+                        break;
+                    case 5:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Circle";
+                        break;
+                    case 6:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Faults";
+                        break;
+                    case 8:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Medium";
+                        break;
+                    case 9:
+                        dataGridView1.Rows[e.RowIndex].Cells["type"].ToolTipText = "Meta";
+                        break;
+                }
             }
         }
     }
