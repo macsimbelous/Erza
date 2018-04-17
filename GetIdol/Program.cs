@@ -235,10 +235,10 @@ namespace GetIdol
                 return false;
             }
             string filename = GetFileName(dir, url);
-            if (!IsImageFile(filename))
+            /*if (!IsImageFile(filename))
             {
                 return true;
-            }
+            }*/
             Console.Write("Добавляем информацию в базу данных...");
             //DateTime start_db = DateTime.Now;
             GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
@@ -378,7 +378,7 @@ namespace GetIdol
                 if (match.Success)
                 {
                     string url = match.Value.Substring(file_url.Length);
-                    return "https:" + url;
+                    return "https:" + url.Replace("amp;", String.Empty);
                 }
                 else
                 {
@@ -387,7 +387,7 @@ namespace GetIdol
                     if (match_swf.Success)
                     {
                         string url = match_swf.Value.Substring(12).Replace("\" >Save this flash (right click and save)</a></p>", String.Empty);
-                        return url;
+                        return url.Replace("amp;", String.Empty);
                     }
                     else
                     {
