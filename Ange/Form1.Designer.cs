@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tag_radioButton = new System.Windows.Forms.RadioButton();
             this.md5_radioButton = new System.Windows.Forms.RadioButton();
@@ -36,6 +37,7 @@
             this.slideshow_button = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.view_in_window_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.view_fullscreen_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openOuterSoftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.edittagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,7 +55,6 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.view_in_window_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -158,7 +159,14 @@
             this.MoveAllToDirToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 268);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 246);
+            // 
+            // view_in_window_ToolStripMenuItem
+            // 
+            this.view_in_window_ToolStripMenuItem.Name = "view_in_window_ToolStripMenuItem";
+            this.view_in_window_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.view_in_window_ToolStripMenuItem.Text = "Просмотр в окне";
+            this.view_in_window_ToolStripMenuItem.Click += new System.EventHandler(this.view_in_window_ToolStripMenuItem_Click);
             // 
             // view_fullscreen_ToolStripMenuItem
             // 
@@ -277,13 +285,6 @@
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
             // 
-            // view_in_window_ToolStripMenuItem
-            // 
-            this.view_in_window_ToolStripMenuItem.Name = "view_in_window_ToolStripMenuItem";
-            this.view_in_window_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
-            this.view_in_window_ToolStripMenuItem.Text = "Просмотр в окне";
-            this.view_in_window_ToolStripMenuItem.Click += new System.EventHandler(this.view_in_window_ToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -298,6 +299,7 @@
             this.Controls.Add(this.md5_radioButton);
             this.Controls.Add(this.tag_radioButton);
             this.Controls.Add(this.textBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Ange";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);

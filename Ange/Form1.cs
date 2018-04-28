@@ -45,7 +45,7 @@ namespace Ange
             ListViewItem item = new ListViewItem();
             item.Tag = GetPreview(Result[e.ItemIndex].Hash);
             item.Text = Result[e.ItemIndex].Hash;
-            Result[e.ItemIndex].Tags = ErzaDB.GetTagsByImageID(Result[e.ItemIndex].ImageID, Erza);
+            Result[e.ItemIndex].Tags = ErzaDB.GetTagsByImageIDToString(Result[e.ItemIndex].ImageID, Erza);
             StringBuilder tag_string = new StringBuilder();
             for (int i = 0; i < Result[e.ItemIndex].Tags.Count; i++)
             {

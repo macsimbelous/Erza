@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditTagsForm));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.ImageTags_listBox = new System.Windows.Forms.ListBox();
             this.AllTags_listBox = new System.Windows.Forms.ListBox();
@@ -100,6 +101,7 @@
             this.Controls.Add(this.AllTags_listBox);
             this.Controls.Add(this.ImageTags_listBox);
             this.Controls.Add(this.pictureBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "EditTagsForm";
             this.Text = "Редактирование тегов изображения";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EditTagsForm_FormClosing);

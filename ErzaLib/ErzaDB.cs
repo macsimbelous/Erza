@@ -484,7 +484,7 @@ namespace ErzaLib
             }
             return imgs;
         }
-        public static List<string> GetTagsByImageID(long ImageID, SQLiteConnection Connection)
+        public static List<string> GetTagsByImageIDToString(long ImageID, SQLiteConnection Connection)
         {
             List<string> tags = new List<string>();
             using (SQLiteCommand command = new SQLiteCommand(Connection))
@@ -496,6 +496,37 @@ namespace ErzaLib
                     while (reader.Read())
                     {
                         tags.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return tags;
+        }
+        public static List<TagInfo> GetTagsByImageID(long ImageID, SQLiteConnection Connection)
+        {
+            List<TagInfo> tags = new List<TagInfo>();
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "select tags.tag, tags.count, tags.type, tags.localization, tags.description from tags inner join image_tags on tags.tag_id = image_tags.tag_id where image_tags.image_id = @image_id";
+                command.Parameters.AddWithValue("image_id", ImageID);
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        TagInfo tag = new TagInfo();
+                        tag.Tag = (string)reader["tag"];
+                        tag.Count = (long)reader["count"];
+                        object o = reader["localization"];
+                        if (o != DBNull.Value)
+                        {
+                            tag.TagRus = (string)o;
+                        }
+                        o = reader["description"];
+                        if (o != DBNull.Value)
+                        {
+                            tag.Description = (string)o;
+                        }
+                        tag.Type = (TagType)reader["type"];
+                        tags.Add(tag);
                     }
                 }
             }

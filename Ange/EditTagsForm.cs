@@ -41,7 +41,7 @@ namespace Ange
         {
             this.pictureBox1.ImageLocation = EditImage.FilePath;
             //sadsadsa
-            List<string> tags = ErzaDB.GetTagsByImageID(EditImage.ImageID, Connection);
+            List<string> tags = ErzaDB.GetTagsByImageIDToString(EditImage.ImageID, Connection);
             tags.Sort();
             this.ImageTags_listBox.BeginUpdate();
             this.ImageTags_listBox.Items.AddRange(tags.ToArray());

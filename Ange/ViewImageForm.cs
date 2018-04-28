@@ -34,6 +34,17 @@ namespace Ange
         public string SelectedTag = null;
         public SQLiteConnection Erza;
         public Form1 main_form;
+        BindingList<TagInfo> Tags;
+        //Colors
+        SolidBrush GeneralColor = new SolidBrush(Color.Black);
+        SolidBrush ArtistColor = new SolidBrush(Color.Yellow);
+        SolidBrush StudioColor = new SolidBrush(Color.Magenta);
+        SolidBrush CopyrightColor = new SolidBrush(Color.DarkMagenta);
+        SolidBrush CharacterColor = new SolidBrush(Color.Green);
+        SolidBrush CircleColor = new SolidBrush(Color.Aquamarine);
+        SolidBrush FaultsColor = new SolidBrush(Color.Red);
+        SolidBrush MediumColor = new SolidBrush(Color.Blue);
+        SolidBrush MetaColor = new SolidBrush(Color.Violet);
         public ViewImageForm()
         {
             InitializeComponent();
@@ -42,6 +53,7 @@ namespace Ange
         private void ViewImageForm_Load(object sender, EventArgs e)
         {
             LoadImage();
+            listBox1.DrawMode = DrawMode.OwnerDrawVariable;
         }
         private void LoadImage()
         {
@@ -62,7 +74,10 @@ namespace Ange
                     }*/
                     FileSize = new System.IO.FileInfo(this.Result[this.Index].FilePath).Length;
                     this.size_label.Text = "Размер: " + FileSize.ToString();
-                    this.listBox1.Items.AddRange(ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza).ToArray());
+                    //this.listBox1.Items.AddRange(ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza).ToArray());
+                    List<TagInfo> temp = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza);
+                    this.Tags = new BindingList<TagInfo>(temp.OrderBy(tag => tag.Tag).ToList());
+                    this.listBox1.DataSource = this.Tags;
                     this.tags_count_label.Text = "Количество тегов: " + this.listBox1.Items.Count.ToString();
                 }
                 else
@@ -239,6 +254,56 @@ namespace Ange
                 this.Index--;
                 LoadImage();
             }
+        }
+
+        private void listBox1_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            if (e.Index >= 0 && e.Index < listBox1.Items.Count)
+            {
+                Graphics g = e.Graphics;
+                SolidBrush foregroundBrush = new SolidBrush(Color.White); ;
+                switch (((TagInfo)listBox1.Items[e.Index]).Type)
+                {
+                    case TagType.General:
+                        foregroundBrush = GeneralColor;
+                        break;
+                    case TagType.Artist:
+                        foregroundBrush = ArtistColor;
+                        break;
+                    case TagType.Studio:
+                        foregroundBrush = StudioColor;
+                        break;
+                    case TagType.Copyright:
+                        foregroundBrush = CopyrightColor;
+                        break;
+                    case TagType.Character:
+                        foregroundBrush = CharacterColor;
+                        break;
+                    case TagType.Circle:
+                        foregroundBrush = CircleColor;
+                        break;
+                    case TagType.Faults:
+                        foregroundBrush = FaultsColor;
+                        break;
+                    case TagType.Medium:
+                        bool selected = ((e.State & DrawItemState.Selected) == DrawItemState.Selected);
+                        if (selected)
+                        {
+                            foregroundBrush = GeneralColor;
+                        }
+                        else
+                        {
+                            foregroundBrush = MediumColor;
+                        }
+                        break;
+                    case TagType.Meta:
+                        foregroundBrush = MetaColor;
+                        break;
+                }
+                g.DrawString(((TagInfo)listBox1.Items[e.Index]).Tag, e.Font, foregroundBrush, listBox1.GetItemRectangle(e.Index).Location);
+            }
+            e.DrawFocusRectangle();
         }
     }
 }
