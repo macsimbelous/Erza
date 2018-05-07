@@ -32,6 +32,7 @@ namespace Maki
         static void Main(string[] args)
         {
             string previews = "data source=C:\\utils\\data\\previews.sqlite";
+            List<string> bad_files = new List<string>();
             //string previews = @"data source=C:\Users\maksim\Source\Repos\Erza\Ange\bin\Debug\Previews.sqlite";
             SQLiteConnection conn = new SQLiteConnection(previews);
             conn.Open();
@@ -52,12 +53,22 @@ namespace Maki
                 else
                 {
                     Bitmap preview = CreateThumbnail(file, 200, 150);
-                    using(MemoryStream stream = new MemoryStream())
+                    if (preview != null)
                     {
-                        preview.Save(stream, jpgEncoder, myEncoderParameters);
-                        LoadPreviewToDB(hash, stream.ToArray(), conn);
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            preview.Save(stream, jpgEncoder, myEncoderParameters);
+                            LoadPreviewToDB(hash, stream.ToArray(), conn);
+                        }
+                        Console.WriteLine(file + " Добавлен");
                     }
-                    Console.WriteLine(file + " Добавлен");
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(file + " Ошибка!");
+                        Console.ResetColor();
+                        bad_files.Add(file);
+                    }
                 }
             }
             transact.Commit();
@@ -97,6 +108,11 @@ namespace Maki
                 command.ExecuteNonQuery();
             }
             conn.Close();
+            foreach(string s in bad_files)
+            {
+                Console.WriteLine(s);
+            }
+            Console.WriteLine($"Ошибок {bad_files.Count}");
         }
         public static bool ExistPreview(string hash, SQLiteConnection conn)
         {
@@ -123,7 +139,7 @@ namespace Maki
                 Bitmap loBMP = new Bitmap(lcFilename);
                 ImageFormat loFormat = loBMP.RawFormat;
 
-                decimal lnRatio;
+                //decimal lnRatio;
                 int lnNewWidth = 0;
                 int lnNewHeight = 0;
 
