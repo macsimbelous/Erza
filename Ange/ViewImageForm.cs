@@ -143,7 +143,8 @@ namespace Ange
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            SelectedTag = (string)this.listBox1.SelectedItem;
+            TagInfo t = (TagInfo)this.listBox1.SelectedItem;
+            SelectedTag = t.Tag;
             this.Close();
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
