@@ -55,6 +55,7 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.recreate_preview_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -157,9 +158,10 @@
             this.copytodirToolStripMenuItem,
             this.copyAllToDirToolStripMenuItem,
             this.MoveAllToDirToolStripMenuItem,
+            this.recreate_preview_ToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 246);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 290);
             // 
             // view_in_window_ToolStripMenuItem
             // 
@@ -285,6 +287,13 @@
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
             // 
+            // recreate_preview_ToolStripMenuItem
+            // 
+            this.recreate_preview_ToolStripMenuItem.Name = "recreate_preview_ToolStripMenuItem";
+            this.recreate_preview_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.recreate_preview_ToolStripMenuItem.Text = "Пересоздать эскиз";
+            this.recreate_preview_ToolStripMenuItem.Click += new System.EventHandler(this.recreate_preview_ToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -339,6 +348,7 @@
         private System.Windows.Forms.ToolStripMenuItem copyAllToDirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem MoveAllToDirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem view_in_window_ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem recreate_preview_ToolStripMenuItem;
     }
 }
 

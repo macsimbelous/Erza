@@ -26,6 +26,7 @@ using System.Drawing.Drawing2D;
 using System.Data.SQLite;
 using System.IO;
 using ErzaLib;
+using System.Drawing.Imaging;
 
 namespace Ange
 {
@@ -460,6 +461,116 @@ namespace Ange
                     this.listView1.EnsureVisible(form.Index);
                 }
             }
+        }
+
+        private void recreate_preview_ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.listView1.SelectedIndices.Count > 0)
+            {
+                ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+                EncoderParameters myEncoderParameters = new EncoderParameters(1);
+                EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
+                myEncoderParameters.Param[0] = myEncoderParameter;
+                int i = this.listView1.SelectedIndices[0];
+                using (Bitmap preview = CreateThumbnail(Result[i].FilePath, 200, 150))
+                {
+                    if (preview != null)
+                    {
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            preview.Save(stream, jpgEncoder, myEncoderParameters);
+                            UpdatePreviewToDB(Result[i].Hash, stream.ToArray(), Previews);
+                        }
+                        this.listView1.Items[i].Tag = preview;
+                        this.listView1.RedrawItems(i, i, false);
+                    }
+                    else
+                    {
+                        MessageBox.Show(Result[i].FilePath + " Ошибка!");
+                    }
+                }
+            }
+        }
+        public static void UpdatePreviewToDB(string Hash, byte[] Preview, SQLiteConnection Connection)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "UPDATE previews SET preview = @preview WHERE hash = @hash";
+                command.Parameters.AddWithValue("hash", Hash);
+                command.Parameters.AddWithValue("preview", Preview);
+                command.ExecuteNonQuery();
+            }
+        }
+        public Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
+        {
+            System.Drawing.Bitmap bmpOut = null;
+            try
+            {
+                Bitmap loBMP = new Bitmap(lcFilename);
+                ImageFormat loFormat = loBMP.RawFormat;
+
+                //decimal lnRatio;
+                int lnNewWidth = 0;
+                int lnNewHeight = 0;
+
+                //*** If the image is smaller than a thumbnail just return it
+                if (loBMP.Width < lnWidth && loBMP.Height < lnHeight)
+                    return loBMP;
+
+                float temp = (float)loBMP.Width / (float)lnWidth;
+                if ((int)((float)loBMP.Height / temp) > lnHeight)
+                {
+                    temp = (float)loBMP.Height / (float)lnHeight;
+                    lnNewWidth = (int)((float)loBMP.Width / temp);
+                    lnNewHeight = 150;
+                }
+                else
+                {
+                    lnNewWidth = 200;
+                    lnNewHeight = (int)((float)loBMP.Height / temp);
+                }
+                /*if (loBMP.Width > loBMP.Height)
+                {
+                    lnRatio = (decimal)lnWidth / loBMP.Width;
+                    lnNewWidth = lnWidth;
+                    decimal lnTemp = loBMP.Height * lnRatio;
+                    lnNewHeight = (int)lnTemp;
+                }
+                else
+                {
+                    lnRatio = (decimal)lnHeight / loBMP.Height;
+                    lnNewHeight = lnHeight;
+                    decimal lnTemp = loBMP.Width * lnRatio;
+                    lnNewWidth = (int)lnTemp;
+                }*/
+                bmpOut = new Bitmap(lnNewWidth, lnNewHeight);
+                Graphics g = Graphics.FromImage(bmpOut);
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.FillRectangle(Brushes.White, 0, 0, lnNewWidth, lnNewHeight);
+                g.DrawImage(loBMP, 0, 0, lnNewWidth, lnNewHeight);
+
+                loBMP.Dispose();
+            }
+            catch
+            {
+                return null;
+            }
+
+            return bmpOut;
+        }
+        public ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+            return null;
         }
     }
 }
