@@ -73,7 +73,8 @@ namespace Ange
                         Result[this.Index].Tags = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, ((Form1)this.Parent).Erza);
                     }*/
                     FileSize = new System.IO.FileInfo(this.Result[this.Index].FilePath).Length;
-                    this.size_label.Text = "Размер: " + FileSize.ToString();
+                    //this.size_label.Text = "Размер: " + FileSize.ToString();
+                    this.size_label.Text = String.Format($"Размер: {FileSize:### ### ###} байт");
                     //this.listBox1.Items.AddRange(ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza).ToArray());
                     List<TagInfo> temp = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza);
                     this.Tags = new BindingList<TagInfo>(temp.OrderBy(tag => tag.Tag).ToList());
