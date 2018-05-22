@@ -467,6 +467,15 @@ namespace GetIdol
                 catch (WebException we)
                 {
                     Console.WriteLine("Ошибка: " + we.Message);
+                    if (we.Response != null)
+                    {
+                        HttpWebResponse errorResponse = we.Response as HttpWebResponse;
+                        if (errorResponse.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            Console.WriteLine("Ошибка 404! прекращаем получение ссылок.");
+                            break;
+                        }
+                    }
                     error++;
                     if (error >= Program.config.LimitErrors)
                     {
