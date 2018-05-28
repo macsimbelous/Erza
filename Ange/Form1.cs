@@ -442,17 +442,31 @@ namespace Ange
         {
             if (this.listView1.SelectedIndices.Count > 0)
             {
-                int i = this.listView1.SelectedIndices[0];
+                int index = this.listView1.SelectedIndices[0];
                 //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
                 ViewImageForm form = new ViewImageForm();
                 form.Result = Result;
-                form.Index = i;
+                form.Index = index;
                 form.Erza = this.Erza;
                 form.main_form = this;
                 form.ShowDialog();
-                if (form.SelectedTag != null)
+                if (form.SelectedTags != null && form.SelectedTags.Count > 0)
                 {
-                    this.textBox1.Text = form.SelectedTag;
+                    //this.textBox1.Text = form.SelectedTag;
+                    StringBuilder sb = new StringBuilder();
+                    for(int i=0;i< form.SelectedTags.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            sb.Append(form.SelectedTags[i]);
+                        }
+                        else
+                        {
+                            sb.Append(' ');
+                            sb.Append(form.SelectedTags[i]);
+                        }
+                    }
+                    this.textBox1.Text = sb.ToString();
                     this.search_button.PerformClick();
                 }
                 else

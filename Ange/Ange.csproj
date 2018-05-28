@@ -68,6 +68,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddTagForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddTagForm.Designer.cs">
+      <DependentUpon>AddTagForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditTagsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +107,9 @@
     <Compile Include="ViewImageForm.Designer.cs">
       <DependentUpon>ViewImageForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AddTagForm.resx">
+      <DependentUpon>AddTagForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditTagsForm.resx">
       <DependentUpon>EditTagsForm.cs</DependentUpon>
     </EmbeddedResource>

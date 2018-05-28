@@ -31,16 +31,18 @@ namespace Ange
     {
         public List<ImageInfo> Result;
         public int Index = 0;
-        public string SelectedTag = null;
+        //public string SelectedTag = null;
+        public List<string> SelectedTags = null;
         public SQLiteConnection Erza;
         public Form1 main_form;
         BindingList<TagInfo> Tags;
         //Colors
         SolidBrush GeneralColor = new SolidBrush(Color.Black);
-        SolidBrush ArtistColor = new SolidBrush(Color.Yellow);
+        SolidBrush ArtistColor = new SolidBrush(Color.FromArgb(235, 156, 0));
         SolidBrush StudioColor = new SolidBrush(Color.Magenta);
         SolidBrush CopyrightColor = new SolidBrush(Color.DarkMagenta);
         SolidBrush CharacterColor = new SolidBrush(Color.Green);
+        SolidBrush CharacterColor2 = new SolidBrush(Color.LightGreen);
         SolidBrush CircleColor = new SolidBrush(Color.Aquamarine);
         SolidBrush FaultsColor = new SolidBrush(Color.Red);
         SolidBrush MediumColor = new SolidBrush(Color.Blue);
@@ -144,8 +146,12 @@ namespace Ange
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            TagInfo t = (TagInfo)this.listBox1.SelectedItem;
-            SelectedTag = t.Tag;
+            this.SelectedTags = new List<string>();
+            foreach (var item in listBox1.SelectedItems)
+            {
+                TagInfo t = (TagInfo)item;
+                this.SelectedTags.Add(t.Tag);
+            }
             this.Close();
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -264,7 +270,8 @@ namespace Ange
             if (e.Index >= 0 && e.Index < listBox1.Items.Count)
             {
                 Graphics g = e.Graphics;
-                SolidBrush foregroundBrush = new SolidBrush(Color.White); ;
+                SolidBrush foregroundBrush = new SolidBrush(Color.White);
+                bool selected;
                 switch (((TagInfo)listBox1.Items[e.Index]).Type)
                 {
                     case TagType.General:
@@ -280,7 +287,16 @@ namespace Ange
                         foregroundBrush = CopyrightColor;
                         break;
                     case TagType.Character:
-                        foregroundBrush = CharacterColor;
+                        //foregroundBrush = CharacterColor;
+                        selected = ((e.State & DrawItemState.Selected) == DrawItemState.Selected);
+                        if (selected)
+                        {
+                            foregroundBrush = CharacterColor2;
+                        }
+                        else
+                        {
+                            foregroundBrush = CharacterColor;
+                        }
                         break;
                     case TagType.Circle:
                         foregroundBrush = CircleColor;
@@ -289,7 +305,7 @@ namespace Ange
                         foregroundBrush = FaultsColor;
                         break;
                     case TagType.Medium:
-                        bool selected = ((e.State & DrawItemState.Selected) == DrawItemState.Selected);
+                        selected = ((e.State & DrawItemState.Selected) == DrawItemState.Selected);
                         if (selected)
                         {
                             foregroundBrush = GeneralColor;
@@ -306,6 +322,43 @@ namespace Ange
                 g.DrawString(((TagInfo)listBox1.Items[e.Index]).Tag, e.Font, foregroundBrush, listBox1.GetItemRectangle(e.Index).Location);
             }
             e.DrawFocusRectangle();
+        }
+
+        private void Search_button_Click(object sender, EventArgs e)
+        {
+            this.SelectedTags = new List<string>();
+            foreach (var item in listBox1.SelectedItems)
+            {
+                TagInfo t = (TagInfo)item;
+                this.SelectedTags.Add(t.Tag);
+            }
+            this.Close();
+        }
+
+        private void RemoveTag_button_Click(object sender, EventArgs e)
+        {
+            foreach (var item in listBox1.SelectedItems)
+            {
+                TagInfo t = (TagInfo)item;
+                ErzaDB.DeleteTagFromImage(t.Tag, Result[this.Index].ImageID, Erza);
+            }
+            List<TagInfo> temp = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza);
+            this.Tags = new BindingList<TagInfo>(temp.OrderBy(tag => tag.Tag).ToList());
+            this.listBox1.DataSource = this.Tags;
+        }
+
+        private void AddTag_button_Click(object sender, EventArgs e)
+        {
+            AddTagForm form = new AddTagForm();
+            form.Erza = this.Erza;
+            //form.Tags = ErzaDB.GetAllTags(Erza);
+            if(form.ShowDialog() == DialogResult.OK)
+            {
+                ErzaDB.AddTagToImage(Result[this.Index].ImageID, form.NewTag, Erza);
+                List<TagInfo> temp = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza);
+                this.Tags = new BindingList<TagInfo>(temp.OrderBy(tag => tag.Tag).ToList());
+                this.listBox1.DataSource = this.Tags;
+            }
         }
     }
 }

@@ -107,6 +107,26 @@ namespace ErzaLib
                 }
             }
         }
+        public static void AddTagToImage(long ImageID, string Tag, SQLiteConnection Connection)
+        {
+            string sql = "SELECT image_tags.image_id FROM image_tags inner join tags on image_tags.tag_id = tags.tag_id WHERE image_tags.image_id = @image_id AND tags.tag = @tag";
+            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            {
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.Parameters.AddWithValue("tag", Tag);
+                object o = command.ExecuteScalar();
+                if (o == null)
+                {
+                    long t = GetTagID(Tag, Connection);
+                    if (t < 0)
+                    {
+                        AddTag(Tag, Connection);
+                        t = GetTagID(Tag, Connection);
+                    }
+                    AddImageTags(ImageID, t, Connection);
+                }
+            }
+        }
         public static long GetImageID(string Hash, SQLiteConnection Connection)
         {
             string sql = "SELECT image_id FROM images WHERE hash = @hash";
@@ -538,6 +558,51 @@ namespace ErzaLib
             using (SQLiteCommand command = new SQLiteCommand(Connection))
             {
                 command.CommandText = "SELECT tag FROM tags";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tags.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return tags;
+        }
+        public static void DeleteTagFromImage(long TagID, long ImageID, SQLiteConnection Connection)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "DELETE FROM image_tags WHERE image_id = @image_id AND tag_id = @tag_id";
+                command.Parameters.AddWithValue("tag_id", TagID);
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void DeleteTagFromImage(string Tag, long ImageID, SQLiteConnection Connection)
+        {
+            long tagid = GetTagID(Tag, Connection);
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "DELETE FROM image_tags WHERE image_id = @image_id AND tag_id = @tag_id";
+                command.Parameters.AddWithValue("tag_id", tagid);
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.ExecuteNonQuery();
+            }
+        }
+        public static List<string> SearchTags(string Query, bool First, SQLiteConnection Connection)
+        {
+            List<string> tags = new List<string>();
+            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            {
+                command.CommandText = "SELECT tag FROM tags WHERE tag LIKE @tag";
+                if (First)
+                {
+                    command.Parameters.AddWithValue("tag", Query + "%");
+                }
+                else
+                {
+                    command.Parameters.AddWithValue("tag", "%" + Query + "%");
+                }
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())

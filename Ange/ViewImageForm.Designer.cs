@@ -43,6 +43,9 @@
             this.size_label = new System.Windows.Forms.Label();
             this.resolution_label = new System.Windows.Forms.Label();
             this.format_label = new System.Windows.Forms.Label();
+            this.AddTag_button = new System.Windows.Forms.Button();
+            this.RemoveTag_button = new System.Windows.Forms.Button();
+            this.Search_button = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -112,10 +115,13 @@
             // 
             this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 16;
             this.listBox1.Location = new System.Drawing.Point(12, 12);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(269, 485);
+            this.listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.listBox1.Size = new System.Drawing.Size(269, 436);
             this.listBox1.TabIndex = 1;
             this.listBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox1_DrawItem);
             this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
@@ -174,11 +180,47 @@
             this.format_label.TabIndex = 0;
             this.format_label.Text = "label1";
             // 
+            // AddTag_button
+            // 
+            this.AddTag_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.AddTag_button.Location = new System.Drawing.Point(12, 465);
+            this.AddTag_button.Name = "AddTag_button";
+            this.AddTag_button.Size = new System.Drawing.Size(95, 28);
+            this.AddTag_button.TabIndex = 3;
+            this.AddTag_button.Text = "Добавить тег";
+            this.AddTag_button.UseVisualStyleBackColor = true;
+            this.AddTag_button.Click += new System.EventHandler(this.AddTag_button_Click);
+            // 
+            // RemoveTag_button
+            // 
+            this.RemoveTag_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RemoveTag_button.Location = new System.Drawing.Point(113, 465);
+            this.RemoveTag_button.Name = "RemoveTag_button";
+            this.RemoveTag_button.Size = new System.Drawing.Size(87, 28);
+            this.RemoveTag_button.TabIndex = 4;
+            this.RemoveTag_button.Text = "Удалить тег";
+            this.RemoveTag_button.UseVisualStyleBackColor = true;
+            this.RemoveTag_button.Click += new System.EventHandler(this.RemoveTag_button_Click);
+            // 
+            // Search_button
+            // 
+            this.Search_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Search_button.Location = new System.Drawing.Point(206, 465);
+            this.Search_button.Name = "Search_button";
+            this.Search_button.Size = new System.Drawing.Size(75, 28);
+            this.Search_button.TabIndex = 5;
+            this.Search_button.Text = "Найти";
+            this.Search_button.UseVisualStyleBackColor = true;
+            this.Search_button.Click += new System.EventHandler(this.Search_button_Click);
+            // 
             // ViewImageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1119, 599);
+            this.Controls.Add(this.Search_button);
+            this.Controls.Add(this.RemoveTag_button);
+            this.Controls.Add(this.AddTag_button);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.pictureBox1);
@@ -210,5 +252,8 @@
         private System.Windows.Forms.ToolStripMenuItem nextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem prevToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.Button AddTag_button;
+        private System.Windows.Forms.Button RemoveTag_button;
+        private System.Windows.Forms.Button Search_button;
     }
 }
