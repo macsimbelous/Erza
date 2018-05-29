@@ -47,6 +47,7 @@
             this.copytodirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MoveAllToDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.recreate_preview_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -55,7 +56,6 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.recreate_preview_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +64,8 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.textBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.textBox1.Location = new System.Drawing.Point(10, 12);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(554, 20);
@@ -161,7 +163,7 @@
             this.recreate_preview_ToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 290);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 268);
             // 
             // view_in_window_ToolStripMenuItem
             // 
@@ -233,6 +235,13 @@
             this.MoveAllToDirToolStripMenuItem.Text = "Переместить всё в каталог";
             this.MoveAllToDirToolStripMenuItem.Click += new System.EventHandler(this.MoveAllToDirToolStripMenuItem_Click);
             // 
+            // recreate_preview_ToolStripMenuItem
+            // 
+            this.recreate_preview_ToolStripMenuItem.Name = "recreate_preview_ToolStripMenuItem";
+            this.recreate_preview_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.recreate_preview_ToolStripMenuItem.Text = "Пересоздать эскиз";
+            this.recreate_preview_ToolStripMenuItem.Click += new System.EventHandler(this.recreate_preview_ToolStripMenuItem_Click);
+            // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
@@ -286,13 +295,6 @@
             this.search_condition_checkBox.Text = "ИЛИ";
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
-            // 
-            // recreate_preview_ToolStripMenuItem
-            // 
-            this.recreate_preview_ToolStripMenuItem.Name = "recreate_preview_ToolStripMenuItem";
-            this.recreate_preview_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
-            this.recreate_preview_ToolStripMenuItem.Text = "Пересоздать эскиз";
-            this.recreate_preview_ToolStripMenuItem.Click += new System.EventHandler(this.recreate_preview_ToolStripMenuItem_Click);
             // 
             // Form1
             // 

@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ErzaLib;
+using System.IO;
 
 namespace Ange
 {
@@ -47,7 +48,7 @@ namespace Ange
             //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
             //if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
             //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-            LoadImage(this.Index);
+            LoadImage();
         }
 
         private void FullScreenForm_KeyDown(object sender, KeyEventArgs e)
@@ -63,7 +64,7 @@ namespace Ange
                         this.Index++;
                         //if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                         //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-                        LoadImage(this.Index);
+                        LoadImage();
                     }
                     break;
                 case Keys.Left:
@@ -72,7 +73,7 @@ namespace Ange
                         this.Index--;
                         //if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                         //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-                        LoadImage(this.Index);
+                        LoadImage();
                     }
                     break;
                 case Keys.Delete:
@@ -86,7 +87,8 @@ namespace Ange
                             {
                                 this.Index = this.Result.Count - 1;
                             }
-                            this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                            //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                            LoadImage();
                         }
                     }
                     break;
@@ -102,14 +104,17 @@ namespace Ange
                 g.DrawString(s, new Font("Arial", 10), System.Drawing.Brushes.White, new Point(0, 0));
             }
         }
-        private void LoadImage(int Index)
+        private void LoadImage()
         {
             try
             {
                 if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {
-                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    FileStream fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
+                    this.pictureBox1.Image = Image.FromStream(fs);
+                    fs.Close();
                     ImageFormat = GetImageFormat(this.pictureBox1.Image);
                     Result[this.Index].Tags = ErzaDB.GetTagsByImageIDToString(Result[this.Index].ImageID, main_form.Erza);
                     StringBuilder tag_string = new StringBuilder();

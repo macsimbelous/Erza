@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ErzaLib;
 using System.Data.SQLite;
+using System.IO;
 
 namespace Ange
 {
@@ -66,7 +67,10 @@ namespace Ange
                 if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {
-                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    FileStream fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
+                    this.pictureBox1.Image = Image.FromStream(fs);
+                    fs.Close();
                     ImageFormat = GetImageFormat(this.pictureBox1.Image);
                     this.format_label.Text = "Формат: " + ImageFormat;
                     this.resolution_label.Text = String.Format($"Разрешение: {this.pictureBox1.Image.Size.Width} x {this.pictureBox1.Image.Size.Height}");
@@ -190,7 +194,8 @@ namespace Ange
                             {
                                 this.Index = this.Result.Count - 1;
                             }
-                            this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                            //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                            LoadImage();
                         }
                     }
                     break;
@@ -241,7 +246,8 @@ namespace Ange
                     {
                         this.Index = this.Result.Count - 1;
                     }
-                    this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
+                    LoadImage();
                 }
             }
         }

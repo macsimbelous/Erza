@@ -586,5 +586,29 @@ namespace Ange
             }
             return null;
         }
+
+        private void LoadAutoComplit(object sender)
+        {
+            TextBox t = sender as TextBox;
+            if (t != null)
+            {
+                //say you want to do a search when user types 3 or more chars
+                if (t.Text.Length >= 1)
+                {
+                    this.textBox1.AutoCompleteMode = AutoCompleteMode.None;
+                    //SuggestStrings will have the logic to return array of strings either from cache/db
+                    List<string> temp = ErzaDB.SearchTags(this.textBox1.Text, true, Erza);
+                    temp.Sort();
+                    string[] arr = temp.ToArray();
+
+                    AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
+                    collection.AddRange(arr);
+
+                    this.textBox1.AutoCompleteCustomSource = collection;
+                    this.textBox1.AutoCompleteMode = AutoCompleteMode.Suggest;
+                    this.textBox1.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                }
+            }
+        }
     }
 }

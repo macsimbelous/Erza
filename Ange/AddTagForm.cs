@@ -60,7 +60,7 @@ namespace Ange
             this.comboBox1.DroppedDown = true;
             this.comboBox1.Text = ts;
             this.comboBox1.SelectionStart = ts.Length;
-            this.comboBox1.AutoCompleteMode = AutoCompleteMode.None;
+            //this.comboBox1.AutoCompleteMode = AutoCompleteMode.None;
             /*string ts = this.comboBox1.Text;
             var selectedTeams = from t in Tags // определяем каждый объект из teams как t
                                 where t.ToLower().StartsWith(this.comboBox1.Text) //фильтрация по критерию
@@ -73,6 +73,8 @@ namespace Ange
             this.comboBox1.Text = ts;
             this.comboBox1.SelectionStart = ts.Length;
             this.comboBox1.AutoCompleteMode = AutoCompleteMode.None;*/
+            //this.comboBox1.Cursor = Cursors.Arrow;
+            Cursor.Current = Cursors.Default;
         }
     }
 }
