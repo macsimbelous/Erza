@@ -83,7 +83,7 @@ namespace Ange
         private void search_button_Click(object sender, EventArgs e)
         {
             listView1.VirtualListSize = 0;
-            if(this.textBox1.Text.Length == 0)
+            if(this.comboBox1.Text.Length == 0)
             {
                 this.Result = ErzaDB.GetAllImages(this.Erza);
                 if (this.Result.Count > 0)
@@ -96,7 +96,7 @@ namespace Ange
             }
             if (this.tag_radioButton.Checked)
             {
-                string[] temp = this.textBox1.Text.Split(' ');
+                string[] temp = this.comboBox1.Text.Split(' ');
                 List<string> tags = new List<string>();
                 foreach(string tag in temp)
                 {
@@ -140,7 +140,7 @@ namespace Ange
             }
             if (this.part_tag_radioButton.Checked)
             {
-                this.Result = ErzaDB.GetImagesByPartTag(this.textBox1.Text, this.Erza);
+                this.Result = ErzaDB.GetImagesByPartTag(this.comboBox1.Text, this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
                 if (this.Result.Count > 0)
                 {
@@ -152,7 +152,7 @@ namespace Ange
             if (this.md5_radioButton.Checked)
             {
                 this.Result.Clear();
-                this.Result.Add(ErzaDB.GetImageWithOutTags(this.textBox1.Text, this.Erza));
+                this.Result.Add(ErzaDB.GetImageWithOutTags(this.comboBox1.Text, this.Erza));
                 this.listView1.VirtualListSize = this.Result.Count;
                 if (this.Result.Count > 0)
                 {
@@ -466,7 +466,7 @@ namespace Ange
                             sb.Append(form.SelectedTags[i]);
                         }
                     }
-                    this.textBox1.Text = sb.ToString();
+                    this.comboBox1.Text = sb.ToString();
                     this.search_button.PerformClick();
                 }
                 else
@@ -586,28 +586,32 @@ namespace Ange
             }
             return null;
         }
-
-        private void LoadAutoComplit(object sender)
+        private void comboBox1_TextUpdate(object sender, EventArgs e)
         {
-            TextBox t = sender as TextBox;
-            if (t != null)
+            string ts = this.comboBox1.Text;
+            List<string> temp;
+            if (ts.Length < 3)
             {
-                //say you want to do a search when user types 3 or more chars
-                if (t.Text.Length >= 1)
-                {
-                    this.textBox1.AutoCompleteMode = AutoCompleteMode.None;
-                    //SuggestStrings will have the logic to return array of strings either from cache/db
-                    List<string> temp = ErzaDB.SearchTags(this.textBox1.Text, true, Erza);
-                    temp.Sort();
-                    string[] arr = temp.ToArray();
+                temp = ErzaDB.SearchTags(ts, true, true, Erza);
+            }
+            else
+            {
+                temp = ErzaDB.SearchTags(ts, false, true, Erza);
+            }
+            //temp.Sort();
+            this.comboBox1.DataSource = temp;
+            this.comboBox1.DroppedDown = true;
+            this.comboBox1.Text = ts;
+            this.comboBox1.SelectionStart = ts.Length;
 
-                    AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
-                    collection.AddRange(arr);
+            Cursor.Current = Cursors.Default;
+        }
 
-                    this.textBox1.AutoCompleteCustomSource = collection;
-                    this.textBox1.AutoCompleteMode = AutoCompleteMode.Suggest;
-                    this.textBox1.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                }
+        private void comboBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                this.search_button.PerformClick();
             }
         }
     }

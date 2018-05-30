@@ -589,12 +589,19 @@ namespace ErzaLib
                 command.ExecuteNonQuery();
             }
         }
-        public static List<string> SearchTags(string Query, bool First, SQLiteConnection Connection)
+        public static List<string> SearchTags(string Query, bool First, bool Sort, SQLiteConnection Connection)
         {
             List<string> tags = new List<string>();
             using (SQLiteCommand command = new SQLiteCommand(Connection))
             {
-                command.CommandText = "SELECT tag FROM tags WHERE tag LIKE @tag";
+                if (Sort)
+                {
+                    command.CommandText = "SELECT tag FROM tags WHERE tag LIKE @tag ORDER BY tag ASC";
+                }
+                else
+                {
+                    command.CommandText = "SELECT tag FROM tags WHERE tag LIKE @tag";
+                }
                 if (First)
                 {
                     command.Parameters.AddWithValue("tag", Query + "%");

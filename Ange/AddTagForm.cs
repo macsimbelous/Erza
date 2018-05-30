@@ -50,30 +50,16 @@ namespace Ange
             List<string> temp;
             if (ts.Length < 3)
             {
-                temp = ErzaDB.SearchTags(ts, true, Erza);
+                temp = ErzaDB.SearchTags(ts, true, true, Erza);
             }
             else
             {
-                temp = ErzaDB.SearchTags(ts, false, Erza);
+                temp = ErzaDB.SearchTags(ts, false, true, Erza);
             }
             this.comboBox1.DataSource = temp;
             this.comboBox1.DroppedDown = true;
             this.comboBox1.Text = ts;
             this.comboBox1.SelectionStart = ts.Length;
-            //this.comboBox1.AutoCompleteMode = AutoCompleteMode.None;
-            /*string ts = this.comboBox1.Text;
-            var selectedTeams = from t in Tags // определяем каждый объект из teams как t
-                                where t.ToLower().StartsWith(this.comboBox1.Text) //фильтрация по критерию
-                                orderby t  // упорядочиваем по возрастанию
-                                select t; // выбираем объект
-            //BindingList<string> temp = new BindingList<string>(selectedTeams.ToList());
-            //this.comboBox1.DataSource = temp;
-            this.comboBox1.DataSource = selectedTeams.ToList();
-            this.comboBox1.DroppedDown = true;
-            this.comboBox1.Text = ts;
-            this.comboBox1.SelectionStart = ts.Length;
-            this.comboBox1.AutoCompleteMode = AutoCompleteMode.None;*/
-            //this.comboBox1.Cursor = Cursors.Arrow;
             Cursor.Current = Cursors.Default;
         }
     }

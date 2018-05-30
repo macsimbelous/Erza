@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.tag_radioButton = new System.Windows.Forms.RadioButton();
             this.md5_radioButton = new System.Windows.Forms.RadioButton();
             this.search_button = new System.Windows.Forms.Button();
@@ -56,22 +55,10 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // textBox1
-            // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.textBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.textBox1.Location = new System.Drawing.Point(10, 12);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(554, 20);
-            this.textBox1.TabIndex = 0;
-            this.toolTip1.SetToolTip(this.textBox1, "Поле для ввода тегов");
-            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
             // tag_radioButton
             // 
@@ -296,11 +283,22 @@
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
             // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(13, 12);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(551, 21);
+            this.comboBox1.TabIndex = 0;
+            this.comboBox1.TextUpdate += new System.EventHandler(this.comboBox1_TextUpdate);
+            this.comboBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBox1_KeyDown);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(883, 503);
+            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.search_condition_checkBox);
             this.Controls.Add(this.part_tag_radioButton);
             this.Controls.Add(this.statusStrip1);
@@ -309,7 +307,6 @@
             this.Controls.Add(this.search_button);
             this.Controls.Add(this.md5_radioButton);
             this.Controls.Add(this.tag_radioButton);
-            this.Controls.Add(this.textBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Ange";
@@ -324,8 +321,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.RadioButton tag_radioButton;
         private System.Windows.Forms.RadioButton md5_radioButton;
         private System.Windows.Forms.Button search_button;
@@ -351,6 +346,7 @@
         private System.Windows.Forms.ToolStripMenuItem MoveAllToDirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem view_in_window_ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem recreate_preview_ToolStripMenuItem;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
 
