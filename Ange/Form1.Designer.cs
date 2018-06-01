@@ -55,9 +55,10 @@
             this.search_condition_checkBox = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.radAutoCompleteBox1 = new Telerik.WinControls.UI.RadAutoCompleteBox();
             this.contextMenuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.radAutoCompleteBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // tag_radioButton
@@ -283,22 +284,22 @@
             this.toolTip1.SetToolTip(this.search_condition_checkBox, "Логическое условие используемое при поиске по нескольким тегам");
             this.search_condition_checkBox.UseVisualStyleBackColor = true;
             // 
-            // comboBox1
+            // radAutoCompleteBox1
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(13, 12);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(551, 21);
-            this.comboBox1.TabIndex = 0;
-            this.comboBox1.TextUpdate += new System.EventHandler(this.comboBox1_TextUpdate);
-            this.comboBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBox1_KeyDown);
+            this.radAutoCompleteBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.radAutoCompleteBox1.Location = new System.Drawing.Point(8, 8);
+            this.radAutoCompleteBox1.Name = "radAutoCompleteBox1";
+            this.radAutoCompleteBox1.Size = new System.Drawing.Size(556, 26);
+            this.radAutoCompleteBox1.TabIndex = 0;
+            this.radAutoCompleteBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.radAutoCompleteBox1_KeyDown);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(883, 503);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.radAutoCompleteBox1);
             this.Controls.Add(this.search_condition_checkBox);
             this.Controls.Add(this.part_tag_radioButton);
             this.Controls.Add(this.statusStrip1);
@@ -315,6 +316,7 @@
             this.contextMenuStrip1.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.radAutoCompleteBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -346,7 +348,7 @@
         private System.Windows.Forms.ToolStripMenuItem MoveAllToDirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem view_in_window_ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem recreate_preview_ToolStripMenuItem;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private Telerik.WinControls.UI.RadAutoCompleteBox radAutoCompleteBox1;
     }
 }
 

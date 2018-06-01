@@ -83,7 +83,7 @@ namespace Ange
         private void search_button_Click(object sender, EventArgs e)
         {
             listView1.VirtualListSize = 0;
-            if(this.comboBox1.Text.Length == 0)
+            if(this.radAutoCompleteBox1.Text.Length == 0)
             {
                 this.Result = ErzaDB.GetAllImages(this.Erza);
                 if (this.Result.Count > 0)
@@ -96,7 +96,7 @@ namespace Ange
             }
             if (this.tag_radioButton.Checked)
             {
-                string[] temp = this.comboBox1.Text.Split(' ');
+                string[] temp = this.radAutoCompleteBox1.Text.Split(' ');
                 List<string> tags = new List<string>();
                 foreach(string tag in temp)
                 {
@@ -140,7 +140,7 @@ namespace Ange
             }
             if (this.part_tag_radioButton.Checked)
             {
-                this.Result = ErzaDB.GetImagesByPartTag(this.comboBox1.Text, this.Erza);
+                this.Result = ErzaDB.GetImagesByPartTag(this.radAutoCompleteBox1.Text, this.Erza);
                 this.listView1.VirtualListSize = this.Result.Count;
                 if (this.Result.Count > 0)
                 {
@@ -152,7 +152,7 @@ namespace Ange
             if (this.md5_radioButton.Checked)
             {
                 this.Result.Clear();
-                this.Result.Add(ErzaDB.GetImageWithOutTags(this.comboBox1.Text, this.Erza));
+                this.Result.Add(ErzaDB.GetImageWithOutTags(this.radAutoCompleteBox1.Text, this.Erza));
                 this.listView1.VirtualListSize = this.Result.Count;
                 if (this.Result.Count > 0)
                 {
@@ -194,6 +194,50 @@ namespace Ange
             this.Previews.Open();
             this.Result = new List<ImageInfo>();
             this.brush = new SolidBrush(Color.Orange);
+            //Загружвем список тегов
+            List<string> tags = new List<string>();
+            using (SQLiteCommand command = new SQLiteCommand(Erza))
+            {
+                command.CommandText = "SELECT tag FROM tags ORDER BY tag ASC";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string tag = reader.GetString(0);
+                        if (String.IsNullOrEmpty(tag))
+                        {
+                            continue;
+                        }
+                        if (String.IsNullOrWhiteSpace(tag))
+                        {
+                            continue;
+                        }
+                        if (tag.IndexOf('\n') >= 0)
+                        {
+                            continue;
+                        }
+                        if (tag.IndexOf(' ') >= 0)
+                        {
+                            continue;
+                        }
+                        if (tag.IndexOf('\t') >= 0)
+                        {
+                            continue;
+                        }
+                        if (tag.IndexOf('\r') >= 0)
+                        {
+                            continue;
+                        }
+                        if (tag.IndexOf((char)12288) >= 0)
+                        {
+                            continue;
+                        }
+                        tags.Add(reader.GetString(0));
+                    }
+                }
+            }
+            this.radAutoCompleteBox1.AutoCompleteDataSource = tags;
+            this.radAutoCompleteBox1.Delimiter = ' ';
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -339,13 +383,11 @@ namespace Ange
                 ViewImageInWindow();
             }
         }
-
         private void copyhashToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i = this.listView1.SelectedIndices[0];
             Clipboard.SetText(this.Result[i].Hash);
         }
-
         private void copytodirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.listView1.SelectedIndices.Count > 0)
@@ -393,15 +435,6 @@ namespace Ange
                 this.listView1.EnsureVisible(Index);
             }
         }
-
-        private void textBox1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if(e.KeyCode == Keys.Enter)
-            {
-                this.search_button.PerformClick();
-            }
-        }
-
         private void openOuterSoftToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.listView1.SelectedIndices.Count > 0)
@@ -411,7 +444,6 @@ namespace Ange
             }
             
         }
-
         private void MoveAllToDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
@@ -422,7 +454,6 @@ namespace Ange
                 }
             }
         }
-
         private void copyAllToDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
@@ -433,7 +464,6 @@ namespace Ange
                 }
             }
         }
-
         private void view_in_window_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ViewImageInWindow();
@@ -466,7 +496,7 @@ namespace Ange
                             sb.Append(form.SelectedTags[i]);
                         }
                     }
-                    this.comboBox1.Text = sb.ToString();
+                    this.radAutoCompleteBox1.Text = sb.ToString();
                     this.search_button.PerformClick();
                 }
                 else
@@ -586,28 +616,7 @@ namespace Ange
             }
             return null;
         }
-        private void comboBox1_TextUpdate(object sender, EventArgs e)
-        {
-            string ts = this.comboBox1.Text;
-            List<string> temp;
-            if (ts.Length < 3)
-            {
-                temp = ErzaDB.SearchTags(ts, true, true, Erza);
-            }
-            else
-            {
-                temp = ErzaDB.SearchTags(ts, false, true, Erza);
-            }
-            //temp.Sort();
-            this.comboBox1.DataSource = temp;
-            this.comboBox1.DroppedDown = true;
-            this.comboBox1.Text = ts;
-            this.comboBox1.SelectionStart = ts.Length;
-
-            Cursor.Current = Cursors.Default;
-        }
-
-        private void comboBox1_KeyDown(object sender, KeyEventArgs e)
+        private void radAutoCompleteBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
