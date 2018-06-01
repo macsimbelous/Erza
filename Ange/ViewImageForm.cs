@@ -37,6 +37,7 @@ namespace Ange
         public SQLiteConnection Erza;
         public Form1 main_form;
         BindingList<TagInfo> Tags;
+        FileStream fs = null;
         //Colors
         SolidBrush GeneralColor = new SolidBrush(Color.Black);
         SolidBrush ArtistColor = new SolidBrush(Color.FromArgb(235, 156, 0));
@@ -65,12 +66,13 @@ namespace Ange
             try
             {
                 if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                if(fs != null) { fs.Close(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {
                     //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-                    FileStream fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
+                    fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
                     this.pictureBox1.Image = Image.FromStream(fs);
-                    fs.Close();
+                    //fs.Close();
                     ImageFormat = GetImageFormat(this.pictureBox1.Image);
                     this.format_label.Text = "Формат: " + ImageFormat;
                     this.resolution_label.Text = String.Format($"Разрешение: {this.pictureBox1.Image.Size.Width} x {this.pictureBox1.Image.Size.Height}");
@@ -187,6 +189,7 @@ namespace Ange
                     if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
                     {
                         if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        if (fs != null) { fs.Close(); }
                         main_form.DeleteImage(this.Index);
                         if (this.Result.Count > 0)
                         {
@@ -239,6 +242,7 @@ namespace Ange
             if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
                 if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                if (fs != null) { fs.Close(); }
                 main_form.DeleteImage(this.Index);
                 if (this.Result.Count > 0)
                 {
