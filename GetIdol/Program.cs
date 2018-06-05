@@ -241,16 +241,18 @@ namespace GetIdol
             }*/
             Console.Write("Добавляем информацию в базу данных...");
             //DateTime start_db = DateTime.Now;
-            GetTagsFromSankaku(Path.GetFileNameWithoutExtension(url), post);
+            string hash = Path.GetFileNameWithoutExtension(url);
+            GetTagsFromSankaku(hash, post);
             //DateTime stop_db = DateTime.Now;
             //Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
             Console.WriteLine("OK");
-            if (ExistImage(Path.GetFileNameWithoutExtension(url)))
+            if (ExistImage(hash))
             {
                 Console.WriteLine("Уже скачан: {0}", store_file);
                 //count_skip++;
                 return true;
             }
+            ErzaDB.SetImagePath(hash, filename, connection);
             Console.WriteLine("Начинаем закачку {0}.", url);
             FileInfo fi = new FileInfo(filename);
             //ВРЕМЕННО!!!!!!!!

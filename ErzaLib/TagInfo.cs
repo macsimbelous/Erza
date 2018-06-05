@@ -40,7 +40,7 @@ namespace ErzaLib
         }
         override public string ToString()
         {
-            return this.Tag + Count.ToString();
+            return this.Tag + " " + Count.ToString();
         }
     }
     public enum TagType: long

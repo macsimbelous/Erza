@@ -43,6 +43,9 @@ namespace GetGelbooru
         static int count_error = 0;
         static int count_skip = 0;
         static SQLiteConnection connection = null;
+        static List<string> Tags = null;
+        static int StartPid = 0;
+        static int MaxPage = 0;
         static void Main(string[] args)
         {
             LoadSettings();
@@ -52,18 +55,19 @@ namespace GetGelbooru
                 Console.WriteLine("Не заданы теги!");
                 return;
             }
+            ParseArgs(args);
             ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
-            StringBuilder tags = new StringBuilder();
-            for (int i = 0; i < args.Length; i++)
+            StringBuilder tags_bilder = new StringBuilder();
+            for (int i = 0; i < Tags.Count; i++)
             {
                 if (i == 0)
                 {
-                    tags.Append(WebUtility.UrlEncode(args[i]));
+                    tags_bilder.Append(WebUtility.UrlEncode(Tags[i]));
                 }
                 else
                 {
-                    tags.Append("+");
-                    tags.Append(WebUtility.UrlEncode(args[i]));
+                    tags_bilder.Append("+");
+                    tags_bilder.Append(WebUtility.UrlEncode(Tags[i]));
                 }
             }
             CookieCollection cookies = GetGelbooruCookies(Program.config.GelbooruLogin, Program.config.GelbooruPassword);
@@ -73,7 +77,7 @@ namespace GetGelbooru
                 return;
             }
             Console.WriteLine("Получаем ссылки на порсты.");
-            post_links.AddRange(GetPosts(tags.ToString(), cookies));
+            post_links.AddRange(GetPosts(tags_bilder.ToString(), cookies));
             if (post_links.Count <= 0)
             {
                 Console.WriteLine("Ничего ненайдено.");
@@ -82,14 +86,14 @@ namespace GetGelbooru
             Console.Write("\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n");
             connection = new SQLiteConnection(Program.config.ConnectionString);
             connection.Open();
-            string path = Program.config.DownloadPath + "\\" + args[0];
+            string path = Program.config.DownloadPath + "\\" + tags_bilder.ToString();
             Directory.CreateDirectory(path);
             for (int i = 0; i < post_links.Count; i++)
             {
                 Console.WriteLine("###### {0}/{1} ######", (i + 1), post_links.Count);
                 for (int ie = 0; ie < Program.config.LimitError; ie++)
                 {
-                    if (DownloadImage(post_links[i], path, "http://gelbooru.com/index.php?page=post&s=list&tags=" + tags.ToString(), cookies))
+                    if (DownloadImage(post_links[i], path, "http://gelbooru.com/index.php?page=post&s=list&tags=" + tags_bilder.ToString(), cookies))
                     {
                         count_complit++;
                         Thread.Sleep(2500);
@@ -108,13 +112,71 @@ namespace GetGelbooru
             Console.WriteLine($"\nУспешно скачано: {count_complit}\nСкачано ренее: {count_skip}\nУдалено ранее: {count_deleted}\nОшибочно: {count_error}\nВсего: {post_links.Count}");
             connection.Close();
         }
+        static void ParseArgs(string[] args)
+        {
+            string start_page_string = "--start-pid=";
+            string max_page_string = "--max-page=";
+            Program.Tags = new List<string>();
+            foreach (string param in args)
+            {
+                if (param.Length >= start_page_string.Length)
+                {
+                    if (param.Substring(0, start_page_string.Length) == start_page_string)
+                    {
+                        if (param.Length > start_page_string.Length)
+                        {
+                            Program.StartPid = int.Parse(param.Substring(start_page_string.Length));
+                            if (Program.StartPid < 0)
+                            {
+                                Console.WriteLine("Параметр {0} не может быть меньше 0", param);
+                                Environment.Exit(1);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Не правильно задан параметр {0}", param);
+                            Environment.Exit(1);
+                        }
+                        continue;
+                    }
+                }
+                if (param.Length >= max_page_string.Length)
+                {
+                    if (param.Substring(0, max_page_string.Length) == max_page_string)
+                    {
+                        if (param.Length > max_page_string.Length)
+                        {
+                            Program.MaxPage = int.Parse(param.Substring(max_page_string.Length));
+                            if (Program.MaxPage < 0)
+                            {
+                                Console.WriteLine("Параметр {0} не может быть меньше 0", param);
+                                Environment.Exit(1);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Не правильно задан параметр {0}", param);
+                            Environment.Exit(1);
+                        }
+                        continue;
+                    }
+                }
+                Program.Tags.Add(param);
+            }
+        }
         static List<string> GetPosts(string Tag, CookieCollection Cookies)
         {
-            int pid = 0;                //Счетчик постов
+            int pid = Program.StartPid;                //Счетчик постов
+            int page_count = 0;
             List<string> post_list = new List<string>();
             int errors = 0;
             for (; ; )
             {
+                if ((MaxPage > 0) && (page_count >= MaxPage))
+                {
+                    Console.WriteLine("Достигнут лимит страниц.");
+                    break;
+                }
                 string url = String.Format("http://gelbooru.com/index.php?page=post&s=list&tags={0}&pid={1}", Tag, pid);
                 Console.WriteLine($"({pid}) Загружаем и парсим: {url}");
                 try
@@ -141,6 +203,7 @@ namespace GetGelbooru
                     {
                         post_list.AddRange(list);
                         pid = pid + list.Count;
+                        page_count++;
                     }
                     Thread.Sleep(2500);
                 }
@@ -203,14 +266,16 @@ namespace GetGelbooru
                 return true;
             }*/
             Console.Write("Добавляем информацию в базу данных...");
-            UpdateDB(Path.GetFileNameWithoutExtension(url), post);
+            string hash = Path.GetFileNameWithoutExtension(url);
+            UpdateDB(hash, post);
             Console.WriteLine("OK");
-            if (ExistImage(Path.GetFileNameWithoutExtension(url)))
+            if (ExistImage(hash))
             {
                 //Console.WriteLine("Уже скачан: {0}", store_file);
                 //count_skip++;
                 return true;
             }
+            ErzaDB.SetImagePath(hash, filename, connection);
             Console.WriteLine("Начинаем закачку {0}.", url);
             return DownloadFile(url, filename, Referer, Cookies, Program.config.UserAgent);
         }

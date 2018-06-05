@@ -1060,20 +1060,31 @@ namespace Erza
                 {
                     string extension = Path.GetExtension(url);
                     DateTime start = DateTime.Now;
+                    string filename;
                     if (extension == ".jpeg")
                     {
-                        long result = DownloadFile(url, dir + "\\" + img.Hash + ".jpg", GetReferer(url, img));
+                        filename = dir + "\\" + img.Hash + ".jpg";
+                        long result = DownloadFile(url, filename, GetReferer(url, img));
                         if (result == 0)
                         {
+                            if (Program.config.UseDB)
+                            {
+                                ErzaDB.SetImagePath(Path.GetFileNameWithoutExtension(filename), filename, connection);
+                            }
                             MyWait(start, 2500);
                             return 0;
                         }
                     }
                     else
                     {
-                        long result = DownloadFile(url, dir + "\\" + img.Hash + extension, GetReferer(url, img));
+                        filename = dir + "\\" + img.Hash + extension;
+                        long result = DownloadFile(url, filename, GetReferer(url, img));
                         if (result == 0)
                         {
+                            if (Program.config.UseDB)
+                            {
+                                ErzaDB.SetImagePath(Path.GetFileNameWithoutExtension(filename), filename, connection);
+                            }
                             MyWait(start, 2500);
                             return 0;
                         }
