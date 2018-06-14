@@ -93,11 +93,13 @@ namespace Erza
                 {
                     Console.WriteLine("Добавляем хэши в базу данных SQLite");
                     DateTime start = DateTime.Now;
+                    SQLiteTransaction transact = connection.BeginTransaction();
                     for (int i = 0; i < il.Count; i++)
                     {
                         ErzaLib.ErzaDB.LoadImageToErza(il[i], connection);
                         Console.Write("Обрабатываю хэш {0} ({1}/{2})\r", il[i].Hash, i, il.Count);
                     }
+                    transact.Commit();
                     DateTime finish = DateTime.Now;
                     Console.WriteLine("\nХэшей добавлено: {0} за: {1} секунд ({2} в секунду)", il.Count.ToString(), (finish - start).TotalSeconds.ToString("0.00"), (il.Count / (finish - start).TotalSeconds).ToString("0.00"));
                 }
