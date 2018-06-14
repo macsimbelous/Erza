@@ -42,7 +42,7 @@ namespace GetIdol
         static List<string> Tags = null;
         static GetidolConfig config = null;
         static SQLiteConnection connection = null;
-        //static SQLiteConnection connection2 = null;
+        static SQLiteConnection getidoldb = null;
         static int count_complit = 0;
         static int count_deleted = 0;
         static int count_error = 0;
@@ -82,14 +82,19 @@ namespace GetIdol
 
             connection = new SQLiteConnection(Program.config.ConnectionString);
             connection.Open();
-            //connection2 = new SQLiteConnection(@"data source=C:\temp\erza.sqlite");
-            //connection2.Open();
+            getidoldb = new SQLiteConnection(@"data source=C:\utils\data\getidol.sqlite");
+            getidoldb.Open();
             Directory.CreateDirectory(".\\" + tags.ToString());
             for (int i = 0; i < post_ids.Count; i++)
             {
                 Console.WriteLine("\n###### {0}/{1} ######", (i + 1), post_ids.Count);
                 for (int index = 0; index < Program.config.LimitErrors; index++)
                 {
+                    if (ExistPostIDFromPosts(post_ids[i]))
+                    {
+                        Console.WriteLine("Этот пост уже был ранне скачан.");
+                        continue;
+                    }
                     //DateTime start = DateTime.Now;
                     if (DownloadImageFromSankaku(post_ids[i], ".\\" + tags.ToString(), sankaku_cookies))
                     {
@@ -106,7 +111,7 @@ namespace GetIdol
             }
             Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
             connection.Close();
-            //connection2.Close();
+            getidoldb.Close();
             return;
         }
         static void LoadSettings()
@@ -252,7 +257,7 @@ namespace GetIdol
                 //count_skip++;
                 return true;
             }
-            ErzaDB.SetImagePath(hash, filename, connection);
+            //ErzaDB.SetImagePath(hash, filename, connection);
             Console.WriteLine("Начинаем закачку {0}.", url);
             FileInfo fi = new FileInfo(filename);
             //ВРЕМЕННО!!!!!!!!
@@ -289,6 +294,7 @@ namespace GetIdol
                         Console.WriteLine("Уже скачан: {0}", filename);
                         count_skip++;
                         //wrp.Close();
+                        ErzaDB.SetImagePath(hash, filename, connection);
                         return true;
                     }
                     else
@@ -321,6 +327,8 @@ namespace GetIdol
                 {
                     Console.WriteLine("\nЗакачка завершена.");
                     count_complit++;
+                    ErzaDB.SetImagePath(hash, filename, connection);
+                    AddPostIDToPosts(post_id, hash);
                     return true;
                 }
             }
@@ -872,6 +880,72 @@ namespace GetIdol
                     return true;
             }
             return false;
+        }
+        static bool ExistPostIDFromPosts(long PostID)
+        {
+            string sql = "SELECT post_id FROM posts WHERE post_id = @post_id";
+            using (SQLiteCommand command = new SQLiteCommand(sql, getidoldb))
+            {
+                command.Parameters.AddWithValue("post_id", PostID);
+                object o = command.ExecuteScalar();
+                if (o == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+        static void AddPostIDToPosts(long PostID, string Hash)
+        {
+            string sql = "INSERT INTO posts (post_id, hash) VALUES (@post_id, @hash);";
+            using (SQLiteCommand command = new SQLiteCommand(sql, getidoldb))
+            {
+                command.Parameters.AddWithValue("post_id", PostID);
+                command.Parameters.AddWithValue("hash", Hash);
+                command.ExecuteNonQuery();
+            }
+        }
+        static void RemovePostIDFromCache(long PostID)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(getidoldb))
+            {
+                command.CommandText = "DELETE FROM cache WHERE post_id = @post_id";
+                command.Parameters.AddWithValue("post_id", PostID);
+                command.ExecuteNonQuery();
+            }
+        }
+        static void AddPostIDsToCache(List<long> PostIDs)
+        {
+            SQLiteTransaction transact = getidoldb.BeginTransaction();
+            string sql = "INSERT INTO cache (post_id) VALUES (@post_id);";
+            foreach (long post_id in PostIDs)
+            {
+                using (SQLiteCommand command = new SQLiteCommand(sql, getidoldb))
+                {
+                    command.Parameters.AddWithValue("post_id", post_id);
+                    command.ExecuteNonQuery();
+                }
+            }
+            transact.Commit();
+        }
+        static List<long> GetPostIDsFromCache()
+        {
+            List<long> post_ids = new List<long>();
+            using (SQLiteCommand command = new SQLiteCommand(getidoldb))
+            {
+                command.CommandText = "SELECT post_id FROM cache";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        post_ids.Add(reader.GetInt64(0));
+                    }
+                }
+            }
+            return post_ids;
         }
     }
     [DataContract]

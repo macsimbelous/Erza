@@ -275,9 +275,14 @@ namespace GetGelbooru
                 //count_skip++;
                 return true;
             }
-            ErzaDB.SetImagePath(hash, filename, connection);
+            //ErzaDB.SetImagePath(hash, filename, connection);
             Console.WriteLine("Начинаем закачку {0}.", url);
-            return DownloadFile(url, filename, Referer, Cookies, Program.config.UserAgent);
+            bool result = DownloadFile(url, filename, Referer, Cookies, Program.config.UserAgent);
+            if (result)
+            {
+                ErzaDB.SetImagePath(hash, filename, connection);
+            }
+            return result;
         }
         public static string DownloadString(string Url, string Referer, CookieCollection Cookies, string UserAgent)
         {
