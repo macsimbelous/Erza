@@ -254,6 +254,7 @@ namespace GetIdol
             if (ExistImage(hash))
             {
                 Console.WriteLine("Уже скачан: {0}", store_file);
+                AddPostIDToPosts(post_id, hash);
                 //count_skip++;
                 return true;
             }
@@ -295,6 +296,7 @@ namespace GetIdol
                         count_skip++;
                         //wrp.Close();
                         ErzaDB.SetImagePath(hash, filename, connection);
+                        AddPostIDToPosts(post_id, hash);
                         return true;
                     }
                     else
