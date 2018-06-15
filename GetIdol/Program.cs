@@ -48,68 +48,136 @@ namespace GetIdol
         static int count_error = 0;
         static int count_skip = 0;
         static string store_file = null;
+        static bool ClearCacheFlag = false;
         static void Main(string[] args)
         {
             LoadSettings();
-            if (args.Length <= 0) 
-            { 
-                Console.WriteLine("Не заданы параметры!");
-                return;
-            }
             ParseArgs(args);
-            if (Tags.Count <= 0)
-            {
-                Console.WriteLine("Не заданы теги!");
-                return;
-            }
-            StringBuilder tags = new StringBuilder();
-            for(int i=0;i<Tags.Count;i++)
-            {
-                if (i == 0)
-                {
-                    tags.Append(WebUtility.UrlEncode(Tags[i]));
-                }
-                else
-                {
-                    tags.Append("+");
-                    tags.Append(WebUtility.UrlEncode(Tags[i]));
-                }
-            }
             ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
-            Console.WriteLine("Импортируем тег " + tags.ToString() + " с санкаки");
-            List<int> post_ids = GetImageInfoFromSankaku(tags.ToString());
-            Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
-
+            getidoldb = new SQLiteConnection("data source=C:\\utils\\data\\getidol.sqlite");
+            getidoldb.Open();
             connection = new SQLiteConnection(Program.config.ConnectionString);
             connection.Open();
-            getidoldb = new SQLiteConnection(@"data source=C:\utils\data\getidol.sqlite");
-            getidoldb.Open();
-            Directory.CreateDirectory(".\\" + tags.ToString());
-            for (int i = 0; i < post_ids.Count; i++)
+            List<CacheItem> post_ids;
+            if (ClearCacheFlag)
             {
-                Console.WriteLine("\n###### {0}/{1} ######", (i + 1), post_ids.Count);
-                for (int index = 0; index < Program.config.LimitErrors; index++)
+                Console.WriteLine("Очишаю кэш.");
+                ClearCache();
+                VacuumGetIdolDB();
+                return;
+            }
+            Console.WriteLine("Востанавливаю список из кэша.");
+            post_ids = GetItemsFromCache();
+            if (post_ids.Count <= 0)
+            {
+                Console.WriteLine("Кэш пуст!");
+                if(Tags.Count <= 0)
                 {
-                    if (ExistPostIDFromPosts(post_ids[i]))
+                    Console.WriteLine("Задайте теги!");
+                    return;
+                }
+                StringBuilder tags = new StringBuilder();
+                for (int i = 0; i < Tags.Count; i++)
+                {
+                    if (i == 0)
                     {
-                        Console.WriteLine("Этот пост уже был ранне скачан.");
-                        continue;
+                        tags.Append(WebUtility.UrlEncode(Tags[i]));
                     }
-                    //DateTime start = DateTime.Now;
-                    if (DownloadImageFromSankaku(post_ids[i], ".\\" + tags.ToString(), sankaku_cookies))
+                    else
                     {
-                        //MyWait(start, 5000);
-                        //count_complit++;
-                        break;
-                    }
-                    //MyWait(start, 7000);
-                    if (index == 0)
-                    {
-                        count_error++;
+                        tags.Append("+");
+                        tags.Append(WebUtility.UrlEncode(Tags[i]));
                     }
                 }
+                Console.WriteLine("Импортируем тег " + tags.ToString() + " с санкаки");
+                post_ids = GetImageInfoFromSankaku(tags.ToString());
+                AddItemsToCache(post_ids);
+                Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
+                Directory.CreateDirectory(".\\" + tags.ToString());
+                for (int i = 0; i < post_ids.Count; i++)
+                {
+                    Console.WriteLine("\n###### {0}/{1} ######", (i + 1), post_ids.Count);
+                    for (int index = 0; index < Program.config.LimitErrors; index++)
+                    {
+                        if (ExistPostIDFromPosts(post_ids[i].PostID))
+                        {
+                            Console.WriteLine("Этот пост уже был ранне скачан.");
+                            continue;
+                        }
+                        //DateTime start = DateTime.Now;
+                        if (DownloadImageFromSankaku(post_ids[i], ".\\" + tags.ToString(), sankaku_cookies))
+                        {
+                            //MyWait(start, 5000);
+                            //count_complit++;
+                            break;
+                        }
+                        //MyWait(start, 7000);
+                        if (index == 0)
+                        {
+                            count_error++;
+                        }
+                    }
+                }
+                Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
             }
-            Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
+            else
+            {
+                int temp = 0;
+                for (; ; )
+                {
+                    sankaku_cookies = GetSankakuCookies(Program.config.BaseURL + "user/authenticate");
+                    if (sankaku_cookies != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (temp < Program.config.LimitErrors)
+                        {
+                            temp++;
+                            Thread.Sleep(Program.config.TimeOut);
+                            continue;
+                        }
+                        else
+                        {
+                            Console.Write("Не удалось получить куки!");
+                            return;
+                        }
+                    }
+                }
+                Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
+                List<string> tags = GetTagsFromCache();
+                foreach(string tag in tags)
+                {
+                    Directory.CreateDirectory(".\\" + tag);
+                }
+                for (int i = 0; i < post_ids.Count; i++)
+                {
+                    Console.WriteLine("\n###### {0}/{1} ######", (i + 1), post_ids.Count);
+                    for (int index = 0; index < Program.config.LimitErrors; index++)
+                    {
+                        if (ExistPostIDFromPosts(post_ids[i].PostID))
+                        {
+                            Console.WriteLine("Этот пост уже был ранне скачан.");
+                            continue;
+                        }
+                        //DateTime start = DateTime.Now;
+                        if (DownloadImageFromSankaku(post_ids[i], ".\\" + post_ids[i].Tag, sankaku_cookies))
+                        {
+                            //MyWait(start, 5000);
+                            //count_complit++;
+                            break;
+                        }
+                        //MyWait(start, 7000);
+                        if (index == 0)
+                        {
+                            count_error++;
+                        }
+                    }
+                }
+                Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
+            }
+            VacuumGetIdolDB();
             connection.Close();
             getidoldb.Close();
             return;
@@ -165,23 +233,14 @@ namespace GetIdol
         {
             string start_page_string = "--start-page=";
             string max_page_string = "--max-page=";
-            string nosqlite_string = "--nosqlite";
-            string sqlite_path_string = "--sqlite-path=";
+            string clear_cache_string = "--clear-cache";
             Program.Tags = new List<string>();
             foreach (string param in args)
             {
-                if (param == nosqlite_string)
+                if (param == clear_cache_string)
                 {
-                    //Program.config.UseDB = false;
+                    ClearCacheFlag = true;
                     continue;
-                }
-                if (param.Length >= sqlite_path_string.Length)
-                {
-                    if (param.Substring(0, sqlite_path_string.Length) == sqlite_path_string)
-                    {
-                        //Program.config.ConnectionString = "data source=" + param.Substring(sqlite_path_string.Length);
-                        continue;
-                    }
                 }
                 if (param.Length >= start_page_string.Length)
                 {
@@ -228,10 +287,10 @@ namespace GetIdol
                 Program.Tags.Add(param);
             }
         }
-        static bool DownloadImageFromSankaku(int post_id, string dir, CookieCollection cookies)
+        static bool DownloadImageFromSankaku(CacheItem Item, string dir, CookieCollection cookies)
         {
             Thread.Sleep(Program.config.TimeOut);
-            string post = GetPostPage(post_id, cookies);
+            string post = GetPostPage(Item.PostID, cookies, Item.Referer);
             if (post == null) { return false; }
             string url = GetOriginalUrlFromPostPage(post);
             if (url == null)
@@ -254,7 +313,8 @@ namespace GetIdol
             if (ExistImage(hash))
             {
                 Console.WriteLine("Уже скачан: {0}", store_file);
-                AddPostIDToPosts(post_id, hash);
+                AddPostIDToPosts(Item.PostID, hash);
+                RemoveItemFromCache(Item.PostID);
                 //count_skip++;
                 return true;
             }
@@ -279,7 +339,7 @@ namespace GetIdol
             Stream rStream = null;
             try
             {
-                httpWRQ.Referer = Program.config.BaseURL + "post/show/" + post_id.ToString();
+                httpWRQ.Referer = Program.config.BaseURL + "post/show/" + Item.PostID.ToString();
                 httpWRQ.UserAgent = Program.config.UserAgent;
                 httpWRQ.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
                 httpWRQ.Headers.Add("Accept-Encoding: identity");
@@ -296,7 +356,8 @@ namespace GetIdol
                         count_skip++;
                         //wrp.Close();
                         ErzaDB.SetImagePath(hash, filename, connection);
-                        AddPostIDToPosts(post_id, hash);
+                        AddPostIDToPosts(Item.PostID, hash);
+                        RemoveItemFromCache(Item.PostID);
                         return true;
                     }
                     else
@@ -330,7 +391,8 @@ namespace GetIdol
                     Console.WriteLine("\nЗакачка завершена.");
                     count_complit++;
                     ErzaDB.SetImagePath(hash, filename, connection);
-                    AddPostIDToPosts(post_id, hash);
+                    AddPostIDToPosts(Item.PostID, hash);
+                    RemoveItemFromCache(Item.PostID);
                     return true;
                 }
             }
@@ -361,7 +423,7 @@ namespace GetIdol
                 }
             }
         }
-        static string GetPostPage(int npost, CookieCollection cookies)
+        static string GetPostPage(long npost, CookieCollection cookies, string Referer)
         {
             Random rnd = new Random();
             string strURL = Program.config.BaseURL + "post/show/" + npost.ToString();
@@ -412,7 +474,7 @@ namespace GetIdol
                 return null;
             }
         }
-        static List<int> GetImageInfoFromSankaku(string tag)
+        static List<CacheItem> GetImageInfoFromSankaku(string tag)
         {
             if (sankaku_cookies == null)
             {
@@ -440,7 +502,7 @@ namespace GetIdol
                     }
                 }
             }
-            List<int> imgs = new List<int>();
+            List<CacheItem> imgs = new List<CacheItem>();
 
             string url = String.Format("{0}?tags={1}", Program.config.BaseURL, tag);
             string prev_url = Program.config.BaseURL;
@@ -460,7 +522,16 @@ namespace GetIdol
                     string text = DownloadStringFromSankaku(url, prev_url, sankaku_cookies);
                     if (page_count >= StartPage)
                     {
-                        imgs.AddRange(ParseHTML_sankaku(text));
+                        //imgs.AddRange(ParseHTML_sankaku(text));
+                        List<long> temp = ParseHTML_sankaku(text);
+                        foreach(long id in temp)
+                        {
+                            CacheItem item = new CacheItem();
+                            item.PostID = id;
+                            item.Referer = url;
+                            item.Tag = tag;
+                            imgs.Add(item);
+                        }
                     }
                     else
                     {
@@ -633,15 +704,15 @@ namespace GetIdol
                 }
             }
         }
-        static List<int> ParseHTML_sankaku(string html)
+        static List<long> ParseHTML_sankaku(string html)
         {
-            List<int> temp = new List<int>();
+            List<long> temp = new List<long>();
             Regex rx_digit = new Regex("[0-9]+", RegexOptions.Compiled);
             Regex rx = new Regex(@"PostModeMenu\.click\([0-9]*\)", RegexOptions.Compiled);
             MatchCollection matches = rx.Matches(html);
             foreach (Match match in matches)
             {
-                temp.Add(int.Parse(rx_digit.Match(match.Value).Value));
+                temp.Add(long.Parse(rx_digit.Match(match.Value).Value));
             }
             return temp;
         }
@@ -910,12 +981,21 @@ namespace GetIdol
                 command.ExecuteNonQuery();
             }
         }
-        static void RemovePostIDFromCache(long PostID)
+        static void RemoveItemFromCache(long PostID)
         {
             using (SQLiteCommand command = new SQLiteCommand(getidoldb))
             {
                 command.CommandText = "DELETE FROM cache WHERE post_id = @post_id";
                 command.Parameters.AddWithValue("post_id", PostID);
+                command.ExecuteNonQuery();
+            }
+        }
+        static void RemoveItemFromCache(CacheItem Item)
+        {
+            using (SQLiteCommand command = new SQLiteCommand(getidoldb))
+            {
+                command.CommandText = "DELETE FROM cache WHERE post_id = @post_id";
+                command.Parameters.AddWithValue("post_id", Item.PostID);
                 command.ExecuteNonQuery();
             }
         }
@@ -928,6 +1008,22 @@ namespace GetIdol
                 using (SQLiteCommand command = new SQLiteCommand(sql, getidoldb))
                 {
                     command.Parameters.AddWithValue("post_id", post_id);
+                    command.ExecuteNonQuery();
+                }
+            }
+            transact.Commit();
+        }
+        static void AddItemsToCache(List<CacheItem> Items)
+        {
+            SQLiteTransaction transact = getidoldb.BeginTransaction();
+            string sql = "INSERT INTO cache (post_id, referer, tag) VALUES (@post_id, @referer, @tag);";
+            foreach (CacheItem item in Items)
+            {
+                using (SQLiteCommand command = new SQLiteCommand(sql, getidoldb))
+                {
+                    command.Parameters.AddWithValue("post_id", item.PostID);
+                    command.Parameters.AddWithValue("referer", item.Referer);
+                    command.Parameters.AddWithValue("tag", item.Tag);
                     command.ExecuteNonQuery();
                 }
             }
@@ -948,6 +1044,58 @@ namespace GetIdol
                 }
             }
             return post_ids;
+        }
+        static List<CacheItem> GetItemsFromCache()
+        {
+            List<CacheItem> post_ids = new List<CacheItem>();
+            using (SQLiteCommand command = new SQLiteCommand(getidoldb))
+            {
+                command.CommandText = "SELECT post_id, referer, tag FROM cache";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        CacheItem item = new CacheItem();
+                        item.PostID = reader.GetInt64(0);
+                        item.Referer = reader.GetString(1);
+                        item.Tag = reader.GetString(2);
+                        post_ids.Add(item);
+                    }
+                }
+            }
+            return post_ids;
+        }
+        static void VacuumGetIdolDB()
+        {
+            using (SQLiteCommand command = new SQLiteCommand(connection))
+            {
+                command.CommandText = "VACUUM";
+                command.ExecuteNonQuery();
+            }
+        }
+        static void ClearCache()
+        {
+            using (SQLiteCommand command = new SQLiteCommand(getidoldb))
+            {
+                command.CommandText = "DELETE FROM cache";
+                command.ExecuteNonQuery();
+            }
+        }
+        static List<string> GetTagsFromCache()
+        {
+            List<string> tags = new List<string>();
+            using (SQLiteCommand command = new SQLiteCommand(getidoldb))
+            {
+                command.CommandText = "SELECT tag FROM cache  GROUP BY tag";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tags.Add(reader.GetString(0));
+                    }
+                }
+            }
+            return tags;
         }
     }
     [DataContract]
@@ -983,5 +1131,11 @@ namespace GetIdol
         public string ProxyPassword;
         [DataMember(Name = "UserAgent", IsRequired = true)]
         public string UserAgent;
+    }
+    public class CacheItem
+    {
+        public long PostID;
+        public string Referer;
+        public string Tag;
     }
 }
