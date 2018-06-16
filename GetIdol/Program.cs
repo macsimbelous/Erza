@@ -159,7 +159,8 @@ namespace GetIdol
                         if (ExistPostIDFromPosts(post_ids[i].PostID))
                         {
                             Console.WriteLine("Этот пост уже был ранне скачан.");
-                            continue;
+                            RemoveItemFromCache(post_ids[i].PostID);
+                            break;
                         }
                         //DateTime start = DateTime.Now;
                         if (DownloadImageFromSankaku(post_ids[i], ".\\" + post_ids[i].Tag, sankaku_cookies))
