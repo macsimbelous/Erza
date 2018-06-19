@@ -59,6 +59,7 @@ namespace GetIdol
             connection = new SQLiteConnection(Program.config.ConnectionString);
             connection.Open();
             List<CacheItem> post_ids;
+            string current_path = Directory.GetCurrentDirectory();
             if (ClearCacheFlag)
             {
                 Console.WriteLine("Очишаю кэш.");
@@ -93,7 +94,7 @@ namespace GetIdol
                 post_ids = GetImageInfoFromSankaku(tags.ToString());
                 AddItemsToCache(post_ids);
                 Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
-                Directory.CreateDirectory(".\\" + tags.ToString());
+                Directory.CreateDirectory(current_path + "\\" + tags.ToString());
                 for (int i = 0; i < post_ids.Count; i++)
                 {
                     Console.WriteLine("\n###### {0}/{1} ######", (i + 1), post_ids.Count);
@@ -106,7 +107,7 @@ namespace GetIdol
                             break;
                         }
                         //DateTime start = DateTime.Now;
-                        if (DownloadImageFromSankaku(post_ids[i], ".\\" + tags.ToString(), sankaku_cookies))
+                        if (DownloadImageFromSankaku(post_ids[i], current_path + "\\" + tags.ToString(), sankaku_cookies))
                         {
                             //MyWait(start, 5000);
                             //count_complit++;
@@ -150,7 +151,7 @@ namespace GetIdol
                 List<string> tags = GetTagsFromCache();
                 foreach(string tag in tags)
                 {
-                    Directory.CreateDirectory(".\\" + tag);
+                    Directory.CreateDirectory(current_path + "\\" + tag);
                 }
                 for (int i = 0; i < post_ids.Count; i++)
                 {
@@ -164,7 +165,7 @@ namespace GetIdol
                             break;
                         }
                         //DateTime start = DateTime.Now;
-                        if (DownloadImageFromSankaku(post_ids[i], ".\\" + post_ids[i].Tag, sankaku_cookies))
+                        if (DownloadImageFromSankaku(post_ids[i], current_path + "\\" + post_ids[i].Tag, sankaku_cookies))
                         {
                             //MyWait(start, 5000);
                             //count_complit++;

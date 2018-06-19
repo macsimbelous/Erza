@@ -56,6 +56,10 @@ namespace GetGelbooru
                 return;
             }
             ParseArgs(args);
+            if(Program.config.DownloadPath == ".")
+            {
+                Program.config.DownloadPath = Directory.GetCurrentDirectory();
+            }
             ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
             StringBuilder tags_bilder = new StringBuilder();
             for (int i = 0; i < Tags.Count; i++)

@@ -56,7 +56,14 @@ namespace Erza
                     Console.WriteLine("Не заданы теги!");
                     return;
                 }
-                if (Program.use_sub_dir) { Program.config.DownloadPath = Program.config.DownloadPath + @"\" + WebUtility.UrlEncode(Program.tags[0]); }
+                if (Program.config.DownloadPath == ".")
+                {
+                    Program.config.DownloadPath = Directory.GetCurrentDirectory();
+                }
+                if (Program.use_sub_dir)
+                {
+                    Program.config.DownloadPath = Program.config.DownloadPath + @"\" + WebUtility.UrlEncode(Program.tags[0]);
+                }
                 ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
                 for (int i = 0; i < Program.tags.Count; i++)
                 {

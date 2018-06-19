@@ -47,6 +47,10 @@ namespace GetDanbooru
                 Console.WriteLine("Не заданы теги!");
                 return;
             }
+            if (Program.config.DownloadPath == ".")
+            {
+                Program.config.DownloadPath = Directory.GetCurrentDirectory();
+            }
             foreach (string tag in args)
             {
                 Console.WriteLine("Импортируем тег " + tag + " с Данбуру");
