@@ -49,8 +49,11 @@ namespace GetIdol
         static int count_skip = 0;
         static string store_file = null;
         static bool ClearCacheFlag = false;
+        static bool OnlyCacheFlag = false;
         static void Main(string[] args)
         {
+            bool restore_cache = false;
+            string tags = null;
             LoadSettings();
             ParseArgs(args);
             ServicePointManager.ServerCertificateValidationCallback = ValidationCallback;
@@ -62,124 +65,116 @@ namespace GetIdol
             string current_path = Directory.GetCurrentDirectory();
             if (ClearCacheFlag)
             {
-                Console.WriteLine("Очишаю кэш.");
+                Console.Write("Очишаю кэш...");
                 ClearCache();
                 VacuumGetIdolDB();
+                Console.WriteLine("Готово");
                 return;
             }
-            Console.WriteLine("Востанавливаю список из кэша.");
-            post_ids = GetItemsFromCache();
-            if (post_ids.Count <= 0)
+            Console.Write("Авторизуемся на Санкаке...");
+            int temp = 0;
+            for (; ; )
             {
-                Console.WriteLine("Кэш пуст!");
-                if(Tags.Count <= 0)
+                sankaku_cookies = GetSankakuCookies(Program.config.BaseURL + "user/authenticate");
+                if (sankaku_cookies != null)
                 {
-                    Console.WriteLine("Задайте теги!");
-                    return;
+                    Console.WriteLine("Готово");
+                    break;
                 }
-                StringBuilder tags = new StringBuilder();
+                else
+                {
+                    if (temp < Program.config.LimitErrors)
+                    {
+                        temp++;
+                        Thread.Sleep(Program.config.TimeOut);
+                        Console.WriteLine("Сбой!");
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Сбой!\nНе удалось получить куки!");
+                        return;
+                    }
+                }
+            }
+            if (Tags.Count > 0)
+            {
+                StringBuilder tags_builder = new StringBuilder();
                 for (int i = 0; i < Tags.Count; i++)
                 {
                     if (i == 0)
                     {
-                        tags.Append(WebUtility.UrlEncode(Tags[i]));
+                        tags_builder.Append(WebUtility.UrlEncode(Tags[i]));
                     }
                     else
                     {
-                        tags.Append("+");
-                        tags.Append(WebUtility.UrlEncode(Tags[i]));
+                        tags_builder.Append("+");
+                        tags_builder.Append(WebUtility.UrlEncode(Tags[i]));
                     }
                 }
-                Console.WriteLine("Импортируем тег " + tags.ToString() + " с санкаки");
-                post_ids = GetImageInfoFromSankaku(tags.ToString());
+                tags = tags_builder.ToString();
+                Console.WriteLine($"Импортируем тег {tags} с санкаки");
+                post_ids = GetImageInfoFromSankaku(tags);
+                Console.Write("Сохраняю список в кэш...");
                 AddItemsToCache(post_ids);
-                Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
-                Directory.CreateDirectory(current_path + "\\" + tags.ToString());
-                for (int i = 0; i < post_ids.Count; i++)
+                Console.WriteLine("Готово");
+                if (OnlyCacheFlag)
                 {
-                    Console.WriteLine("\n###### {0}/{1} ######", (i + 1), post_ids.Count);
-                    for (int index = 0; index < Program.config.LimitErrors; index++)
-                    {
-                        if (ExistPostIDFromPosts(post_ids[i].PostID))
-                        {
-                            Console.WriteLine("Этот пост уже был ранне скачан.");
-                            RemoveItemFromCache(post_ids[i].PostID);
-                            break;
-                        }
-                        //DateTime start = DateTime.Now;
-                        if (DownloadImageFromSankaku(post_ids[i], current_path + "\\" + tags.ToString(), sankaku_cookies))
-                        {
-                            //MyWait(start, 5000);
-                            //count_complit++;
-                            break;
-                        }
-                        //MyWait(start, 7000);
-                        if (index == 0)
-                        {
-                            count_error++;
-                        }
-                    }
+                    Console.WriteLine("Указана опция --only-cache, прекращаю работу");
+                    return;
                 }
-                Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
             }
             else
             {
-                int temp = 0;
-                for (; ; )
+                Console.Write("Востанавливаю список из кэша...");
+                post_ids = GetItemsFromCache();
+                if (post_ids.Count <= 0)
                 {
-                    sankaku_cookies = GetSankakuCookies(Program.config.BaseURL + "user/authenticate");
-                    if (sankaku_cookies != null)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (temp < Program.config.LimitErrors)
-                        {
-                            temp++;
-                            Thread.Sleep(Program.config.TimeOut);
-                            continue;
-                        }
-                        else
-                        {
-                            Console.Write("Не удалось получить куки!");
-                            return;
-                        }
-                    }
+                    Console.WriteLine("Готово\nКэш пуст!");
+                    return;
                 }
-                Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
-                List<string> tags = GetTagsFromCache();
-                foreach(string tag in tags)
+                restore_cache = true;
+                Console.WriteLine($"Готово\nВостанавлено {post_ids.Count} элемента.");
+            }
+            Console.WriteLine("\nНачинаю загрузку картинок\n");
+            if (restore_cache)
+            {
+                List<string> list = GetTagsFromCache();
+                foreach (string tag in list)
                 {
                     Directory.CreateDirectory(current_path + "\\" + tag);
                 }
-                for (int i = 0; i < post_ids.Count; i++)
+            }
+            else
+            {
+                Directory.CreateDirectory(current_path + "\\" + tags);
+            }
+            for (int i = 0; i < post_ids.Count; i++)
+            {
+                Console.WriteLine($"\nПост {post_ids[i].PostID} {(i + 1)}/{post_ids.Count}");
+                for (int index = 0; index < Program.config.LimitErrors; index++)
                 {
-                    Console.WriteLine("\n###### {0}/{1} ######", (i + 1), post_ids.Count);
-                    for (int index = 0; index < Program.config.LimitErrors; index++)
+                    if (ExistPostIDFromPosts(post_ids[i].PostID))
                     {
-                        if (ExistPostIDFromPosts(post_ids[i].PostID))
-                        {
-                            Console.WriteLine("Этот пост уже был ранне скачан.");
-                            RemoveItemFromCache(post_ids[i].PostID);
-                            break;
-                        }
-                        //DateTime start = DateTime.Now;
-                        if (DownloadImageFromSankaku(post_ids[i], current_path + "\\" + post_ids[i].Tag, sankaku_cookies))
-                        {
-                            //MyWait(start, 5000);
-                            //count_complit++;
-                            break;
-                        }
-                        //MyWait(start, 7000);
-                        if (index == 0)
-                        {
-                            count_error++;
-                        }
+                        Console.WriteLine("Этот пост уже был ранее скачан.");
+                        RemoveItemFromCache(post_ids[i].PostID);
+                        break;
+                    }
+                    //DateTime start = DateTime.Now;
+                    if (DownloadImageFromSankaku(post_ids[i], current_path + "\\" + post_ids[i].Tag, sankaku_cookies))
+                    {
+                        //MyWait(start, 5000);
+                        //count_complit++;
+                        break;
+                    }
+                    //MyWait(start, 7000);
+                    if (index == 0)
+                    {
+                        count_error++;
                     }
                 }
-                Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
             }
+            Console.WriteLine("Успешно скачано: {0}\nСкачано ренее: {1}\nУдалено ранее: {2}\nОшибочно: {3}\nВсего: {4}", count_complit, count_skip, count_deleted, count_error, post_ids.Count);
             VacuumGetIdolDB();
             connection.Close();
             getidoldb.Close();
@@ -200,7 +195,7 @@ namespace GetIdol
             Program.config.SankakuPassword = null;
             Program.config.UseProxy = false;
             Program.config.ProxyAddress = null;
-            Program.config.ProxyPort = 8888;
+            Program.config.ProxyPort = 3128;
             Program.config.ProxyLogin = null;
             Program.config.ProxyPassword = null;
             Program.config.DownloadPath = ".";
@@ -237,12 +232,18 @@ namespace GetIdol
             string start_page_string = "--start-page=";
             string max_page_string = "--max-page=";
             string clear_cache_string = "--clear-cache";
+            string only_cache_string = "--only-cache";
             Program.Tags = new List<string>();
             foreach (string param in args)
             {
                 if (param == clear_cache_string)
                 {
                     ClearCacheFlag = true;
+                    continue;
+                }
+                if (param == only_cache_string)
+                {
+                    OnlyCacheFlag = true;
                     continue;
                 }
                 if (param.Length >= start_page_string.Length)
@@ -479,7 +480,7 @@ namespace GetIdol
         }
         static List<CacheItem> GetImageInfoFromSankaku(string tag)
         {
-            if (sankaku_cookies == null)
+            /*if (sankaku_cookies == null)
             {
                 int temp = 0;
                 for (; ; )
@@ -504,7 +505,7 @@ namespace GetIdol
                         }
                     }
                 }
-            }
+            }*/
             List<CacheItem> imgs = new List<CacheItem>();
 
             string url = String.Format("{0}?tags={1}", Program.config.BaseURL, tag);
@@ -676,37 +677,6 @@ namespace GetIdol
             }
             return source;
         }
-        static string DownloadHTML(string m_strBaseURL, string m_strTags, int nPage, CookieCollection cookies)
-        {
-            int count_503 = 0;
-            string strURL = String.Format("{0}?tags={1}&page={2}", m_strBaseURL, m_strTags, nPage);
-            Console.WriteLine("Загружаем и парсим: " + strURL);
-            while (true)
-            {
-                try
-                {
-                    return DownloadStringFromSankaku(strURL, null, cookies);
-                }
-                catch (WebException we)
-                {
-                    Console.WriteLine("Ошибка: " + we.Message);
-                    Thread.Sleep(Program.config.TimeOutError);
-                    if (we.Response == null) { continue; }
-                    if (((HttpWebResponse)we.Response).StatusCode == HttpStatusCode.ServiceUnavailable)
-                    {
-                        if (count_503 < Program.config.LimitErrors)
-                        {
-                            count_503++;
-                            continue;
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    }
-                }
-            }
-        }
         static List<long> ParseHTML_sankaku(string html)
         {
             List<long> temp = new List<long>();
@@ -734,19 +704,6 @@ namespace GetIdol
             else
             {
                 return dir + "\\" + Path.GetFileName(url);
-            }
-        }
-        static void MyWait(DateTime start, int delay)
-        {
-            int current = (int)((DateTime.Now - start).TotalMilliseconds);
-            if (current < delay)
-            {
-                Thread.Sleep(delay - current);
-                return;
-            }
-            else
-            {
-                return;
             }
         }
         static bool ValidationCallback(Object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
@@ -925,15 +882,6 @@ namespace GetIdol
                 return;
             }
             return;
-        }
-        static byte[] SetHashString(string hash_string)
-        {
-            byte[] result = new byte[hash_string.Length / 2];
-            for (int i = 0; i < hash_string.Length; i += 2)
-            {
-                result[i / 2] = byte.Parse(hash_string.Substring(i, 2), NumberStyles.HexNumber);
-            }
-            return result;
         }
         static bool IsImageFile(string FilePath)
         {
