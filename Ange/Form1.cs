@@ -244,6 +244,7 @@ namespace Ange
         {
             this.Previews.Close();
             this.Erza.Close();
+            this.brush.Dispose();
         }
 
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)

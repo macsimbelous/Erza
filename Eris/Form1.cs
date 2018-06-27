@@ -57,7 +57,7 @@ namespace Eris
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             adapter.Update(this.table);
-            connection.Clone();
+            connection.Close();
         }
 
         private void edit_toolStripButton_Click(object sender, EventArgs e)

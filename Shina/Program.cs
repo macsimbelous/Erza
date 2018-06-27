@@ -195,12 +195,10 @@ namespace Shina
             }
             catch (WebException we)
             {
-                we.GetType();
                 return null;
             }
             catch (XmlException e)
             {
-                e.GetType();
                 return null;
             }
             finally
@@ -235,7 +233,6 @@ namespace Shina
                             return img;
                         }
                     }
-                    return null;
                 }
                 return null;
             }

@@ -34,7 +34,7 @@ namespace Misaka
                 Console.WriteLine("Не задан режим работы!");
                 return;
             }
-            if (!((args[0] == "-delete") | (args[0] == "-vipe")))
+            if (!((args[0] == "-delete") || (args[0] == "-vipe")))
             { 
                 Console.WriteLine("Параметр не опознан!");
                 return;

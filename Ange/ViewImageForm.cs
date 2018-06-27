@@ -92,8 +92,6 @@ namespace Ange
                 else
                 {
                     this.pictureBox1.Image = (Image)Properties.Resources.noimage;
-                    ImageFormat = String.Empty;
-                    FileSize = 0;
                 }
             }
             catch (Exception ex)
