@@ -52,6 +52,7 @@
             this.Controls.Add(this.pictureBox1);
             this.Name = "FullScreenForm";
             this.Text = "FullScreenForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FullScreenForm_FormClosed);
             this.Load += new System.EventHandler(this.FullScreenForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FullScreenForm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

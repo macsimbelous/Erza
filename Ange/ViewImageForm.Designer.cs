@@ -228,6 +228,7 @@
             this.Name = "ViewImageForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Просмотр";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ViewImageForm_FormClosed);
             this.Load += new System.EventHandler(this.ViewImageForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);

@@ -368,5 +368,10 @@ namespace Ange
                 this.listBox1.DataSource = this.Tags;
             }
         }
+
+        private void ViewImageForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (fs != null) { fs.Close(); }
+        }
     }
 }
