@@ -59,7 +59,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "CalculateAllLinksForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "CalculateAllLinksForm";
+            this.Text = "Подсчёт ссылок на все теги";
             this.Load += new System.EventHandler(this.CalculateAllLinksForm_Load);
             this.ResumeLayout(false);
 

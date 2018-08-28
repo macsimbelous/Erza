@@ -19,47 +19,47 @@ namespace Eris
         bool Abort = false;
         SynchronizationContext synchronizationContext;
         public SQLiteConnection connection;
+        
         public CalculateAllLinksForm()
         {
             InitializeComponent();
         }
         private void LongRunningTask(object o)
         {
-            SQLiteTransaction transact = connection.BeginTransaction();
-            int count_rows = this.table.Rows.Count;
-            for (int i = 0; i < count_rows; i++)
+            List<TagsCount> it = new List<TagsCount>();
+            using (SQLiteCommand command = new SQLiteCommand(connection))
             {
-                if (Abort)
+                command.CommandText = "SELECT count(tag_id), tag_id FROM image_tags GROUP BY tag_id";
+                using(SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    transact.Rollback();
-                    synchronizationContext.Post(EndProgress, false);
-                    return;
+                    while (reader.Read())
+                    {
+                        it.Add(new TagsCount(reader.GetInt64(1), reader.GetInt64(0)));
+                    }
+                    reader.Close();
                 }
-                DataRow row = table.Rows[i];
-                long tag_id = (long)row["tag_id"];
-                long count_links = 0;
-                using (SQLiteCommand command = new SQLiteCommand())
+            }
+            using (SQLiteTransaction transact = connection.BeginTransaction())
+            {
+                for (int i = 0; i < it.Count; i++)
                 {
-                    command.CommandText = "SELECT count(*) FROM image_tags WHERE image_tags.tag_id = @tag_id;";
-                    command.Parameters.AddWithValue("tag_id", tag_id);
-                    command.Connection = connection;
-                    //row["count"] = System.Convert.ToInt64(command.ExecuteScalar());
-                    count_links = System.Convert.ToInt64(command.ExecuteScalar());
-                }
-                if (count_links > 0)
-                {
-                    using (SQLiteCommand command = new SQLiteCommand())
+                    if (Abort)
+                    {
+                        transact.Rollback();
+                        synchronizationContext.Post(EndProgress, false);
+                        return;
+                    }
+                    using (SQLiteCommand command = new SQLiteCommand(connection))
                     {
                         command.CommandText = "UPDATE tags SET count = @count WHERE tag_id = @tag_id;";
-                        command.Parameters.AddWithValue("count", count_links);
-                        command.Parameters.AddWithValue("tag_id", tag_id);
-                        command.Connection = connection;
+                        command.Parameters.AddWithValue("count", it[i].Count);
+                        command.Parameters.AddWithValue("tag_id", it[i].TagID);
                         command.ExecuteNonQuery();
                     }
+                    synchronizationContext.Post(RefreshProgress, i + 1);
                 }
-                synchronizationContext.Post(RefreshProgress, i+1);
+                transact.Commit();
             }
-            transact.Commit();
             synchronizationContext.Post(EndProgress, true);
         }
         private void RefreshProgress(object progress) // это для вызова  через Пост/Сенд
@@ -95,6 +95,16 @@ namespace Eris
         private void button1_Click(object sender, EventArgs e)
         {
             this.Abort = true;
+        }
+    }
+    public class TagsCount
+    {
+        public long TagID;
+        public long Count;
+        public TagsCount(long TagID, long Count)
+        {
+            this.Count = Count;
+            this.TagID = TagID;
         }
     }
 }
