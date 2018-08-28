@@ -620,5 +620,66 @@ namespace ErzaLib
             }
             return tags;
         }
+        public static long CountTag(string Tag, SQLiteConnection Connection)
+        {
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT count(*) FROM image_tags WHERE image_tags.tag_id = @tag_id;";
+                command.Parameters.AddWithValue("tag_id", Tag);
+                command.Connection = Connection;
+                object o = command.ExecuteScalar();
+                if (o == null)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return System.Convert.ToInt64(o);
+                }
+            }
+        }
+        public static List<TagInfo> CountTags(List<TagInfo> Tags, SQLiteConnection Connection)
+        {
+            List<TagInfo> tags = new List<TagInfo>();
+            StringBuilder sql = new StringBuilder();
+            sql.Append("select count(tags.tag), tags.tag, tags.type, tags.localization, tags.description from tags inner join image_tags on tags.tag_id = image_tags.tag_id where tags.tag in (");
+            for (int i = 0; i < Tags.Count; i++)
+            {
+                if (i > 0) sql.Append(", ");
+                //sql.Append("'" + Tags[i].Tag + "'");
+                sql.Append("@tag" + i.ToString());
+            }
+            sql.Append(") GROUP BY tags.tag;");
+            using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
+            {
+                for (int i = 0; i < Tags.Count; i++)
+                {
+                    command.Parameters.AddWithValue("@tag" + i.ToString(), Tags[i].Tag);
+                }
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        TagInfo tag = new TagInfo();
+                        tag.Tag = (string)reader[1];
+                        tag.Count = (long)reader[0];
+                        object o = reader[3];
+                        if (o != DBNull.Value)
+                        {
+                            tag.TagRus = (string)o;
+                        }
+                        o = reader[4];
+                        if (o != DBNull.Value)
+                        {
+                            tag.Description = (string)o;
+                        }
+                        tag.Type = (TagType)reader[2];
+                        tags.Add(tag);
+                    }
+                    reader.Close();
+                }
+            }
+            return tags;
+        }
     }
 }

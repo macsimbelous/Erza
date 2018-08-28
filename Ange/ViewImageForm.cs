@@ -85,6 +85,7 @@ namespace Ange
                     this.size_label.Text = String.Format($"Размер: {FileSize:### ### ###} байт");
                     //this.listBox1.Items.AddRange(ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza).ToArray());
                     List<TagInfo> temp = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza);
+                    //temp = ErzaDB.CountTags(temp, this.Erza);
                     this.Tags = new BindingList<TagInfo>(temp.OrderBy(tag => tag.Tag).ToList());
                     this.listBox1.DataSource = this.Tags;
                     this.tags_count_label.Text = "Количество тегов: " + this.listBox1.Items.Count.ToString();
@@ -327,7 +328,7 @@ namespace Ange
                         foregroundBrush = MetaColor;
                         break;
                 }
-                g.DrawString(((TagInfo)listBox1.Items[e.Index]).Tag, e.Font, foregroundBrush, listBox1.GetItemRectangle(e.Index).Location);
+                g.DrawString(((TagInfo)listBox1.Items[e.Index]).Tag + " - " + ((TagInfo)listBox1.Items[e.Index]).Count.ToString(), e.Font, foregroundBrush, listBox1.GetItemRectangle(e.Index).Location);
             }
             e.DrawFocusRectangle();
         }
