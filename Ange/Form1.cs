@@ -321,7 +321,7 @@ namespace Ange
             if (this.listView1.SelectedIndices.Count > 0)
             {
                 int i = this.listView1.SelectedIndices[0];
-                string dest_path = "I:\\Wallpapers\\" + Path.GetFileName(this.Result[i].FilePath);
+                string dest_path = "E:\\Wallpapers\\" + Path.GetFileName(this.Result[i].FilePath);
                 try
                 {
                     if (File.Exists(dest_path))

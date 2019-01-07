@@ -8,11 +8,12 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Maki</RootNamespace>
     <AssemblyName>Maki</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,7 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.109.1\lib\net451\System.Data.SQLite.dll</HintPath>
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.109.2\lib\net451\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
@@ -68,11 +69,11 @@
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetPath) C:\utils\bin\$(TargetFileName) /Y</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.1\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.1\build\net451\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.109.1\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.109.1\build\net451\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets'))" />
   </Target>
 </Project>

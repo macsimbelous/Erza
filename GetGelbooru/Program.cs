@@ -284,7 +284,7 @@ namespace GetGelbooru
             bool result = DownloadFile(url, filename, Referer, Cookies, Program.config.UserAgent);
             if (result)
             {
-                ErzaDB.SetImagePath(hash, filename, connection);
+                ErzaDB.SetImagePath(hash, filename.ToLower(), connection);
             }
             return result;
         }

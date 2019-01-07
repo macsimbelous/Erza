@@ -112,7 +112,7 @@ namespace Sagiri
             {
                 files = Directory.GetFiles(config.SourcePath, "*.*", SearchOption.TopDirectoryOnly);
             }
-            //string[] files = Directory.GetFiles("I:\\AnimeArt\\UnSorted", "*.*", SearchOption.AllDirectories);
+            //string[] files = Directory.GetFiles("F:\\AnimeArt\\UnSorted", "*.*", SearchOption.AllDirectories);
             for(int i = 0; i < files.Length; i++)
             {
                 if (IsImageFile(files[i]))
@@ -253,8 +253,8 @@ namespace Sagiri
         {
             Program.config = new Config();
             //Параметры по умолчанию
-            Program.config.SourcePath = @"I:\AnimeArt\Unsorted";
-            Program.config.TargetPath = @"I:\AnimeArt";
+            Program.config.SourcePath = @"F:\AnimeArt\Unsorted";
+            Program.config.TargetPath = @"F:\AnimeArt";
             DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Config));
             if (File.Exists("C:\\utils\\cfg\\Sagiri.json"))
             {

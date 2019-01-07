@@ -359,7 +359,7 @@ namespace GetIdol
                         Console.WriteLine("Уже скачан: {0}", filename);
                         count_skip++;
                         //wrp.Close();
-                        ErzaDB.SetImagePath(hash, filename, connection);
+                        ErzaDB.SetImagePath(hash, filename.ToLower(), connection);
                         AddPostIDToPosts(Item.PostID, hash);
                         RemoveItemFromCache(Item.PostID);
                         return true;
@@ -394,7 +394,7 @@ namespace GetIdol
                 {
                     Console.WriteLine("\nЗакачка завершена.");
                     count_complit++;
-                    ErzaDB.SetImagePath(hash, filename, connection);
+                    ErzaDB.SetImagePath(hash, filename.ToLower(), connection);
                     AddPostIDToPosts(Item.PostID, hash);
                     RemoveItemFromCache(Item.PostID);
                     return true;

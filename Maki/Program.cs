@@ -36,7 +36,7 @@ namespace Maki
             //string previews = @"data source=C:\Users\maksim\Source\Repos\Erza\Ange\bin\Debug\Previews.sqlite";
             SQLiteConnection conn = new SQLiteConnection(previews);
             conn.Open();
-            string[] files = Directory.GetFiles("I:\\AnimeArt", "*.*", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles("F:\\AnimeArt", "*.*", SearchOption.AllDirectories);
             ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
             EncoderParameters myEncoderParameters = new EncoderParameters(1);
             EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);

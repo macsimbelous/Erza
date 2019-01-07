@@ -1078,7 +1078,7 @@ namespace Erza
                         {
                             if (Program.config.UseDB)
                             {
-                                ErzaDB.SetImagePath(Path.GetFileNameWithoutExtension(filename), filename, connection);
+                                ErzaDB.SetImagePath(Path.GetFileNameWithoutExtension(filename), filename.ToLower(), connection);
                             }
                             MyWait(start, 2500);
                             return 0;
@@ -1092,7 +1092,7 @@ namespace Erza
                         {
                             if (Program.config.UseDB)
                             {
-                                ErzaDB.SetImagePath(Path.GetFileNameWithoutExtension(filename), filename, connection);
+                                ErzaDB.SetImagePath(Path.GetFileNameWithoutExtension(filename), filename.ToLower(), connection);
                             }
                             MyWait(start, 2500);
                             return 0;
