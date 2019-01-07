@@ -63,9 +63,9 @@ namespace GetDanbooru
             }
             Console.Write("\n\n\n\t\tНАЧИНАЕТСЯ ЗАГРУЗКА\n\n\n");
             int count_complit = 0;
-            int count_deleted = 0;
+            //int count_deleted = 0;
             int count_error = 0;
-            int count_skip = 0;
+            //int count_skip = 0;
             Program.config.DownloadPath = Program.config.DownloadPath + "\\" + args[0];
             Directory.CreateDirectory(Program.config.DownloadPath);
             for (int i = 0; i < il.Count; i++)

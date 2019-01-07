@@ -30,8 +30,9 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using System.Data.SQLite;
 using AngleSharp;
-using AngleSharp.Parser.Html;
+//using AngleSharp.Parser.Html;
 using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
 
 namespace GetGelbooru
 {
@@ -224,7 +225,7 @@ namespace GetGelbooru
         {
             List<string> links = new List<string>();
             var parser = new HtmlParser();
-            var document = parser.Parse(Page);
+            var document = parser.ParseDocument(Page);
             foreach (IElement element in document.QuerySelectorAll("div"))
             {
                 if (element.GetAttribute("class") == "thumbnail-preview")
@@ -240,7 +241,7 @@ namespace GetGelbooru
         static string ParsePostPage(string Page)
         {
             var parser = new HtmlParser();
-            var document = parser.Parse(Page);
+            var document = parser.ParseDocument(Page);
             foreach (IElement element in document.QuerySelectorAll("a"))
             {
                 if ("Original image" == element.InnerHtml)
@@ -341,7 +342,7 @@ namespace GetGelbooru
             {
                 List<string> tags = new List<string>();
                 var parser = new HtmlParser();
-                var document = parser.Parse(Page);
+                var document = parser.ParseDocument(Page);
                 foreach (IElement element in document.QuerySelectorAll("textarea"))
                 {
                     if (element.GetAttribute("name") == "tags")

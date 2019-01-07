@@ -30,8 +30,8 @@ namespace Shina
 {
     class Program
     {
-        static string ConnectionString = @"data source=C:\utils\data\erza.sqlite";
-        static string UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+        //static string ConnectionString = @"data source=C:\utils\data\erza.sqlite";
+        //static string UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
         static string LoginForDanbooru = "macsimbelous";
         static string ApiKeyForDanbooru = "F5eC.ADAOFChEkOwVA1x.BUES0S9GaRqSoohs7wO";
         static void Main(string[] args)
@@ -193,11 +193,11 @@ namespace Shina
                 }
                 return null;
             }
-            catch (WebException we)
+            catch (WebException)
             {
                 return null;
             }
-            catch (XmlException e)
+            catch (XmlException)
             {
                 return null;
             }
