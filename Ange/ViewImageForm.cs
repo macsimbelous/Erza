@@ -89,6 +89,7 @@ namespace Ange
                     this.Tags = new BindingList<TagInfo>(temp.OrderBy(tag => tag.Tag).ToList());
                     this.listBox1.DataSource = this.Tags;
                     this.tags_count_label.Text = "Количество тегов: " + this.listBox1.Items.Count.ToString();
+                    this.Text = "Просмотр " + this.Result[this.Index].Hash;
                 }
                 else
                 {
