@@ -32,6 +32,8 @@ namespace Ange
 {
     public partial class Form1 : Form
     {
+        private const int PreviewWidth = 300;
+        private const int PreviewHeight = 225;
         SQLiteConnection Previews;
         public SQLiteConnection Erza;
         List<ImageInfo> Result;
@@ -98,9 +100,9 @@ namespace Ange
             float x = (e.Bounds.Width / 2f) - ((float)img.Width / 2f);
             float y = (e.Bounds.Height / 2f) - ((float)img.Height / 2f);
             e.Graphics.DrawImage(img, new RectangleF(e.Bounds.X + x, e.Bounds.Y + y, (float)img.Width, (float)img.Height));
-            StringFormat drawFormat = new StringFormat();
-            drawFormat.Alignment = StringAlignment.Center;
-            e.Graphics.DrawString(e.Item.Text, new Font("Arial", 8f), new SolidBrush(Color.Black), e.Bounds.X + (e.Bounds.Width / 2f), e.Bounds.Y + 156f, drawFormat);
+            //StringFormat drawFormat = new StringFormat();
+            //drawFormat.Alignment = StringAlignment.Center;
+            //e.Graphics.DrawString(e.Item.Text, new Font("Arial", 8f), new SolidBrush(Color.Black), e.Bounds.X + (e.Bounds.Width / 2f), e.Bounds.Y + 156f, drawFormat);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -109,7 +111,8 @@ namespace Ange
             this.Erza = new SQLiteConnection("data source=C:\\utils\\data\\Erza.sqlite");
             this.Erza.Open();
             //this.Previews = new SQLiteConnection("data source=" + Application.StartupPath + "\\Previews.sqlite");
-            this.Previews = new SQLiteConnection("data source=C:\\utils\\data\\Previews.sqlite");
+            //this.Previews = new SQLiteConnection("data source=C:\\utils\\data\\Previews.sqlite");
+            this.Previews = new SQLiteConnection("data source=E:\\Previews.sqlite");
             this.Previews.Open();
             this.Result = new List<ImageInfo>();
             this.brush = new SolidBrush(Color.Orange);
@@ -429,7 +432,7 @@ namespace Ange
                 EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
                 myEncoderParameters.Param[0] = myEncoderParameter;
                 int i = this.listView1.SelectedIndices[0];
-                using (Bitmap preview = CreateThumbnail(Result[i].FilePath, 200, 150))
+                using (Bitmap preview = CreateThumbnail(Result[i].FilePath, PreviewWidth, PreviewHeight))
                 {
                     if (preview != null)
                     {
@@ -479,11 +482,11 @@ namespace Ange
                 {
                     temp = (float)loBMP.Height / (float)lnHeight;
                     lnNewWidth = (int)((float)loBMP.Width / temp);
-                    lnNewHeight = 150;
+                    lnNewHeight = lnHeight;
                 }
                 else
                 {
-                    lnNewWidth = 200;
+                    lnNewWidth = lnWidth;
                     lnNewHeight = (int)((float)loBMP.Height / temp);
                 }
                 /*if (loBMP.Width > loBMP.Height)

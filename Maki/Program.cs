@@ -31,6 +31,8 @@ namespace Maki
     {
         static void Main(string[] args)
         {
+            const int PreviewWidth = 300;
+            const int PreviewHeight = 225;
             string previews = "data source=C:\\utils\\data\\previews.sqlite";
             List<string> bad_files = new List<string>();
             //string previews = @"data source=C:\Users\maksim\Source\Repos\Erza\Ange\bin\Debug\Previews.sqlite";
@@ -52,7 +54,7 @@ namespace Maki
                 }
                 else
                 {
-                    Bitmap preview = CreateThumbnail(file, 200, 150);
+                    Bitmap preview = CreateThumbnail(file, PreviewWidth, PreviewHeight);
                     if (preview != null)
                     {
                         using (MemoryStream stream = new MemoryStream())
@@ -152,11 +154,11 @@ namespace Maki
                 {
                     temp = (float)loBMP.Height / (float)lnHeight;
                     lnNewWidth = (int)((float)loBMP.Width / temp);
-                    lnNewHeight = 150;
+                    lnNewHeight = lnHeight;
                 }
                 else
                 {
-                    lnNewWidth = 200;
+                    lnNewWidth = lnWidth;
                     lnNewHeight = (int)((float)loBMP.Height / temp);
                 }
                 /*if (loBMP.Width > loBMP.Height)
