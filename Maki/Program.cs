@@ -33,7 +33,8 @@ namespace Maki
         {
             const int PreviewWidth = 300;
             const int PreviewHeight = 225;
-            string previews = "data source=C:\\utils\\data\\previews.sqlite";
+            //string previews = "data source=C:\\utils\\data\\previews.sqlite";
+            string previews = "data source=E:\\previews.sqlite";
             List<string> bad_files = new List<string>();
             //string previews = @"data source=C:\Users\maksim\Source\Repos\Erza\Ange\bin\Debug\Previews.sqlite";
             SQLiteConnection conn = new SQLiteConnection(previews);

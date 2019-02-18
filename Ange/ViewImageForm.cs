@@ -98,7 +98,9 @@ namespace Ange
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                this.Text = "Просмотр " + this.Result[this.Index].Hash + " - " + ex.Message;
+                if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                //MessageBox.Show(ex.Message);
             }
         }
         private string GetImageFormat(Image image)
