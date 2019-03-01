@@ -460,12 +460,12 @@ namespace GetIdol
                 }
                 else
                 {
-                    Regex rx_swf = new Regex("<p><a href=\"" + @"(?<protocol>http(s)?)://(?<server>([A-Za-z0-9-]+\.)*(?<basedomain>[A-Za-z0-9-]+\.[A-Za-z0-9]+))+((:)?(?<port>[0-9]+)?(/?)(?<path>(?<dir>[A-Za-z0-9\._\-/]+)(/){0,1}[A-Za-z0-9.-/_]*)){0,1}" + "\" >Save this flash \\(right click and save\\)</a></p>", RegexOptions.Compiled);
+                    Regex rx_swf = new Regex("<p><a href=\"" + @"\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?" + "\">Save this file \\(right click and save as\\)</a></p>", RegexOptions.Compiled);
                     Match match_swf = rx_swf.Match(post);
                     if (match_swf.Success)
                     {
-                        string url = match_swf.Value.Substring(12).Replace("\" >Save this flash (right click and save)</a></p>", String.Empty);
-                        return url.Replace("amp;", String.Empty);
+                        string url = match_swf.Value.Substring(12).Replace("\">Save this file (right click and save as)</a></p>", String.Empty);
+                        return "https:" + url.Replace("amp;", String.Empty);
                     }
                     else
                     {
