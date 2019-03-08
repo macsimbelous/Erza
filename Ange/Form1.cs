@@ -43,6 +43,7 @@ namespace Ange
         {
             InitializeComponent();
             //ListView_SetSpacing(this.listView1, PreviewWidth +12, PreviewHeight + 24);
+            //imageList1.ImageSize = new Size(300, 225);
         }
 
         private void listView1_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
@@ -85,7 +86,6 @@ namespace Ange
             }
         }
         
-
         private void listView1_DrawItem(object sender, DrawListViewItemEventArgs e)
         {
             if ((e.State & ListViewItemStates.Selected) != 0)
@@ -106,7 +106,6 @@ namespace Ange
             //drawFormat.Alignment = StringAlignment.Center;
             //e.Graphics.DrawString(e.Item.Text, new Font("Arial", 8f), new SolidBrush(Color.Black), e.Bounds.X + (e.Bounds.Width / 2f), e.Bounds.Y + 156f, drawFormat);
         }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             //this.Erza = new SQLiteConnection("data source="+ Application.StartupPath + "\\Erza.sqlite");
@@ -167,6 +166,7 @@ namespace Ange
             this.tag_toolStripComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
             this.tag_toolStripComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
             this.option_toolStripComboBox.SelectedIndex = 0;
+            this.DoubleBuffered = true;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
