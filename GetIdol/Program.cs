@@ -29,6 +29,8 @@ using System.Globalization;
 using System.Data.SQLite;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
+using System.Drawing;
+using System.Drawing.Imaging;
 using ErzaLib;
 
 namespace GetIdol
@@ -50,6 +52,14 @@ namespace GetIdol
         static string store_file = null;
         static bool ClearCacheFlag = false;
         static bool OnlyCacheFlag = false;
+        static int PreviewWidth = 300;
+        static int PreviewHeight = 225;
+        //string previews = "data source=C:\\utils\\data\\previews.sqlite";
+        static string previews = "data source=E:\\previews.sqlite";
+        static SQLiteConnection prev_conn = new SQLiteConnection(previews);
+        static readonly object prevlock = new object();
+        static readonly object prevlock2 = new object();
+        static int thread_count = 0;
         static void Main(string[] args)
         {
             bool restore_cache = false;
@@ -61,6 +71,7 @@ namespace GetIdol
             getidoldb.Open();
             connection = new SQLiteConnection(Program.config.ConnectionString);
             connection.Open();
+            prev_conn.Open();
             List<CacheItem> post_ids;
             string current_path = Directory.GetCurrentDirectory();
             if (ClearCacheFlag)
@@ -178,6 +189,19 @@ namespace GetIdol
             VacuumGetIdolDB();
             connection.Close();
             getidoldb.Close();
+            while (true)
+            {
+                if (thread_count > 0)
+                {
+                    Thread.Sleep(0);
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            prev_conn.Close();
             return;
         }
         static void LoadSettings()
@@ -397,6 +421,7 @@ namespace GetIdol
                     ErzaDB.SetImagePath(hash, filename.ToLower(), connection);
                     AddPostIDToPosts(Item.PostID, hash);
                     RemoveItemFromCache(Item.PostID);
+                    ThreadPool.QueueUserWorkItem(CreatePreview, filename);
                     return true;
                 }
             }
@@ -1047,6 +1072,27 @@ namespace GetIdol
                 }
             }
             return tags;
+        }
+        static void CreatePreview(Object o)
+        {
+            lock (prevlock2)
+            {
+                thread_count++;
+            }
+            string FilePath = (string)o;
+            string Hash = Path.GetFileNameWithoutExtension(FilePath);
+            using (Bitmap bitmap = PreviewDB.CreatePreview(FilePath, PreviewWidth, PreviewHeight))
+            {
+                byte[] array = PreviewDB.PreviewToJpeg(bitmap);
+                lock (prevlock)
+                {
+                    PreviewDB.LoadPreviewToDB(Hash, array, prev_conn);
+                }
+            }
+            lock (prevlock2)
+            {
+                thread_count--;
+            }
         }
     }
     [DataContract]

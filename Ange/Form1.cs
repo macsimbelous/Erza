@@ -453,7 +453,7 @@ namespace Ange
                 }
             }
         }
-        public static void UpdatePreviewToDB(string Hash, byte[] Preview, SQLiteConnection Connection)
+        public void UpdatePreviewToDB(string Hash, byte[] Preview, SQLiteConnection Connection)
         {
             using (SQLiteCommand command = new SQLiteCommand(Connection))
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,8 @@ namespace Ange
             this.TopMost = true;
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
-            this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+            //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+            LoadImageAsync(this.Result[this.Index].FilePath);
             this.rnd = new Random();
             this.timer1.Enabled = true;
         }
@@ -44,7 +46,8 @@ namespace Ange
                 if (this.Index < (this.Result.Count - 1))
                 {
                     this.Index++;
-                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    LoadImageAsync(this.Result[this.Index].FilePath);
                 }
             }
             if (e.KeyCode == Keys.Left)
@@ -52,7 +55,8 @@ namespace Ange
                 if (this.Index > 0)
                 {
                     this.Index--;
-                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    LoadImageAsync(this.Result[this.Index].FilePath);
                 }
             }
             this.timer1.Enabled = true;
@@ -63,20 +67,45 @@ namespace Ange
             if (this.RandomShow)
             {
                 this.Index = rnd.Next(this.Result.Count);
-                this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                LoadImageAsync(this.Result[this.Index].FilePath);
             }
             else
             {
                 if (this.Index < (this.Result.Count - 1))
                 {
                     this.Index++;
-                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    LoadImageAsync(this.Result[this.Index].FilePath);
                 }
                 else
                 {
                     this.Index = 0;
-                    this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    //this.pictureBox1.ImageLocation = this.Result[this.Index].FilePath;
+                    LoadImageAsync(this.Result[this.Index].FilePath);
                 }
+            }
+        }
+        private async void LoadImageAsync(string path)
+        {
+            if (Path.GetExtension(path).ToLower() == "gif")
+            {
+                await Task.Run(() => LoadImage(path));
+            }
+            else
+            {
+                LoadImage(path);
+            }
+        }
+        private void LoadImage(string path)
+        {
+            try
+            {
+                this.pictureBox1.ImageLocation = path;
+            }
+            catch (Exception e)
+            {
+                this.Text = e.Message;
             }
         }
     }
