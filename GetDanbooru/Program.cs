@@ -235,7 +235,8 @@ namespace GetDanbooru
                 if (ext.InnerText.ToLower().LastIndexOf('?') > -1) { break; }
                 //mImgDescriptor.FilePath = "http://danbooru.donmai.us/data/" + md5.InnerText + "." + ext.InnerText;
                 XmlElement url = node["file-url"];
-                mImgDescriptor.FilePath = "http://danbooru.donmai.us" + url.InnerText;
+                //mImgDescriptor.FilePath = "http://danbooru.donmai.us" + url.InnerText;
+                mImgDescriptor.FilePath = url.InnerText;
                 XmlElement height = node["image-height"];
                 XmlElement width = node["image-width"];
                 mImgDescriptor.Height = System.Convert.ToInt32(height.InnerText);
