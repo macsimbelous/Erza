@@ -51,11 +51,25 @@ namespace GetDanbooru
             {
                 Program.config.DownloadPath = Directory.GetCurrentDirectory();
             }
-            foreach (string tag in args)
+            /*foreach (string tag in args)
             {
                 Console.WriteLine("Импортируем тег " + tag + " с Данбуру");
                 il = SliyanieLists(il, get_hash_danbooru_new_api(WebUtility.UrlEncode(tag)));
+            }*/
+            StringBuilder tags_builder = new StringBuilder();
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (i == 0)
+                {
+                    tags_builder.Append(WebUtility.UrlEncode(args[i]));
+                }
+                else
+                {
+                    tags_builder.Append("+");
+                    tags_builder.Append(WebUtility.UrlEncode(args[i]));
+                }
             }
+            il = get_hash_danbooru_new_api(tags_builder.ToString());
             if (il.Count <= 0)
             {
                 Console.WriteLine("Ничего ненайдено.");
