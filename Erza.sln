@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Erza", "Erza\Erza.csproj", "{FB05786A-9BF6-4909-97DA-03529030812B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -51,6 +51,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eris", "Eris\Eris.csproj", "{4B43BCBA-6831-463D-B59A-A06F4408E664}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagiri", "Sagiri\Sagiri.csproj", "{D19259EF-8DBA-486F-8AD1-61DE6F3FFD08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rei", "Rei\Rei.csproj", "{160FFAFE-19A3-42F3-857E-83E10A5D2107}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -276,6 +278,22 @@ Global
 		{D19259EF-8DBA-486F-8AD1-61DE6F3FFD08}.Release|x64.Build.0 = Release|Any CPU
 		{D19259EF-8DBA-486F-8AD1-61DE6F3FFD08}.Release|x86.ActiveCfg = Release|Any CPU
 		{D19259EF-8DBA-486F-8AD1-61DE6F3FFD08}.Release|x86.Build.0 = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|x64.Build.0 = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Debug|x86.Build.0 = Debug|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|x64.ActiveCfg = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|x64.Build.0 = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|x86.ActiveCfg = Release|Any CPU
+		{160FFAFE-19A3-42F3-857E-83E10A5D2107}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
