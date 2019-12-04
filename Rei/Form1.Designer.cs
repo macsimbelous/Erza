@@ -54,6 +54,7 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(510, 615);
             this.listBox1.TabIndex = 0;
+            this.listBox1.SelectedValueChanged += new System.EventHandler(this.listBox1_SelectedValueChanged);
             // 
             // tag_textBox
             // 
@@ -66,6 +67,7 @@
             // type_comboBox
             // 
             this.type_comboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.type_comboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.type_comboBox.FormattingEnabled = true;
             this.type_comboBox.Location = new System.Drawing.Point(714, 61);
             this.type_comboBox.Name = "type_comboBox";
@@ -139,6 +141,7 @@
             this.new_button.TabIndex = 5;
             this.new_button.Text = "Создать";
             this.new_button.UseVisualStyleBackColor = true;
+            this.new_button.Click += new System.EventHandler(this.new_button_Click);
             // 
             // edit_button
             // 
@@ -149,6 +152,7 @@
             this.edit_button.TabIndex = 6;
             this.edit_button.Text = "Редактировать";
             this.edit_button.UseVisualStyleBackColor = true;
+            this.edit_button.Click += new System.EventHandler(this.edit_button_Click);
             // 
             // save_button
             // 
@@ -159,6 +163,7 @@
             this.save_button.TabIndex = 7;
             this.save_button.Text = "Сохранить";
             this.save_button.UseVisualStyleBackColor = true;
+            this.save_button.Click += new System.EventHandler(this.save_button_Click);
             // 
             // del_button
             // 
@@ -169,6 +174,7 @@
             this.del_button.TabIndex = 8;
             this.del_button.Text = "Удалить";
             this.del_button.UseVisualStyleBackColor = true;
+            this.del_button.Click += new System.EventHandler(this.del_button_Click);
             // 
             // label5
             // 
@@ -200,6 +206,8 @@
             this.Controls.Add(this.listBox1);
             this.Name = "Form1";
             this.Text = "Rei";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
