@@ -62,11 +62,23 @@ namespace Rei
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Connection.Close();
+            if (EditMode)
+            {
+                if (MessageBox.Show("Выйти без сохранения?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    Connection.Close();
+                    return;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            }
         }
 
         private void listBox1_SelectedValueChanged(object sender, EventArgs e)
         {
+            if (EditMode) { return; }
             string tag = (string)listBox1.SelectedValue;
             using (SQLiteCommand command = new SQLiteCommand())
             {
@@ -144,13 +156,28 @@ namespace Rei
             string tag = (string)listBox1.SelectedValue;
             if (EditMode)
             {
-
+                if (MessageBox.Show("Отменить редактирование?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    new_button.Enabled = true;
+                    edit_button.Enabled = true;
+                    tag_textBox.ReadOnly = true;
+                    description_textBox.ReadOnly = true;
+                    type_comboBox.Enabled = false;
+                    save_button.Enabled = false;
+                    listBox1.Enabled = true;
+                    NewMode = false;
+                    EditMode = false;
+                    listBox1.SetSelected(listBox1.SelectedIndex, true);
+                }
+                else { return; }
             }
             else
             {
-                RemoveTag(tag);
-                Tags.Remove(tag);
-                listBox1.Refresh();
+                if (MessageBox.Show("Удалить тег " + tag + " ?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    RemoveTag(tag);
+                    Tags.Remove(tag);
+                }
             }
         }
         private void RemoveTag(string Tag)
@@ -166,43 +193,46 @@ namespace Rei
 
         private void save_button_Click(object sender, EventArgs e)
         {
-            if (NewMode)
+            if (MessageBox.Show("Сохранить тег?", "Запрос", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                using (SQLiteCommand command = new SQLiteCommand())
+                if (NewMode)
                 {
-                    command.CommandText = "INSERT INTO favtags (tag, type, description) VALUES (@tag, @type, @description)";
-                    command.Parameters.AddWithValue("tag", tag_textBox.Text);
-                    command.Parameters.AddWithValue("type", ((TypeTag)type_comboBox.SelectedItem).Type);
-                    command.Parameters.AddWithValue("description", description_textBox.Text);
-                    command.Connection = Connection;
-                    command.ExecuteNonQuery();
+                    using (SQLiteCommand command = new SQLiteCommand())
+                    {
+                        command.CommandText = "INSERT INTO favtags (tag, type, description) VALUES (@tag, @type, @description)";
+                        command.Parameters.AddWithValue("tag", tag_textBox.Text);
+                        command.Parameters.AddWithValue("type", ((TypeTag)type_comboBox.SelectedItem).Type);
+                        command.Parameters.AddWithValue("description", description_textBox.Text);
+                        command.Connection = Connection;
+                        command.ExecuteNonQuery();
+                    }
+                    Tags.Add(tag_textBox.Text);
+                    listBox1.SelectedItem = tag_textBox.Text;
                 }
-                Tags.Add(tag_textBox.Text);
-            }
-            else
-            {
-                Tags[listBox1.SelectedIndex] = tag_textBox.Text;
-                using (SQLiteCommand command = new SQLiteCommand())
+                else
                 {
-                    command.CommandText = "UPDATE favtags SET tag = @tag, type = @type, description = @description WHERE tag = @tagold";
-                    command.Parameters.AddWithValue("tag", tag_textBox.Text);
-                    command.Parameters.AddWithValue("tagold", (string)listBox1.SelectedValue);
-                    command.Parameters.AddWithValue("type", ((TypeTag)type_comboBox.SelectedItem).Type);
-                    command.Parameters.AddWithValue("description", description_textBox.Text);
-                    command.Connection = Connection;
-                    command.ExecuteNonQuery();
+                    using (SQLiteCommand command = new SQLiteCommand())
+                    {
+                        command.CommandText = "UPDATE favtags SET tag = @tag, type = @type, description = @description WHERE tag = @tagold";
+                        command.Parameters.AddWithValue("tag", tag_textBox.Text);
+                        command.Parameters.AddWithValue("tagold", (string)listBox1.SelectedValue);
+                        command.Parameters.AddWithValue("type", ((TypeTag)type_comboBox.SelectedItem).Type);
+                        command.Parameters.AddWithValue("description", description_textBox.Text);
+                        command.Connection = Connection;
+                        command.ExecuteNonQuery();
+                    }
+                    Tags[listBox1.SelectedIndex] = tag_textBox.Text;
                 }
-                
+                new_button.Enabled = true;
+                edit_button.Enabled = true;
+                tag_textBox.ReadOnly = true;
+                description_textBox.ReadOnly = true;
+                type_comboBox.Enabled = false;
+                save_button.Enabled = false;
+                listBox1.Enabled = true;
+                NewMode = false;
+                EditMode = false;
             }
-            new_button.Enabled = true;
-            edit_button.Enabled = true;
-            tag_textBox.ReadOnly = true;
-            description_textBox.ReadOnly = true;
-            type_comboBox.Enabled = false;
-            save_button.Enabled = false;
-            listBox1.Enabled = true;
-            NewMode = false;
-            EditMode = false;
         }
     }
     public class TypeTag
