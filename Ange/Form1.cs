@@ -457,7 +457,8 @@ namespace Ange
         {
             using (SQLiteCommand command = new SQLiteCommand(Connection))
             {
-                command.CommandText = "UPDATE previews SET preview = @preview WHERE hash = @hash";
+                //command.CommandText = "UPDATE previews SET preview = @preview WHERE hash = @hash";
+                command.CommandText = "INSERT INTO previews(hash, preview) VALUES(@hash, @preview) ON CONFLICT(hash) DO UPDATE SET preview = @preview;";
                 command.Parameters.AddWithValue("hash", Hash);
                 command.Parameters.AddWithValue("preview", Preview);
                 command.ExecuteNonQuery();
