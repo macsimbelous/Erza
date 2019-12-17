@@ -421,7 +421,7 @@ namespace GetIdol
                     ErzaDB.SetImagePath(hash, filename.ToLower(), connection);
                     AddPostIDToPosts(Item.PostID, hash);
                     RemoveItemFromCache(Item.PostID);
-                    ThreadPool.QueueUserWorkItem(CreatePreview, filename);
+                    //ThreadPool.QueueUserWorkItem(CreatePreview, filename);
                     return true;
                 }
             }

@@ -38,7 +38,7 @@ namespace Ange
         private const int PreviewHeight = 225;
         public static SQLiteConnection Previews;
         public SQLiteConnection Erza;
-        List<ImageInfo> Result;
+        public static List<ImageInfo> Result;
         SolidBrush brush;
         private CustomAdaptor adaptor;
         public Form1()
@@ -117,8 +117,9 @@ namespace Ange
             //this.Previews = new SQLiteConnection("data source=C:\\utils\\data\\Previews.sqlite");
             Form1.Previews = new SQLiteConnection("data source=E:\\Previews.sqlite");
             Form1.Previews.Open();
-            this.Result = new List<ImageInfo>();
+            Form1.Result = new List<ImageInfo>();
             this.brush = new SolidBrush(Color.Orange);
+            adaptor = new CustomAdaptor();
             //this.imageListView1.ThumbnailSize = new Size(300, 225);
             //Загружвем список тегов
             List<string> tags = new List<string>();
@@ -199,7 +200,7 @@ namespace Ange
         private void slideshow_button_Click(object sender, EventArgs e)
         {
             SlideShowForm form = new SlideShowForm();
-            form.Result = this.Result;
+            form.Result = Form1.Result;
             form.Index = 0;
             if (MessageBox.Show("Выводить слайды в случайном порядке?", "Слайдшоу", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
             {
@@ -243,7 +244,7 @@ namespace Ange
                 EditTagsForm form = new EditTagsForm();
                 form.Connection = Erza;
                 ImageListViewItem i = this.imageListView1.SelectedItems[0];
-                form.EditImage = this.Result[i.Index];
+                form.EditImage = Form1.Result[i.Index];
                 form.ShowDialog();
             }
         }
@@ -253,7 +254,7 @@ namespace Ange
             if (this.imageListView1.SelectedItems.Count > 0)
             {
                 ImageListViewItem i = this.imageListView1.SelectedItems[0];
-                string dest_path = "E:\\Wallpapers\\" + Path.GetFileName(this.Result[i.Index].FilePath);
+                string dest_path = "E:\\Wallpapers\\" + Path.GetFileName(Form1.Result[i.Index].FilePath);
                 try
                 {
                     if (File.Exists(dest_path))
@@ -261,12 +262,12 @@ namespace Ange
                         if (MessageBox.Show("Целевой фаил уже сушествует, перезаписать?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                         {
                             File.Delete(dest_path);
-                            File.Copy(this.Result[i.Index].FilePath, dest_path);
+                            File.Copy(Form1.Result[i.Index].FilePath, dest_path);
                         }
                     }
                     else
                     {
-                        File.Copy(this.Result[i.Index].FilePath, dest_path);
+                        File.Copy(Form1.Result[i.Index].FilePath, dest_path);
                     }
                 }
                 catch (IOException ex)
@@ -280,7 +281,7 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                if (MessageBox.Show("Удалить изображение " + this.Result[this.imageListView1.SelectedItems[0].Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                if (MessageBox.Show("Удалить изображение " + Form1.Result[this.imageListView1.SelectedItems[0].Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     DeleteImage(this.imageListView1.SelectedItems[0].Index);
                 }
@@ -307,7 +308,7 @@ namespace Ange
         private void copyhashToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i = this.imageListView1.SelectedItems[0].Index;
-            Clipboard.SetText(this.Result[i].Hash);
+            Clipboard.SetText(Form1.Result[i].Hash);
         }
         private void copytodirToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -316,7 +317,7 @@ namespace Ange
                 if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
                 {
                     int i = this.imageListView1.SelectedItems[0].Index;
-                    string dest_path = this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(this.Result[i].FilePath);
+                    string dest_path = this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(Form1.Result[i].FilePath);
                     try
                     {
                         if (File.Exists(dest_path))
@@ -324,12 +325,12 @@ namespace Ange
                             if (MessageBox.Show("Целевой фаил уже сушествует, перезаписать?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                             {
                                 File.Delete(dest_path);
-                                File.Copy(this.Result[i].FilePath, dest_path);
+                                File.Copy(Form1.Result[i].FilePath, dest_path);
                             }
                         }
                         else
                         {
-                            File.Copy(this.Result[i].FilePath, dest_path);
+                            File.Copy(Form1.Result[i].FilePath, dest_path);
                         }
                     }
                     catch (IOException ex)
@@ -341,10 +342,10 @@ namespace Ange
         }
         public void DeleteImage(int Index)
         {
-            ErzaDB.DeleteImage(this.Result[Index].ImageID, Erza);
-            //File.Delete(this.Result[Index].FilePath);
-            RecybleBin.Send(this.Result[Index].FilePath);
-            this.Result.RemoveAt(Index);
+            ErzaDB.DeleteImage(Form1.Result[Index].ImageID, Erza);
+            //File.Delete(Form1.Result[Index].FilePath);
+            RecybleBin.Send(Form1.Result[Index].FilePath);
+            Form1.Result.RemoveAt(Index);
             this.imageListView1.Refresh();
         }
         private void openOuterSoftToolStripMenuItem_Click(object sender, EventArgs e)
@@ -360,7 +361,7 @@ namespace Ange
         {
             if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                foreach (ImageInfo img in this.Result)
+                foreach (ImageInfo img in Form1.Result)
                 {
                     File.Move(img.FilePath, this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath));
                 }
@@ -370,7 +371,7 @@ namespace Ange
         {
             if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                foreach (ImageInfo img in this.Result)
+                foreach (ImageInfo img in Form1.Result)
                 {
                     File.Copy(img.FilePath, this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath));
                 }
@@ -558,19 +559,19 @@ namespace Ange
             //imageListView1.VirtualListSize = 0;
             if (this.tags_toolStripSpringTextBox.Text.Length == 0)
             {
-                this.Result = ErzaDB.GetAllImages(this.Erza);
-                if (this.Result.Count > 0)
+                Form1.Result = ErzaDB.GetAllImages(this.Erza);
+                if (Form1.Result.Count > 0)
                 {
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
-                    for(int i=0;i< this.Result.Count;i++)
+                    for (int i=0;i< Form1.Result.Count;i++)
                     {
-                        imageListView1.Items.Add(i, this.Result[i].Hash, adaptor);
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                     }
                     imageListView1.ResumeLayout();
                     imageListView1.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 return;
             }
             if (SelectIsTags())
@@ -586,12 +587,12 @@ namespace Ange
                 }
                 if (tags.Count > 1)
                 {
-                    this.Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, this.Erza);
+                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, this.Erza);
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
-                    for (int i = 0; i < this.Result.Count; i++)
+                    for (int i = 0; i < Form1.Result.Count; i++)
                     {
-                        imageListView1.Items.Add(i, this.Result[i].Hash, adaptor);
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                     }
                     imageListView1.ResumeLayout();
                     imageListView1.EnsureVisible(0);
@@ -600,26 +601,26 @@ namespace Ange
                 {
                     if (tags.Count == 1)
                     {
-                        this.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
+                        Form1.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
                     }
                     else
                     {
-                        this.Result = ErzaDB.GetAllImages(this.Erza);
+                        Form1.Result = ErzaDB.GetAllImages(this.Erza);
                     }
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
-                    for (int i = 0; i < this.Result.Count; i++)
+                    for (int i = 0; i < Form1.Result.Count; i++)
                     {
-                        imageListView1.Items.Add(i, this.Result[i].Hash, adaptor);
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                     }
                     imageListView1.ResumeLayout();
                     imageListView1.EnsureVisible(0);
                 }
-                if (this.Result.Count > 0)
+                if (Form1.Result.Count > 0)
                 {
                     imageListView1.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 return;
             }
             if (SelectIsTagsOr())
@@ -635,12 +636,12 @@ namespace Ange
                 }
                 if (tags.Count > 1)
                 {
-                    this.Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, this.Erza);
+                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, this.Erza);
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
-                    for (int i = 0; i < this.Result.Count; i++)
+                    for (int i = 0; i < Form1.Result.Count; i++)
                     {
-                        imageListView1.Items.Add(i, this.Result[i].Hash, adaptor);
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                     }
                     imageListView1.ResumeLayout();
                     imageListView1.EnsureVisible(0);
@@ -649,63 +650,63 @@ namespace Ange
                 {
                     if (tags.Count == 1)
                     {
-                        this.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
+                        Form1.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
                     }
                     else
                     {
-                        this.Result = ErzaDB.GetAllImages(this.Erza);
+                        Form1.Result = ErzaDB.GetAllImages(this.Erza);
                     }
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
-                    for (int i = 0; i < this.Result.Count; i++)
+                    for (int i = 0; i < Form1.Result.Count; i++)
                     {
-                        imageListView1.Items.Add(i, this.Result[i].Hash, adaptor);
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                     }
                     imageListView1.ResumeLayout();
                     imageListView1.EnsureVisible(0);
                 }
-                if (this.Result.Count > 0)
+                if (Form1.Result.Count > 0)
                 {
                     this.imageListView1.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 return;
             }
             if (SelectIsPartTag())
             {
-                this.Result = ErzaDB.GetImagesByPartTag(this.tags_toolStripSpringTextBox.Text, this.Erza);
+                Form1.Result = ErzaDB.GetImagesByPartTag(this.tags_toolStripSpringTextBox.Text, this.Erza);
                 imageListView1.SuspendLayout();
                 imageListView1.Items.Clear();
-                for (int i = 0; i < this.Result.Count; i++)
+                for (int i = 0; i < Form1.Result.Count; i++)
                 {
-                    imageListView1.Items.Add(i, this.Result[i].Hash, adaptor);
+                    imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                 }
                 imageListView1.ResumeLayout();
                 imageListView1.EnsureVisible(0);
-                if (this.Result.Count > 0)
+                if (Form1.Result.Count > 0)
                 {
                     this.imageListView1.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 return;
             }
             if (SelectIsMD5())
             {
-                this.Result.Clear();
-                this.Result.Add(ErzaDB.GetImageWithOutTags(this.tags_toolStripSpringTextBox.Text, this.Erza));
+                Form1.Result.Clear();
+                Form1.Result.Add(ErzaDB.GetImageWithOutTags(this.tags_toolStripSpringTextBox.Text, this.Erza));
                 imageListView1.SuspendLayout();
                 imageListView1.Items.Clear();
-                for (int i = 0; i < this.Result.Count; i++)
+                for (int i = 0; i < Form1.Result.Count; i++)
                 {
-                    imageListView1.Items.Add(i, this.Result[i].Hash, adaptor);
+                    imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                 }
                 imageListView1.ResumeLayout();
                 imageListView1.EnsureVisible(0);
-                if (this.Result.Count > 0)
+                if (Form1.Result.Count > 0)
                 {
                     this.imageListView1.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + this.Result.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 return;
             }
         }
@@ -757,7 +758,7 @@ namespace Ange
         private void slideshow_toolStripButton_Click(object sender, EventArgs e)
         {
             SlideShowForm form = new SlideShowForm();
-            form.Result = this.Result;
+            form.Result = Form1.Result;
             form.Index = 0;
             if (MessageBox.Show("Выводить слайды в случайном порядке?", "Слайдшоу", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
             {
@@ -799,7 +800,7 @@ namespace Ange
         {
             public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
             {
-                string file = key as string;
+                int i = (int)key;
                 /*if (!string.IsNullOrEmpty(file))
                 {
                     using (Image img = Image.FromFile(file))
@@ -811,7 +812,7 @@ namespace Ange
 
                 return null;*/
                 //return Form1.thumb;
-                return GetPreview(Path.GetFileNameWithoutExtension(file));
+                return GetPreview(Path.GetFileNameWithoutExtension(Result[i].Hash));
 
             }
             private Image GetPreview(string hash)
@@ -836,12 +837,13 @@ namespace Ange
             }
             public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
             {
-                return (string)key;
+                int i = (int)key;
+                return Result[i].Hash;
             }
             public override string GetSourceImage(object key)
             {
-                string file = key as string;
-                return file;
+                int i = (int)key;
+                return Result[i].Hash;
             }
 
             /// <summary>
@@ -852,18 +854,18 @@ namespace Ange
             public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key)
             {
 
-                string filename = (string)key;
+                int i = (int)key;
                 List<Utility.Tuple<ColumnType, string, object>> details = new List<Utility.Tuple<ColumnType, string, object>>();
 
                 // Get file info
-                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateCreated, string.Empty, string.Empty));
-                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateAccessed, string.Empty, string.Empty));
-                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateModified, string.Empty, string.Empty));
-                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FileSize, string.Empty, string.Empty));
-                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FilePath, string.Empty, string.Empty));
-                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FolderName, string.Empty, string.Empty));
+                //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateCreated, string.Empty, string.Empty));
+                //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateAccessed, string.Empty, string.Empty));
+                //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateModified, string.Empty, string.Empty));
+                //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FileSize, string.Empty, string.Empty));
+                //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FilePath, string.Empty, string.Empty));
+                //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FolderName, string.Empty, string.Empty));
 
-                //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FileName, string.Empty, filename));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.UserComment, string.Empty, Result[i].GetStringOfTags()));
                 return details.ToArray();
             }
             public override void Dispose()
