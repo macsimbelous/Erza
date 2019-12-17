@@ -438,8 +438,8 @@ namespace Ange
                             preview.Save(stream, jpgEncoder, myEncoderParameters);
                             UpdatePreviewToDB(Result[i].Hash, stream.ToArray(), Previews);
                         }
-                        this.imageListView1.Items[i].Tag = preview;
-                        this.imageListView1.Refresh();
+                        //this.imageListView1.Items[i].Tag = preview;
+                        this.imageListView1.Items[i].Update();
                     }
                     else
                     {
@@ -874,6 +874,11 @@ namespace Ange
             }
         }
         #endregion
+
+        private void imageListView1_ItemDoubleClick(object sender, ItemClickEventArgs e)
+        {
+            ViewImageInWindow();
+        }
     }
 
 }
