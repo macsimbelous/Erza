@@ -290,19 +290,17 @@ namespace Ange
 
         private void imageListView1_KeyDown(object sender, KeyEventArgs e)
         {
-            /*if(e.KeyCode == Keys.Enter && this.imageListView1.SelectedItems.Count > 0)
+            switch (e.KeyCode)
             {
-                int i = this.imageListView1.SelectedItems[0];
-                FullScreenForm form = new FullScreenForm();
-                form.Result = Result;
-                form.Index = i;
-                form.main_form = this;
-                form.ShowDialog();
-                this.imageListView1.EnsureVisible(form.Index);
-            }*/
-            if (e.KeyCode == Keys.Enter)
-            {
-                ViewImageInWindow();
+                case Keys.Enter:
+                    ViewImageInWindow();
+                    break;
+                case Keys.Home:
+                    this.imageListView1.EnsureVisible(0);
+                    break;
+                case Keys.End:
+                    this.imageListView1.EnsureVisible(this.imageListView1.Items.Count);
+                    break;
             }
         }
         private void copyhashToolStripMenuItem_Click(object sender, EventArgs e)
@@ -428,22 +426,24 @@ namespace Ange
                 EncoderParameters myEncoderParameters = new EncoderParameters(1);
                 EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
                 myEncoderParameters.Param[0] = myEncoderParameter;
-                int i = this.imageListView1.SelectedItems[0].Index;
-                using (Bitmap preview = CreateThumbnail(Result[i].FilePath, PreviewWidth, PreviewHeight))
+                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
                 {
-                    if (preview != null)
+                    //int i = this.imageListView1.SelectedItems[0].Index;
+                    using (Bitmap preview = CreateThumbnail(Result[item.Index].FilePath, PreviewWidth, PreviewHeight))
                     {
-                        using (MemoryStream stream = new MemoryStream())
+                        if (preview != null)
                         {
-                            preview.Save(stream, jpgEncoder, myEncoderParameters);
-                            UpdatePreviewToDB(Result[i].Hash, stream.ToArray(), Previews);
+                            using (MemoryStream stream = new MemoryStream())
+                            {
+                                preview.Save(stream, jpgEncoder, myEncoderParameters);
+                                UpdatePreviewToDB(Result[item.Index].Hash, stream.ToArray(), Previews);
+                            }
+                            item.Update();
                         }
-                        //this.imageListView1.Items[i].Tag = preview;
-                        this.imageListView1.Items[i].Update();
-                    }
-                    else
-                    {
-                        MessageBox.Show(Result[i].FilePath + " Ошибка!");
+                        else
+                        {
+                            MessageBox.Show(Result[item.Index].FilePath + " Ошибка!");
+                        }
                     }
                 }
             }

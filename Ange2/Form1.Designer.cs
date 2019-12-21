@@ -274,6 +274,7 @@
             this.imageListView1.ThumbnailSize = new System.Drawing.Size(300, 225);
             this.imageListView1.UseWIC = true;
             this.imageListView1.ItemDoubleClick += new Manina.Windows.Forms.ItemDoubleClickEventHandler(this.imageListView1_ItemDoubleClick);
+            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
             // 
             // Form1
             // 
