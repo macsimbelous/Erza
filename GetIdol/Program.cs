@@ -819,7 +819,11 @@ namespace GetIdol
                 {
                     string temp = match.Value.Substring(("<title>").Length);
                     temp = temp.Replace(" | Sankaku Channel</title>", String.Empty);
-                    tags.AddRange(temp.Split(' '));
+                    tags.AddRange(temp.Split(','));
+                    for(int i = 0; i < tags.Count; i++)
+                    {
+                        tags[i] = tags[i].TrimStart().Replace(' ', '_');
+                    }
                 }
                 else
                 {
