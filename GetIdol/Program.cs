@@ -813,12 +813,12 @@ namespace GetIdol
             {
                 List<string> tags = new List<string>();
                 //string tags_string = null;
-                Regex rx = new Regex("<input id=post_old_tags name=\"post\\[old_tags\\]\" type=hidden value=\"(.+)\">");
+                Regex rx = new Regex("<title>(.+)</title>");
                 Match match = rx.Match(post);
                 if (match.Success)
                 {
-                    string temp = match.Value.Substring(("<input id=post_old_tags name=\"post\\[old_tags\\]\" type=hidden value=\"").Length);
-                    temp = temp.Substring(0, temp.Length - 2);
+                    string temp = match.Value.Substring(("<title>").Length);
+                    temp = temp.Replace(" | Sankaku Channel</title>", String.Empty);
                     tags.AddRange(temp.Split(' '));
                 }
                 else
