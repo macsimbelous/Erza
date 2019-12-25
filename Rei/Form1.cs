@@ -242,7 +242,7 @@ namespace Rei
         {
             if (this.openFileDialog1.ShowDialog()== DialogResult.OK)
             {
-                using (JsonDocument document = JsonDocument.Parse(File.ReadAllText("bookmarks.json")))
+                using (JsonDocument document = JsonDocument.Parse(File.ReadAllText(this.openFileDialog1.FileName)))
                 {
                     JsonElement root = document.RootElement;
 
@@ -278,7 +278,23 @@ namespace Rei
                         }
                     }
                 }
+                Tags = new BindingList<string>();
+                using (SQLiteCommand command = new SQLiteCommand())
+                {
+
+                    command.CommandText = "SELECT tag FROM favtags";
+                    command.Connection = Connection;
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Tags.Add(reader.GetString(0));
+                        }
+                        reader.Close();
+                    }
                 }
+                listBox1.DataSource = Tags;
+            }
         }
         private bool FindElement(JsonElement Element, string PropertyName, string PropertyValue, out JsonElement OutElement)
         {
