@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SQLite;
+using System.Text.Json;
+using System.IO;
+using System.Web;
 
 namespace Rei
 {
@@ -232,6 +235,79 @@ namespace Rei
                 listBox1.Enabled = true;
                 NewMode = false;
                 EditMode = false;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (this.openFileDialog1.ShowDialog()== DialogResult.OK)
+            {
+                using (JsonDocument document = JsonDocument.Parse(File.ReadAllText("bookmarks.json")))
+                {
+                    JsonElement root = document.RootElement;
+
+                    if (FindElement(root, "title", "Картинки", out JsonElement OutElement))
+                    {
+                        JsonElement imgchilds = OutElement.GetProperty("children");
+                        foreach (JsonElement imgchild in imgchilds.EnumerateArray())
+                        {
+                            //Console.WriteLine(student.GetRawText());
+                            imgchild.TryGetProperty("uri", out JsonElement imgelement);
+                            //Console.WriteLine(imgelement.GetString());
+                            //Console.WriteLine(WebUtility.UrlDecode(imgelement.GetString()));
+                            Uri myUri = new Uri(imgelement.GetString());
+                            var col = HttpUtility.ParseQueryString(myUri.Query);
+                            string tag = col["tags"];
+                            //Console.WriteLine(col["tags"]);
+                            if(tag != null)
+                            {
+                                try
+                                {
+                                    using (SQLiteCommand command = new SQLiteCommand())
+                                    {
+                                        command.CommandText = "INSERT INTO favtags (tag) VALUES (@tag)";
+                                        command.Parameters.AddWithValue("tag", tag);
+                                        command.Connection = Connection;
+                                        command.ExecuteNonQuery();
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                }
+                            }
+                        }
+                    }
+                }
+                }
+        }
+        private bool FindElement(JsonElement Element, string PropertyName, string PropertyValue, out JsonElement OutElement)
+        {
+            if (Element.TryGetProperty("children", out JsonElement childs))
+            {
+                foreach (JsonElement child in childs.EnumerateArray())
+                {
+                    child.TryGetProperty(PropertyName, out JsonElement property);
+                    if (property.GetString() == PropertyValue)
+                    {
+                        OutElement = child;
+                        return true;
+                    }
+                    if (child.TryGetProperty("children", out JsonElement childrenproperty))
+                    {
+                        //Console.WriteLine(child.GetRawText());
+                        if (FindElement(child, PropertyName, PropertyValue, out OutElement))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                OutElement = Element;
+                return false;
+            }
+            else
+            {
+                OutElement = Element;
+                return false;
             }
         }
     }
