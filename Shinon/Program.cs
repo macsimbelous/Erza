@@ -119,7 +119,7 @@ namespace Shinon
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
-                    command.CommandText = "SELECT images.image_id, images.hash FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
+                    command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
                     command.Connection = connection;
                     SQLiteDataReader reader = command.ExecuteReader();
                     int count = 0;
@@ -128,6 +128,7 @@ namespace Shinon
                         ImageInfo img = new ImageInfo();
                         img.Hash = (string)reader["hash"];
                         img.ImageID = (long)reader["image_id"];
+                        img.FilePath = (string)reader["file_path"];
                         imgs.Add(img);
                         count++;
                     }
