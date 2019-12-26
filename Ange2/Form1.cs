@@ -182,18 +182,6 @@ namespace Ange
 
         private void imageListView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            /*if (this.imageListView1.SelectedItems.Count > 0)
-            {
-                int i = ((ListView)sender).SelectedIndices[0];
-                //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
-                FullScreenForm form = new FullScreenForm();
-                form.Result = Result;
-                form.Index = i;
-                form.main_form = this;
-                form.ShowDialog();
-                this.imageListView1.Refresh();
-                this.imageListView1.EnsureVisible(form.Index);
-            }*/
             ViewImageInWindow();
         }
 
@@ -217,10 +205,10 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                ImageListViewItem i = this.imageListView1.SelectedItems[0];
+                int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 FullScreenForm form = new FullScreenForm();
                 form.Result = Result;
-                form.Index = i.Index;
+                form.Index = i;
                 form.main_form = this;
                 form.ShowDialog();
                 this.imageListView1.Refresh();
@@ -230,10 +218,10 @@ namespace Ange
 
         private void slideshowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ImageListViewItem i = this.imageListView1.SelectedItems[0];
+            int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
             SlideShowForm form = new SlideShowForm();
             form.Result = Result;
-            form.Index = i.Index;
+            form.Index = i;
             form.ShowDialog();
         }
 
@@ -243,8 +231,8 @@ namespace Ange
             {
                 EditTagsForm form = new EditTagsForm();
                 form.Connection = Erza;
-                ImageListViewItem i = this.imageListView1.SelectedItems[0];
-                form.EditImage = Form1.Result[i.Index];
+                int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                form.EditImage = Form1.Result[i];
                 form.ShowDialog();
             }
         }
@@ -253,8 +241,8 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                ImageListViewItem i = this.imageListView1.SelectedItems[0];
-                string dest_path = "E:\\Wallpapers\\" + Path.GetFileName(Form1.Result[i.Index].FilePath);
+                int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                string dest_path = "E:\\Wallpapers\\" + Path.GetFileName(Form1.Result[i].FilePath);
                 try
                 {
                     if (File.Exists(dest_path))
@@ -262,12 +250,12 @@ namespace Ange
                         if (MessageBox.Show("Целевой фаил уже сушествует, перезаписать?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                         {
                             File.Delete(dest_path);
-                            File.Copy(Form1.Result[i.Index].FilePath, dest_path);
+                            File.Copy(Form1.Result[i].FilePath, dest_path);
                         }
                     }
                     else
                     {
-                        File.Copy(Form1.Result[i.Index].FilePath, dest_path);
+                        File.Copy(Form1.Result[i].FilePath, dest_path);
                     }
                 }
                 catch (IOException ex)
@@ -281,9 +269,9 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                if (MessageBox.Show("Удалить изображение " + Form1.Result[this.imageListView1.SelectedItems[0].Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                if (MessageBox.Show("Удалить изображение " + Form1.Result[(int)this.imageListView1.SelectedItems[0].VirtualItemKey].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
-                    DeleteImage(this.imageListView1.SelectedItems[0].Index);
+                    DeleteImage((int)this.imageListView1.SelectedItems[0].VirtualItemKey);
                 }
             }
         }
@@ -305,8 +293,11 @@ namespace Ange
         }
         private void copyhashToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int i = this.imageListView1.SelectedItems[0].Index;
-            Clipboard.SetText(Form1.Result[i].Hash);
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                Clipboard.SetText(Form1.Result[i].Hash);
+            }
         }
         private void copytodirToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -314,7 +305,7 @@ namespace Ange
             {
                 if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
                 {
-                    int i = this.imageListView1.SelectedItems[0].Index;
+                    int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
                     string dest_path = this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(Form1.Result[i].FilePath);
                     try
                     {
@@ -350,7 +341,7 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                int i = this.imageListView1.SelectedItems[0].Index;
+                int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 System.Diagnostics.Process.Start(Result[i].FilePath);
             }
             
@@ -383,7 +374,7 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                int index = this.imageListView1.SelectedItems[0].Index;
+                int index = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
                 ViewImageForm form = new ViewImageForm();
                 form.Result = Result;
@@ -429,20 +420,20 @@ namespace Ange
                 foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
                 {
                     //int i = this.imageListView1.SelectedItems[0].Index;
-                    using (Bitmap preview = CreateThumbnail(Result[item.Index].FilePath, PreviewWidth, PreviewHeight))
+                    using (Bitmap preview = CreateThumbnail(Result[(int)item.VirtualItemKey].FilePath, PreviewWidth, PreviewHeight))
                     {
                         if (preview != null)
                         {
                             using (MemoryStream stream = new MemoryStream())
                             {
                                 preview.Save(stream, jpgEncoder, myEncoderParameters);
-                                UpdatePreviewToDB(Result[item.Index].Hash, stream.ToArray(), Previews);
+                                UpdatePreviewToDB(Result[(int)item.VirtualItemKey].Hash, stream.ToArray(), Previews);
                             }
                             item.Update();
                         }
                         else
                         {
-                            MessageBox.Show(Result[item.Index].FilePath + " Ошибка!");
+                            MessageBox.Show(Result[(int)item.VirtualItemKey].FilePath + " Ошибка!");
                         }
                     }
                 }
@@ -559,18 +550,18 @@ namespace Ange
             //imageListView1.VirtualListSize = 0;
             if (this.tags_toolStripSpringTextBox.Text.Length == 0)
             {
+                imageListView1.SuspendLayout();
+                imageListView1.Items.Clear();
                 Form1.Result = ErzaDB.GetAllImages(this.Erza);
                 if (Form1.Result.Count > 0)
                 {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
                     for (int i=0;i< Form1.Result.Count;i++)
                     {
                         imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
                     }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
                 }
+                imageListView1.ResumeLayout();
+                imageListView1.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 return;
             }
@@ -587,9 +578,9 @@ namespace Ange
                 }
                 if (tags.Count > 1)
                 {
-                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, this.Erza);
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
+                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, this.Erza);
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
                         imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -599,6 +590,8 @@ namespace Ange
                 }
                 else
                 {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
                     if (tags.Count == 1)
                     {
                         Form1.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
@@ -607,8 +600,6 @@ namespace Ange
                     {
                         Form1.Result = ErzaDB.GetAllImages(this.Erza);
                     }
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
                         imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -636,9 +627,9 @@ namespace Ange
                 }
                 if (tags.Count > 1)
                 {
-                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, this.Erza);
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
+                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, this.Erza);
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
                         imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -648,6 +639,8 @@ namespace Ange
                 }
                 else
                 {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
                     if (tags.Count == 1)
                     {
                         Form1.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
@@ -656,8 +649,6 @@ namespace Ange
                     {
                         Form1.Result = ErzaDB.GetAllImages(this.Erza);
                     }
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
                         imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -674,9 +665,9 @@ namespace Ange
             }
             if (SelectIsPartTag())
             {
-                Form1.Result = ErzaDB.GetImagesByPartTag(this.tags_toolStripSpringTextBox.Text, this.Erza);
                 imageListView1.SuspendLayout();
                 imageListView1.Items.Clear();
+                Form1.Result = ErzaDB.GetImagesByPartTag(this.tags_toolStripSpringTextBox.Text, this.Erza);
                 for (int i = 0; i < Form1.Result.Count; i++)
                 {
                     imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -692,21 +683,32 @@ namespace Ange
             }
             if (SelectIsMD5())
             {
-                Form1.Result.Clear();
-                Form1.Result.Add(ErzaDB.GetImageWithOutTags(this.tags_toolStripSpringTextBox.Text, this.Erza));
-                imageListView1.SuspendLayout();
-                imageListView1.Items.Clear();
-                for (int i = 0; i < Form1.Result.Count; i++)
+                ImageInfo img = ErzaDB.GetImageWithOutTags(this.tags_toolStripSpringTextBox.Text, this.Erza);
+                if (img != null)
                 {
-                    imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    Form1.Result.Clear();
+                    Form1.Result.Add(img);
+                    for (int i = 0; i < Form1.Result.Count; i++)
+                    {
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                    }
+                    imageListView1.ResumeLayout();
+                    imageListView1.EnsureVisible(0);
+                    if (Form1.Result.Count > 0)
+                    {
+                        this.imageListView1.EnsureVisible(0);
+                    }
+                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 }
-                imageListView1.ResumeLayout();
-                imageListView1.EnsureVisible(0);
-                if (Form1.Result.Count > 0)
+                else
                 {
-                    this.imageListView1.EnsureVisible(0);
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    Form1.Result.Clear();
+                    imageListView1.ResumeLayout();
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Form1.Result.Count.ToString();
                 return;
             }
         }
