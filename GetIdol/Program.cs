@@ -331,13 +331,13 @@ namespace GetIdol
             {
                 return true;
             }*/
-            Console.Write("Добавляем информацию в базу данных...");
+            Console.Write("Получаем теги и добавляем в БД...");
             //DateTime start_db = DateTime.Now;
             string hash = Path.GetFileNameWithoutExtension(url);
-            GetTagsFromSankaku(hash, post);
+            int tc = GetTagsFromSankaku(hash, post);
             //DateTime stop_db = DateTime.Now;
             //Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
-            Console.WriteLine("OK");
+            Console.WriteLine($"{tc} OK");
             if (ExistImage(hash))
             {
                 Console.WriteLine("Уже скачан: {0}", store_file);
@@ -807,12 +807,11 @@ namespace GetIdol
                 }
             //}*/
         }
-        static void GetTagsFromSankaku(string md5, string post)
+        static int GetTagsFromSankaku(string md5, string post)
         {
             try
             {
                 List<string> tags = new List<string>();
-                //string tags_string = null;
                 Regex rx = new Regex("<title>(.+)</title>");
                 Match match = rx.Match(post);
                 if (match.Success)
@@ -827,74 +826,9 @@ namespace GetIdol
                 }
                 else
                 {
-                    return;
+                    return 0;
                 }
-                if(tags.Count <= 0) { return; }
-                //using (SQLiteConnection connection = new SQLiteConnection(Program.config.ConnectionString))
-                //{
-                //connection.Open();
-                /*using (SQLiteCommand command = new SQLiteCommand())
-                {
-                    command.CommandText = "select * from hash_tags where hash = @hash";
-                    command.Parameters.AddWithValue("hash", SetHashString(md5));
-                    command.Connection = Program.connection;
-                    using (SQLiteDataReader reader = command.ExecuteReader()) { 
-                    if (reader.Read())
-                    {
-                        ulong id;
-                        if (System.Convert.ToBoolean(reader["is_deleted"]))
-                        {
-                            reader.Close();
-                            return;
-                        }
-                        else
-                        {
-                            if (!Convert.IsDBNull(reader["tags"]))
-                            {
-                                string temp = System.Convert.ToString(reader["tags"]);
-                                tags.AddRange(temp.Split(' '));
-                                tags = tags.Distinct().ToList();
-                                StringBuilder sb = new StringBuilder();
-                                for (int i = 0; i < tags.Count; i++)
-                                {
-                                    if (i == 0)
-                                    {
-                                        sb.Append(tags[i]);
-                                    }
-                                    else
-                                    {
-                                        sb.Append(' ');
-                                        sb.Append(tags[i]);
-                                    }
-                                }
-                                tags_string = sb.ToString();
-                            }
-                            id = System.Convert.ToUInt64(reader["id"]);
-                            reader.Close();
-                        }
-                        using (SQLiteCommand update_command = new SQLiteCommand(Program.connection))
-                        {
-                            update_command.CommandText = "UPDATE hash_tags SET tags = @tags WHERE id = @id";
-                            update_command.Parameters.AddWithValue("id", id);
-                            update_command.Parameters.AddWithValue("tags", tags_string);
-                            update_command.ExecuteNonQuery();
-                        }
-                    }
-                    else
-                    {
-                        using (SQLiteCommand insert_command = new SQLiteCommand(Program.connection))
-                        {
-                            insert_command.CommandText = "insert into hash_tags (hash, tags, is_new, is_deleted) values (@hash, @tags, @is_new, @is_deleted)";
-                            insert_command.Parameters.AddWithValue("hash", SetHashString(md5));
-                            insert_command.Parameters.AddWithValue("tags", tags_string);
-                            insert_command.Parameters.AddWithValue("is_new", true);
-                            insert_command.Parameters.AddWithValue("is_deleted", false);
-                            insert_command.ExecuteNonQuery();
-                        }
-                    }
-                }
-                    }*/
-                //}
+                if(tags.Count <= 0) { return 0; }
                 ImageInfo img = new ImageInfo();
                 img.Hash = md5;
                 img.Tags.AddRange(tags);
@@ -902,15 +836,15 @@ namespace GetIdol
                 SQLiteTransaction transact = Program.connection.BeginTransaction();
                 ErzaDB.LoadImageToErza(img, Program.connection);
                 transact.Commit();
+                return tags.Count;
             }
             catch (Exception ex)
             {
                 //Thread.Sleep(60000);
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                return;
+                return 0;
             }
-            return;
         }
         static bool IsImageFile(string FilePath)
         {

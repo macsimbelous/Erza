@@ -12,6 +12,8 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using ErzaLib;
 using System.Text.RegularExpressions;
+using TagLib;
+using ImageDimensions;
 
 namespace Shinon
 {
@@ -21,18 +23,61 @@ namespace Shinon
         static WebProxy proxy;
         static int Width = 800;
         static int Height = 800;
+        static SQLiteConnection Connection;
         static void Main(string[] args)
         {
             proxy = new WebProxy("nalsjn.ru", 3128);
-            proxy.Credentials = new NetworkCredential(File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
+            proxy.Credentials = new NetworkCredential(System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
             IIqdbClient client = new IqdbClient();
+            Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
+            Connection.Open();
             List<ImageInfo> imgs = GetImagesWithoutTags();
+            int error = 0;
             for(int i = 0; i < imgs.Count; i++)
             {
-                Console.WriteLine($"Ишем дубликаты для {imgs[i].FilePath}...");
-                imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, client);
-                Console.WriteLine($"Найдено {imgs[i].Tags.Count} тегов");
+                try
+                {
+                    if (imgs[i].FilePath == null || !System.IO.File.Exists(imgs[i].FilePath))
+                    {
+                        Console.WriteLine($"[{i}/{imgs.Count}] Отсутствует!");
+                        continue;
+                    }
+                    Console.WriteLine($"[{i}/{imgs.Count}] Ишем дубликаты для {imgs[i].FilePath}...");
+                    if (ImageIsBig(imgs[i].FilePath))
+                    {
+                        Console.Write($"Слишком большой, уменьшаем...");
+                        Stream stream = CreatePreviewStream(imgs[i].FilePath);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("ОК");
+                        Console.ResetColor();
+                        imgs[i].Tags = GetTagsFromIqdb(stream, client);
+                    }
+                    else
+                    {
+                        imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, client);
+                    }
+                    Console.WriteLine($"Найдено {imgs[i].Tags.Count} тегов");
+                    if (imgs[i].Tags.Count > 0)
+                    {
+                        Console.Write("Добавляем в БД...");
+                        SQLiteTransaction transact = Program.Connection.BeginTransaction();
+                        ErzaDB.LoadImageToErza(imgs[i], Program.Connection);
+                        transact.Commit();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("ОК");
+                        Console.ResetColor();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(ex.Message);
+                    Console.ResetColor();
+                    error++;
+                }
             }
+            Console.WriteLine($"Ошибок: {error}");
+            Connection.Close();
         }
         static List<string> GetTagsFromIqdb(string FilePath, IIqdbClient Client)
         {
@@ -114,32 +159,39 @@ namespace Shinon
         static List<ImageInfo> GetImagesWithoutTags()
         {
             List<ImageInfo> imgs = new List<ImageInfo>();
-            using (SQLiteConnection connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite"))
+            using (SQLiteCommand command = new SQLiteCommand())
             {
-                connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand())
+                command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
+                command.Connection = Connection;
+                SQLiteDataReader reader = command.ExecuteReader();
+                int count = 0;
+                while (reader.Read())
                 {
-                    command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
-                    command.Connection = connection;
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    int count = 0;
-                    while (reader.Read())
-                    {
-                        ImageInfo img = new ImageInfo();
-                        img.Hash = (string)reader["hash"];
-                        img.ImageID = (long)reader["image_id"];
-                        img.FilePath = (string)reader["file_path"];
-                        imgs.Add(img);
-                        count++;
-                    }
-                    reader.Close();
+                    ImageInfo img = new ImageInfo();
+                    img.Hash = (string)reader["hash"];
+                    img.ImageID = (long)reader["image_id"];
+                    img.FilePath = (string)reader["file_path"];
+                    imgs.Add(img);
+                    count++;
                 }
-                connection.Close();
+                reader.Close();
             }
             return imgs;
         }
         #region Create Preview
-        public Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
+        static Stream CreatePreviewStream(string FilePath)
+        {
+            ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+            EncoderParameters myEncoderParameters = new EncoderParameters(1);
+            EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
+            myEncoderParameters.Param[0] = myEncoderParameter;
+            Bitmap preview = CreateThumbnail(FilePath, Width, Height);
+            MemoryStream stream = new MemoryStream();
+            preview.Save(stream, jpgEncoder, myEncoderParameters);
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream;
+        }
+        static Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
         {
             Bitmap bmpOut = null;
             try
@@ -239,7 +291,6 @@ namespace Shinon
                 if (Client != null)
                 {
                     Client.Dispose();
-                    Client = null;
                 }
             }
         }
@@ -288,7 +339,6 @@ namespace Shinon
                 if (Client != null)
                 {
                     Client.Dispose();
-                    Client = null;
                 }
             }
         }
@@ -337,7 +387,6 @@ namespace Shinon
                 if (Client != null)
                 {
                     Client.Dispose();
-                    Client = null;
                 }
             }
         }
@@ -387,7 +436,6 @@ namespace Shinon
                 if (Client != null)
                 {
                     Client.Dispose();
-                    Client = null;
                 }
             }
         }
@@ -502,5 +550,55 @@ namespace Shinon
             return temp;
         }
         #endregion
+        static bool ImageIsBig(string Path)
+        {
+            FileInfo fi = new FileInfo(Path);
+            if(fi.Length >= 8000000)
+            {
+                return true;
+            }
+            try
+            {
+                Size s = GetImageSize(Path);
+                if (s.Width >= 7500 || s.Height >= 7500)
+                {
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Не удалось определить разрешение!");
+                Console.ResetColor();
+            }
+            return false;
+        }
+        static Size GetImageSize(string Path)
+        {
+            try
+            {
+                return ImageHelper.GetDimensions(Path);
+            }
+            catch (Exception)
+            {
+            }
+            TagLib.File file = null;
+            try
+            {
+                file = TagLib.File.Create(Path);
+                var image = file as TagLib.Image.File;
+                if (image.Properties != null)
+                {
+                    Size s = new Size();
+                    s.Height = image.Properties.PhotoHeight;
+                    s.Width = image.Properties.PhotoWidth;
+                    return s;
+                }
+            }
+            catch (Exception)
+            {
+            }
+            throw new Exception();
+        }
     }
 }
