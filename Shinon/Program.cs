@@ -33,7 +33,7 @@ namespace Shinon
             Connection.Open();
             List<ImageInfo> imgs = GetImagesWithoutTags();
             int error = 0;
-            for(int i = 0; i < imgs.Count; i++)
+            for(int i = 1600; i < imgs.Count; i++)
             {
                 try
                 {
@@ -559,7 +559,7 @@ namespace Shinon
             }
             try
             {
-                Size s = GetImageSize(Path);
+                Size s = GetImageSize2(Path);
                 if (s.Width >= 7500 || s.Height >= 7500)
                 {
                     return true;
@@ -599,6 +599,17 @@ namespace Shinon
             {
             }
             throw new Exception();
+        }
+        static Size GetImageSize2(string Path)
+        {
+            using (Stream stream = System.IO.File.OpenRead(Path))
+            {
+                using (Image sourceImage = Image.FromStream(stream, false, false))
+                {
+                    Size s = new Size(sourceImage.Width, sourceImage.Height);
+                    return s;
+                }
+            }
         }
     }
 }
