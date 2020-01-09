@@ -205,12 +205,20 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                int i = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                imageListView1.SuspendLayout();
+                int key = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 FullScreenForm form = new FullScreenForm();
                 form.Result = Result;
-                form.Index = i;
+                form.Index = key;
                 form.main_form = this;
                 form.ShowDialog();
+                //imageListView1.SuspendLayout();
+                imageListView1.Items.Clear();
+                for (int i = 0; i < Form1.Result.Count; i++)
+                {
+                    imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                }
+                imageListView1.ResumeLayout();
                 this.imageListView1.Refresh();
                 this.imageListView1.EnsureVisible(form.Index);
             }
@@ -337,6 +345,34 @@ namespace Ange
             Form1.Result.RemoveAt(Index);
             this.imageListView1.Refresh();
         }
+        private void RemoveImages()
+        {
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                imageListView1.SuspendLayout();
+                List<int> keys = new List<int>();
+                foreach(ImageListViewItem item in this.imageListView1.SelectedItems)
+                {
+                    keys.Add((int)item.VirtualItemKey);
+                }
+                keys.Sort();
+                keys.Reverse();
+                foreach(int key in keys)
+                {
+                    ErzaDB.DeleteImage(Form1.Result[key].ImageID, Erza);
+                    RecybleBin.Send(Form1.Result[key].FilePath);
+                    Form1.Result.RemoveAt(key);
+                }
+                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                {
+                    this.imageListView1.Items.Remove(item);
+                }
+                this.imageListView1.ClearSelection();
+                imageListView1.ResumeLayout();
+                this.imageListView1.Refresh();
+                //this.imageListView1.EnsureVisible(form.Index);
+            }
+        }
         private void openOuterSoftToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.imageListView1.SelectedItems.Count > 0)
@@ -374,6 +410,7 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
+                imageListView1.SuspendLayout();
                 int index = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
                 ViewImageForm form = new ViewImageForm();
@@ -403,6 +440,13 @@ namespace Ange
                 }
                 else
                 {
+                    //imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    for (int i = 0; i < Form1.Result.Count; i++)
+                    {
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                    }
+                    imageListView1.ResumeLayout();
                     this.imageListView1.Refresh();
                     this.imageListView1.EnsureVisible(form.Index);
                 }

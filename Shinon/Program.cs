@@ -45,7 +45,7 @@ namespace Shinon
                 imgs = GetImagesFromCache();
             }
             int error = 0;
-            for(int i = 12200; i < imgs.Count; i++)
+            for(int i = 0; i < imgs.Count; i++)
             {
                 try
                 {
