@@ -31,7 +31,19 @@ namespace Shinon
             IIqdbClient client = new IqdbClient();
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
-            List<ImageInfo> imgs = GetImagesWithoutTags();
+            List<ImageInfo> imgs;
+            if (CountItemOnCache() <= 0)
+            {
+                imgs = GetImagesWithoutTags();
+                foreach(ImageInfo img in imgs)
+                {
+                    InsertItemFromCache(img.ImageID);
+                }
+            }
+            else
+            {
+                imgs = GetImagesFromCache();
+            }
             int error = 0;
             for(int i = 12200; i < imgs.Count; i++)
             {
@@ -75,6 +87,7 @@ namespace Shinon
                     Console.ResetColor();
                     error++;
                 }
+                RemoveItemFromCache(imgs[i].ImageID);
             }
             Console.WriteLine($"Ошибок: {error}");
             Connection.Close();
@@ -177,6 +190,58 @@ namespace Shinon
                 reader.Close();
             }
             return imgs;
+        }
+        static int CountItemOnCache()
+        {
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT count(*) FROM shinon_cache;";
+                command.Connection = Connection;
+                int count = Convert.ToInt32(command.ExecuteScalar());
+                return count;
+            }
+        }
+        static List<ImageInfo> GetImagesFromCache()
+        {
+            List<ImageInfo> imgs = new List<ImageInfo>();
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM shinon_cache LEFT OUTER JOIN images on shinon_cache.image_id = images.image_id;";
+                command.Connection = Connection;
+                SQLiteDataReader reader = command.ExecuteReader();
+                //int count = 0;
+                while (reader.Read())
+                {
+                    ImageInfo img = new ImageInfo();
+                    img.Hash = (string)reader["hash"];
+                    img.ImageID = (long)reader["image_id"];
+                    img.FilePath = (string)reader["file_path"];
+                    imgs.Add(img);
+                    //count++;
+                }
+                reader.Close();
+            }
+            return imgs;
+        }
+        static void InsertItemFromCache(long ImageID)
+        {
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "INSERT INTO shinon_cache (image_id) VALUES (@image_id);";
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.Connection = Connection;
+                command.ExecuteNonQuery();
+            }
+        }
+        static void RemoveItemFromCache(long ImageID)
+        {
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "DELETE FROM shinon_cache WHERE image_id = @image_id;";
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.Connection = Connection;
+                command.ExecuteNonQuery();
+            }
         }
         #region Create Preview
         static Stream CreatePreviewStream(string FilePath)
