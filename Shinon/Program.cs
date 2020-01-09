@@ -33,7 +33,7 @@ namespace Shinon
             Connection.Open();
             List<ImageInfo> imgs = GetImagesWithoutTags();
             int error = 0;
-            for(int i = 1600; i < imgs.Count; i++)
+            for(int i = 12200; i < imgs.Count; i++)
             {
                 try
                 {
