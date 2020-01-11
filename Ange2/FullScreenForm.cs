@@ -36,6 +36,7 @@ namespace Ange
         public string ImageFormat = null;
         public string TagString;
         FileStream fs = null;
+        public bool ResultChanged = false;
         public FullScreenForm()
         {
             InitializeComponent();
@@ -82,7 +83,7 @@ namespace Ange
                     {
                         if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                         if (fs != null) { fs.Close(); }
-                        main_form.DeleteImage(this.Index);
+                        DeleteImage(this.Index);
                         if (this.Result.Count > 0)
                         {
                             if (this.Index >= this.Result.Count)
@@ -119,7 +120,7 @@ namespace Ange
                     this.pictureBox1.Image = Image.FromStream(fs);
                     //fs.Close();
                     ImageFormat = GetImageFormat(this.pictureBox1.Image);
-                    Result[this.Index].Tags = ErzaDB.GetTagsByImageIDToString(Result[this.Index].ImageID, main_form.Erza);
+                    Result[this.Index].Tags = ErzaDB.GetTagsByImageIDToString(Result[this.Index].ImageID, Form1.Erza);
                     StringBuilder tag_string = new StringBuilder();
                     for (int i = 0; i < Result[this.Index].Tags.Count; i++)
                     {
@@ -198,6 +199,14 @@ namespace Ange
         private void FullScreenForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (fs != null) { fs.Close(); }
+        }
+        private void DeleteImage(int Index)
+        {
+            ErzaDB.DeleteImage(Form1.Result[Index].ImageID, Form1.Erza);
+            //File.Delete(Form1.Result[Index].FilePath);
+            RecybleBin.Send(Form1.Result[Index].FilePath);
+            Form1.Result.RemoveAt(Index);
+            ResultChanged = true;
         }
     }
 }

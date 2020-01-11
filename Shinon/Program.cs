@@ -35,10 +35,16 @@ namespace Shinon
             if (CountItemOnCache() <= 0)
             {
                 imgs = GetImagesWithoutTags();
-                foreach(ImageInfo img in imgs)
+                Console.Write("Добавляем в Кэш...");
+                SQLiteTransaction transact = Program.Connection.BeginTransaction();
+                foreach (ImageInfo img in imgs)
                 {
                     InsertItemFromCache(img.ImageID);
                 }
+                transact.Commit();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("ОК");
+                Console.ResetColor();
             }
             else
             {

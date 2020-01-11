@@ -37,7 +37,7 @@ namespace Ange
         private const int PreviewWidth = 300;
         private const int PreviewHeight = 225;
         public static SQLiteConnection Previews;
-        public SQLiteConnection Erza;
+        public static SQLiteConnection Erza;
         public static List<ImageInfo> Result;
         SolidBrush brush;
         private CustomAdaptor adaptor;
@@ -110,9 +110,9 @@ namespace Ange
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            //this.Erza = new SQLiteConnection("data source="+ Application.StartupPath + "\\Erza.sqlite");
-            this.Erza = new SQLiteConnection("data source=C:\\utils\\data\\Erza.sqlite");
-            this.Erza.Open();
+            //Form1.Erza = new SQLiteConnection("data source="+ Application.StartupPath + "\\Erza.sqlite");
+            Form1.Erza = new SQLiteConnection("data source=C:\\utils\\data\\Erza.sqlite");
+            Form1.Erza.Open();
             //this.Previews = new SQLiteConnection("data source=" + Application.StartupPath + "\\Previews.sqlite");
             //this.Previews = new SQLiteConnection("data source=C:\\utils\\data\\Previews.sqlite");
             Form1.Previews = new SQLiteConnection("data source=E:\\Previews.sqlite");
@@ -176,7 +176,7 @@ namespace Ange
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Form1.Previews.Close();
-            this.Erza.Close();
+            Form1.Erza.Close();
             this.brush.Dispose();
         }
 
@@ -213,10 +213,13 @@ namespace Ange
                 form.main_form = this;
                 form.ShowDialog();
                 //imageListView1.SuspendLayout();
-                imageListView1.Items.Clear();
-                for (int i = 0; i < Form1.Result.Count; i++)
+                if (form.ResultChanged)
                 {
-                    imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                    imageListView1.Items.Clear();
+                    for (int i = 0; i < Form1.Result.Count; i++)
+                    {
+                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                    }
                 }
                 imageListView1.ResumeLayout();
                 this.imageListView1.Refresh();
@@ -275,13 +278,7 @@ namespace Ange
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
-            {
-                if (MessageBox.Show("Удалить изображение " + Form1.Result[(int)this.imageListView1.SelectedItems[0].VirtualItemKey].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
-                {
-                    DeleteImage((int)this.imageListView1.SelectedItems[0].VirtualItemKey);
-                }
-            }
+            DeleteImage();
         }
 
         private void imageListView1_KeyDown(object sender, KeyEventArgs e)
@@ -337,13 +334,15 @@ namespace Ange
                 }
             }
         }
-        public void DeleteImage(int Index)
+        private void DeleteImage()
         {
-            ErzaDB.DeleteImage(Form1.Result[Index].ImageID, Erza);
-            //File.Delete(Form1.Result[Index].FilePath);
-            RecybleBin.Send(Form1.Result[Index].FilePath);
-            Form1.Result.RemoveAt(Index);
-            this.imageListView1.Refresh();
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                if (MessageBox.Show("Удалить выбранные(" + this.imageListView1.SelectedItems.Count .ToString() + ") изображения?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                {
+                    RemoveImages();
+                }
+            }
         }
         private void RemoveImages()
         {
@@ -351,9 +350,11 @@ namespace Ange
             {
                 imageListView1.SuspendLayout();
                 List<int> keys = new List<int>();
+                List<ImageListViewItem> selitems = new List<ImageListViewItem>();
                 foreach(ImageListViewItem item in this.imageListView1.SelectedItems)
                 {
                     keys.Add((int)item.VirtualItemKey);
+                    selitems.Add(item);
                 }
                 keys.Sort();
                 keys.Reverse();
@@ -363,7 +364,7 @@ namespace Ange
                     RecybleBin.Send(Form1.Result[key].FilePath);
                     Form1.Result.RemoveAt(key);
                 }
-                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                foreach (ImageListViewItem item in selitems)
                 {
                     this.imageListView1.Items.Remove(item);
                 }
@@ -410,13 +411,12 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                imageListView1.SuspendLayout();
                 int index = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 //ImageInfo img = ErzaDB.GetImageWithOutTags(Result[i].Hash, Erza);
                 ViewImageForm form = new ViewImageForm();
                 form.Result = Result;
                 form.Index = index;
-                form.Erza = this.Erza;
+                form.Erza = Form1.Erza;
                 form.main_form = this;
                 form.ShowDialog();
                 if (form.SelectedTags != null && form.SelectedTags.Count > 0)
@@ -440,14 +440,17 @@ namespace Ange
                 }
                 else
                 {
-                    //imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    for (int i = 0; i < Form1.Result.Count; i++)
+                    if (form.ResultChanged)
                     {
-                        imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                        imageListView1.SuspendLayout();
+                        imageListView1.Items.Clear();
+                        for (int i = 0; i < Form1.Result.Count; i++)
+                        {
+                            imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
+                        }
+                        imageListView1.ResumeLayout();
+                        this.imageListView1.Refresh();
                     }
-                    imageListView1.ResumeLayout();
-                    this.imageListView1.Refresh();
                     this.imageListView1.EnsureVisible(form.Index);
                 }
             }
@@ -596,7 +599,7 @@ namespace Ange
             {
                 imageListView1.SuspendLayout();
                 imageListView1.Items.Clear();
-                Form1.Result = ErzaDB.GetAllImages(this.Erza);
+                Form1.Result = ErzaDB.GetAllImages(Form1.Erza);
                 if (Form1.Result.Count > 0)
                 {
                     for (int i=0;i< Form1.Result.Count;i++)
@@ -624,7 +627,7 @@ namespace Ange
                 {
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
-                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, this.Erza);
+                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, Form1.Erza);
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
                         imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -638,11 +641,11 @@ namespace Ange
                     imageListView1.Items.Clear();
                     if (tags.Count == 1)
                     {
-                        Form1.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
+                        Form1.Result = ErzaDB.GetImagesByTag(tags[0], Form1.Erza);
                     }
                     else
                     {
-                        Form1.Result = ErzaDB.GetAllImages(this.Erza);
+                        Form1.Result = ErzaDB.GetAllImages(Form1.Erza);
                     }
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
@@ -673,7 +676,7 @@ namespace Ange
                 {
                     imageListView1.SuspendLayout();
                     imageListView1.Items.Clear();
-                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, this.Erza);
+                    Form1.Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, Form1.Erza);
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
                         imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -687,11 +690,11 @@ namespace Ange
                     imageListView1.Items.Clear();
                     if (tags.Count == 1)
                     {
-                        Form1.Result = ErzaDB.GetImagesByTag(tags[0], this.Erza);
+                        Form1.Result = ErzaDB.GetImagesByTag(tags[0], Form1.Erza);
                     }
                     else
                     {
-                        Form1.Result = ErzaDB.GetAllImages(this.Erza);
+                        Form1.Result = ErzaDB.GetAllImages(Form1.Erza);
                     }
                     for (int i = 0; i < Form1.Result.Count; i++)
                     {
@@ -711,7 +714,7 @@ namespace Ange
             {
                 imageListView1.SuspendLayout();
                 imageListView1.Items.Clear();
-                Form1.Result = ErzaDB.GetImagesByPartTag(this.tags_toolStripSpringTextBox.Text, this.Erza);
+                Form1.Result = ErzaDB.GetImagesByPartTag(this.tags_toolStripSpringTextBox.Text, Form1.Erza);
                 for (int i = 0; i < Form1.Result.Count; i++)
                 {
                     imageListView1.Items.Add(i, Form1.Result[i].Hash, adaptor);
@@ -727,7 +730,7 @@ namespace Ange
             }
             if (SelectIsMD5())
             {
-                ImageInfo img = ErzaDB.GetImageWithOutTags(this.tags_toolStripSpringTextBox.Text, this.Erza);
+                ImageInfo img = ErzaDB.GetImageWithOutTags(this.tags_toolStripSpringTextBox.Text, Form1.Erza);
                 if (img != null)
                 {
                     imageListView1.SuspendLayout();

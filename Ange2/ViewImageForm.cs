@@ -38,6 +38,7 @@ namespace Ange
         public Form1 main_form;
         BindingList<TagInfo> Tags;
         FileStream fs = null;
+        public bool ResultChanged = false;
         //Colors
         SolidBrush GeneralColor = new SolidBrush(Color.Black);
         SolidBrush ArtistColor = new SolidBrush(Color.FromArgb(235, 156, 0));
@@ -192,7 +193,7 @@ namespace Ange
                     {
                         if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                         if (fs != null) { fs.Close(); }
-                        main_form.DeleteImage(this.Index);
+                        DeleteImage(this.Index);
                         if (this.Result.Count > 0)
                         {
                             if (this.Index >= this.Result.Count)
@@ -245,7 +246,7 @@ namespace Ange
             {
                 if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                 if (fs != null) { fs.Close(); }
-                main_form.DeleteImage(this.Index);
+                DeleteImage(this.Index);
                 if (this.Result.Count > 0)
                 {
                     if (this.Index >= this.Result.Count)
@@ -372,7 +373,14 @@ namespace Ange
                 this.listBox1.DataSource = this.Tags;
             }
         }
-
+        private void DeleteImage(int Index)
+        {
+            ErzaDB.DeleteImage(Form1.Result[Index].ImageID, Form1.Erza);
+            //File.Delete(Form1.Result[Index].FilePath);
+            RecybleBin.Send(Form1.Result[Index].FilePath);
+            Form1.Result.RemoveAt(Index);
+            ResultChanged = true;
+        }
         private void ViewImageForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (fs != null) { fs.Close(); }
