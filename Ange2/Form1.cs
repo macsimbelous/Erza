@@ -346,33 +346,30 @@ namespace Ange
         }
         private void RemoveImages()
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            imageListView1.SuspendLayout();
+            List<int> keys = new List<int>();
+            List<ImageListViewItem> selitems = new List<ImageListViewItem>();
+            foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
             {
-                imageListView1.SuspendLayout();
-                List<int> keys = new List<int>();
-                List<ImageListViewItem> selitems = new List<ImageListViewItem>();
-                foreach(ImageListViewItem item in this.imageListView1.SelectedItems)
-                {
-                    keys.Add((int)item.VirtualItemKey);
-                    selitems.Add(item);
-                }
-                keys.Sort();
-                keys.Reverse();
-                foreach(int key in keys)
-                {
-                    ErzaDB.DeleteImage(Form1.Result[key].ImageID, Erza);
-                    RecybleBin.Send(Form1.Result[key].FilePath);
-                    Form1.Result.RemoveAt(key);
-                }
-                foreach (ImageListViewItem item in selitems)
-                {
-                    this.imageListView1.Items.Remove(item);
-                }
-                this.imageListView1.ClearSelection();
-                imageListView1.ResumeLayout();
-                this.imageListView1.Refresh();
-                //this.imageListView1.EnsureVisible(form.Index);
+                keys.Add((int)item.VirtualItemKey);
+                selitems.Add(item);
             }
+            keys.Sort();
+            keys.Reverse();
+            foreach (int key in keys)
+            {
+                ErzaDB.DeleteImage(Form1.Result[key].ImageID, Erza);
+                RecybleBin.Send(Form1.Result[key].FilePath);
+                Form1.Result.RemoveAt(key);
+            }
+            foreach (ImageListViewItem item in selitems)
+            {
+                this.imageListView1.Items.Remove(item);
+            }
+            this.imageListView1.ClearSelection();
+            imageListView1.ResumeLayout();
+            this.imageListView1.Refresh();
+            //this.imageListView1.EnsureVisible(form.Index);
         }
         private void openOuterSoftToolStripMenuItem_Click(object sender, EventArgs e)
         {

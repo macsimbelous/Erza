@@ -203,6 +203,10 @@ namespace Ange
                             //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                             LoadImage();
                         }
+                        else
+                        {
+                            this.Close();
+                        }
                     }
                     break;
             }
