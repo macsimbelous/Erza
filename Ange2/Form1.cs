@@ -223,6 +223,7 @@ namespace Ange
                 }
                 imageListView1.ResumeLayout();
                 this.imageListView1.Refresh();
+                this.imageListView1.Items[form.Index].Selected = true;
                 this.imageListView1.EnsureVisible(form.Index);
             }
         }
@@ -448,6 +449,7 @@ namespace Ange
                         imageListView1.ResumeLayout();
                         this.imageListView1.Refresh();
                     }
+                    this.imageListView1.Items[form.Index].Selected = true;
                     this.imageListView1.EnsureVisible(form.Index);
                 }
             }

@@ -47,72 +47,77 @@ namespace Euphemia
             }
             Console.WriteLine("Получаю список файлов из {0}", dir);
             List<ImageInfo> il = new List<ImageInfo>();
-            string[] files = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
-            for (int i = 0; i < files.Length;i++ )
+            List<string> files_in_dir = new List<string>(Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories));
+            for (int i = 0; i < files_in_dir.Count;i++ )
             {
-                files[i] = files[i].ToLower();
+                files_in_dir[i] = files_in_dir[i].ToLower();
             }
-            List<string> files_in_db = GetFilesFromImageDB();
-            files_in_db.Sort();
-            int files_count = files.Length;
-            if (FullMode == true)
-            {
-                int count = 0;
-                foreach (string file in files)
-                {
-                    if (ImageInfo.IsImageFile(file))
-                    {
-                        count++;
-                        Console.WriteLine("Подсчитываю хэш {0} [{1}/{2}]", Path.GetFileName(file), count, files_count);
-                        ImageInfo img = new ImageInfo();
-                        byte[] temp = CalculateHashFile(file);
-                        img.Hash = BitConverter.ToString(temp).Replace("-", string.Empty);
-                        img.Hash = img.Hash.ToLower();
-                        img.FilePath = file;
-                        il.Add(img);
-                    }
-                }
-            }
-            else
-            {
-                int count = 0;
-                foreach (string file in files)
-                {
-                    if (ImageInfo.IsImageFile(file))
-                    {
-                        count++;
-                        if (files_in_db.BinarySearch(file) >= 0)
-                        {
-                            Console.WriteLine("Фаил {0} уже есть в БД. [{1}/{2}]", Path.GetFileName(file), count, files_count);
-                            continue;
-                        }
-                        Console.WriteLine("Подсчитываю хэш {0} [{1}/{2}]", Path.GetFileName(file), count, files_count);
-                        ImageInfo img = new ImageInfo();
-                        byte[] temp = CalculateHashFile(file);
-                        img.Hash = BitConverter.ToString(temp).Replace("-", string.Empty);
-                        img.Hash = img.Hash.ToLower();
-                        img.FilePath = file;
-                        il.Add(img);
-                    }
-                }
-            }
-            Console.WriteLine("Вычислено хэшей: {0}", il.Count);
-            ImageToDB(il);
-            //Console.ReadKey();
-        }
-        static void ImageToDB(List<ImageInfo> il)
-        {
-            Console.WriteLine("Добавляем хэши в базу данных SQLite");
+            files_in_dir.Sort();
             using (SQLiteConnection connection = new SQLiteConnection(connection_string))
             {
-                DateTime start = DateTime.Now;
                 connection.Open();
+                List<string> files_in_db = new List<string>();
+                using (SQLiteCommand command = new SQLiteCommand())
+                {
+                    command.CommandText = "select file_path from images where file_path IS NOT NULL";
+                    command.Connection = connection;
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        files_in_db.Add(((string)reader[0]).ToLower());
+                    }
+                    reader.Close();
+                }
+                files_in_db.Sort();
+                if (FullMode == true)
+                {
+                    int count = 0;
+                    foreach (string file in files_in_dir)
+                    {
+                        if (ImageInfo.IsImageFile(file))
+                        {
+                            count++;
+                            Console.WriteLine("Подсчитываю хэш {0} [{1}/{2}]", Path.GetFileName(file), count, files_in_dir.Count);
+                            ImageInfo img = new ImageInfo();
+                            byte[] temp = CalculateHashFile(file);
+                            img.Hash = BitConverter.ToString(temp).Replace("-", string.Empty);
+                            img.Hash = img.Hash.ToLower();
+                            img.FilePath = file;
+                            il.Add(img);
+                        }
+                    }
+                }
+                else
+                {
+                    int count = 0;
+                    foreach (string file in files_in_dir)
+                    {
+                        if (ImageInfo.IsImageFile(file))
+                        {
+                            count++;
+                            if (files_in_db.BinarySearch(file) >= 0)
+                            {
+                                Console.WriteLine("Фаил {0} уже есть в БД. [{1}/{2}]", Path.GetFileName(file), count, files_in_dir.Count);
+                                continue;
+                            }
+                            Console.WriteLine("Подсчитываю хэш {0} [{1}/{2}]", Path.GetFileName(file), count, files_in_dir.Count);
+                            ImageInfo img = new ImageInfo();
+                            byte[] temp = CalculateHashFile(file);
+                            img.Hash = BitConverter.ToString(temp).Replace("-", string.Empty);
+                            img.Hash = img.Hash.ToLower();
+                            img.FilePath = file;
+                            il.Add(img);
+                        }
+                    }
+                }
+                Console.WriteLine("Вычислено хэшей: {0}", il.Count);
+                Console.WriteLine("Добавляем хэши в базу данных SQLite");
                 SQLiteTransaction transact = connection.BeginTransaction();
                 for (int i2 = 0; i2 < il.Count; i2++)
                 {
                     Console.Write("Обрабатываю хэш {0} ({1}/{2})\r", il[i2].Hash, (i2 + 1), il.Count);
                     ImageInfo temp = ErzaDB.GetImageWithOutTags(il[i2].Hash, connection);
-                    if(temp != null)
+                    if (temp != null)
                     {
                         if (temp.IsDeleted)
                         {
@@ -127,34 +132,64 @@ namespace Euphemia
                     }
                 }
                 transact.Commit();
-                DateTime finish = DateTime.Now;
-                //Console.WriteLine(finish.ToString());
-                Console.WriteLine("\nХэшей добавлено: " + il.Count.ToString() + " за: " + (finish - start).TotalSeconds.ToString("0.00") + " секунд (" + (il.Count / (finish - start).TotalSeconds) + " в секунду)");
+                Console.WriteLine($"\nХэшей добавлено: {il.Count}");
+
+                //Ищем отсутствующие файлы
+                List <ImageInfo> img_list = new List<ImageInfo>();
+                    using (SQLiteCommand command = new SQLiteCommand())
+                    {
+                        command.CommandText = "SELECT image_id, file_path FROM images WHERE file_path IS NOT NULL ORDER BY file_path ASC";
+                        command.Connection = connection;
+                        SQLiteDataReader reader = command.ExecuteReader();
+                        int count = 0;
+                        while (reader.Read())
+                        {
+                            ImageInfo img = new ImageInfo();
+                            img.ImageID = (long)reader["image_id"];
+                            img.FilePath = (string)reader["file_path"];
+                            img_list.Add(img);
+                            count++;
+                            Console.Write($"\rПолучаем список файлов из БД...{count.ToString("#######")}");
+                        }
+                        reader.Close();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("ОК");
+                        Console.ResetColor();
+                        //Console.WriteLine($"\rВсего: {count}");
+                    }
+                if (img_list.Count <= 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Ничего нет!");
+                    Console.ResetColor();
+                    return;
+                }
+                int count_deleted = 0;
+                int count_file = 0;
+                int all_files = img_list.Count;
+                SQLiteTransaction transact2 = connection.BeginTransaction();
+                foreach (ImageInfo img in img_list)
+                {
+                    count_file++;
+                    if (System.IO.File.Exists(img.FilePath))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Фаил {0} есть. [{1}/{2}]", Path.GetFileName(img.FilePath), count_file, all_files);
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        count_deleted++;
+                        ErzaDB.DeleteImage(img.ImageID, connection);
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Фаил {0} отсутствует. Помечен удалённым. [{1}/{2}]", Path.GetFileName(img.FilePath), count_file, all_files);
+                        Console.ResetColor();
+                    }
+                }
+                transact2.Commit();
+                Console.WriteLine($"Файлов проверено: {img_list.Count} ");
+                Console.WriteLine($"Файлов отсутствует: {count_deleted}");
             }
-        }
-        static bool MoveImageToStore(string file, string StorePath)
-        {
-            MD5 hash_enc = MD5.Create();
-            FileStream fsData = new FileStream(file, FileMode.Open, FileAccess.Read);
-            byte[] hash = hash_enc.ComputeHash(fsData);
-            fsData.Close();
-            string t = BitConverter.ToString(hash).Replace("-", string.Empty);
-            string ext = file.Substring(file.LastIndexOf('.'));
-            if (ext.ToLower() == ".jpeg") { ext = ".jpg"; }
-            string DestFile = StorePath + "\\" + t.Substring(0, 2) + "\\" + t.Substring(2, 2);
-            Directory.CreateDirectory(DestFile.ToLower());
-            DestFile = DestFile + "\\" + t + ext;
-            try
-            {
-                System.IO.File.Move(file, DestFile.ToLower());
-                System.Console.WriteLine(file.Substring(file.LastIndexOf('\\') + 1) + " -> " + t.Substring(file.LastIndexOf('\\') + 1).ToLower());
-            }
-            catch (IOException)
-            {
-                System.Console.WriteLine("ДУБЛИКАТ!!! " + file);
-                return false;
-            }
-            return true;
         }
         static byte[] CalculateHashFile(string file)
         {
@@ -163,51 +198,6 @@ namespace Euphemia
             byte[] hash = hash_enc.ComputeHash(fsData);
             fsData.Close();
             return hash;
-        }
-        static bool ExistFileToImageDB(string file)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(connection_string))
-            {
-                connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand())
-                {
-                    command.CommandText = "select * from hash_tags where file_name = @file_name";
-                    //command.Parameters.Add("hash", DbType.Binary, 16).Value = il[i2].hash;
-                    command.Parameters.AddWithValue("file_name", file);
-                    command.Connection = connection;
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        reader.Close();
-                        return true;
-                    }
-                    else
-                    {
-                        reader.Close();
-                        return false;
-                    }
-                }
-            }
-        }
-        static List<string> GetFilesFromImageDB()
-        {
-            List<string> temp = new List<string>();
-            using (SQLiteConnection connection = new SQLiteConnection(connection_string))
-            {
-                connection.Open();
-                using (SQLiteCommand command = new SQLiteCommand())
-                {
-                    command.CommandText = "select file_path from images where file_path IS NOT NULL";
-                    command.Connection = connection;
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        temp.Add(((string)reader[0]).ToLower());
-                    }
-                    reader.Close();
-                }
-            }
-            return temp;
         }
     }
 }

@@ -47,7 +47,6 @@ namespace Misaka
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
-
                     command.CommandText = "SELECT image_id, file_path FROM images WHERE file_path IS NOT NULL ORDER BY file_path ASC";
                     command.Connection = connection;
                     SQLiteDataReader reader = command.ExecuteReader();
@@ -110,28 +109,6 @@ namespace Misaka
                 Console.WriteLine("Файлов отсутствует: {0}", count_deleted);
             }
             //Console.ReadKey();
-        }
-        static void DeleteImageDB(long id, SQLiteConnection connection)
-        {
-            using (SQLiteCommand update_command = new SQLiteCommand(connection))
-            {
-                update_command.CommandText = "UPDATE hash_tags SET file_name = @file_name, tags = @tags, is_new = @is_new, is_deleted = @is_deleted WHERE id = @id";
-                update_command.Parameters.AddWithValue("is_new", false);
-                update_command.Parameters.AddWithValue("is_deleted", true);
-                update_command.Parameters.AddWithValue("id", id);
-                update_command.Parameters.AddWithValue("tags", null);
-                update_command.Parameters.AddWithValue("file_name", null);
-                update_command.ExecuteNonQuery();
-            }
-        }
-        static void VipeImageDB(long id, SQLiteConnection connection)
-        {
-            using (SQLiteCommand update_command = new SQLiteCommand(connection))
-            {
-                update_command.CommandText = "DELETE FROM hash_tags WHERE id = @id";
-                update_command.Parameters.AddWithValue("id", id);
-                update_command.ExecuteNonQuery();
-            }
         }
     }
 }
