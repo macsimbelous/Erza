@@ -136,27 +136,27 @@ namespace Euphemia
 
                 //Ищем отсутствующие файлы
                 List <ImageInfo> img_list = new List<ImageInfo>();
-                    using (SQLiteCommand command = new SQLiteCommand())
+                using (SQLiteCommand command = new SQLiteCommand())
+                {
+                    command.CommandText = "SELECT image_id, file_path FROM images WHERE file_path IS NOT NULL ORDER BY file_path ASC";
+                    command.Connection = connection;
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    int count = 0;
+                    while (reader.Read())
                     {
-                        command.CommandText = "SELECT image_id, file_path FROM images WHERE file_path IS NOT NULL ORDER BY file_path ASC";
-                        command.Connection = connection;
-                        SQLiteDataReader reader = command.ExecuteReader();
-                        int count = 0;
-                        while (reader.Read())
-                        {
-                            ImageInfo img = new ImageInfo();
-                            img.ImageID = (long)reader["image_id"];
-                            img.FilePath = (string)reader["file_path"];
-                            img_list.Add(img);
-                            count++;
-                            Console.Write($"\rПолучаем список файлов из БД...{count.ToString("#######")}");
-                        }
-                        reader.Close();
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("ОК");
-                        Console.ResetColor();
-                        //Console.WriteLine($"\rВсего: {count}");
+                        ImageInfo img = new ImageInfo();
+                        img.ImageID = (long)reader["image_id"];
+                        img.FilePath = (string)reader["file_path"];
+                        img_list.Add(img);
+                        count++;
+                        Console.Write($"\rПолучаем список файлов из БД...{count.ToString("#######")}");
                     }
+                    reader.Close();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("ОК");
+                    Console.ResetColor();
+                    //Console.WriteLine($"\rВсего: {count}");
+                }
                 if (img_list.Count <= 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -171,7 +171,7 @@ namespace Euphemia
                 foreach (ImageInfo img in img_list)
                 {
                     count_file++;
-                    if (System.IO.File.Exists(img.FilePath))
+                    if (files_in_dir.BinarySearch(img.FilePath.ToLower()) >= 0)  //if (System.IO.File.Exists(img.FilePath))
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Фаил {0} есть. [{1}/{2}]", Path.GetFileName(img.FilePath), count_file, all_files);
