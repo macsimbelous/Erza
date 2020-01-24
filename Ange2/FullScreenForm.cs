@@ -31,7 +31,7 @@ namespace Ange
     {
         public List<ImageInfo> Result;
         public int Index = 0;
-        public Form1 main_form;
+        //public Form1 main_form;
         public long FileSize = 0;
         public string ImageFormat = null;
         public string TagString;
@@ -206,10 +206,10 @@ namespace Ange
         }
         private void DeleteImage(int Index)
         {
-            ErzaDB.DeleteImage(Form1.Result[Index].ImageID, Form1.Erza);
+            ErzaDB.DeleteImage(Result[Index].ImageID, Form1.Erza);
             //File.Delete(Form1.Result[Index].FilePath);
-            RecybleBin.Send(Form1.Result[Index].FilePath);
-            Form1.Result.RemoveAt(Index);
+            RecybleBin.Send(Result[Index].FilePath);
+            Result.RemoveAt(Index);
             ResultChanged = true;
         }
     }

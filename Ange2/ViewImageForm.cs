@@ -35,7 +35,7 @@ namespace Ange
         //public string SelectedTag = null;
         public List<string> SelectedTags = null;
         public SQLiteConnection Erza;
-        public Form1 main_form;
+        //public Form1 main_form;
         BindingList<TagInfo> Tags;
         FileStream fs = null;
         public bool ResultChanged = false;
@@ -218,7 +218,7 @@ namespace Ange
             FullScreenForm form = new FullScreenForm();
             form.Result = Result;
             form.Index = this.Index;
-            form.main_form = this.main_form;
+            //form.main_form = this.main_form;
             form.ShowDialog();
             this.Index = form.Index;
             LoadImage();
@@ -229,7 +229,7 @@ namespace Ange
             FullScreenForm form = new FullScreenForm();
             form.Result = Result;
             form.Index = this.Index;
-            form.main_form = this.main_form;
+            //form.main_form = this.main_form;
             form.ShowDialog();
             this.Index = form.Index;
             LoadImage();
@@ -379,10 +379,10 @@ namespace Ange
         }
         private void DeleteImage(int Index)
         {
-            ErzaDB.DeleteImage(Form1.Result[Index].ImageID, Form1.Erza);
+            ErzaDB.DeleteImage(Result[Index].ImageID, Form1.Erza);
             //File.Delete(Form1.Result[Index].FilePath);
-            RecybleBin.Send(Form1.Result[Index].FilePath);
-            Form1.Result.RemoveAt(Index);
+            RecybleBin.Send(Result[Index].FilePath);
+            Result.RemoveAt(Index);
             ResultChanged = true;
         }
         private void ViewImageForm_FormClosed(object sender, FormClosedEventArgs e)

@@ -174,6 +174,36 @@ namespace ErzaLib
                 }
             }
         }
+        public static ImageInfo GetImageWithOutTags(long ImageID, SQLiteConnection Connection)
+        {
+            string sql = "SELECT image_id, hash, is_deleted, file_path, width, height FROM images WHERE image_id = @image_id";
+            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            {
+                command.Parameters.AddWithValue("image_id", ImageID);
+                SQLiteDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    ImageInfo image = new ImageInfo();
+                    image.ImageID = (long)reader["image_id"];
+                    image.Hash = (string)reader["hash"];
+                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
+                    object o = reader["file_path"];
+                    if (o != DBNull.Value)
+                    {
+                        image.FilePath = (string)o;
+                    }
+                    reader.Close();
+                    return image;
+                }
+                else
+                {
+                    reader.Close();
+                    return null;
+                }
+            }
+        }
         public static void UpdateImage(ImageInfo Image, SQLiteConnection Connection)
         {
             using (SQLiteCommand update_command = new SQLiteCommand(Connection))
