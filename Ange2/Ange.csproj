@@ -161,7 +161,6 @@
     <EmbeddedResource Include="ViewImageForm.resx">
       <DependentUpon>ViewImageForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Ange2_TemporaryKey.pfx" />
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>

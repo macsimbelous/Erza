@@ -134,7 +134,7 @@ namespace Ange
                         imageListView1.Items.Add(img, img.Hash, adaptor);
                     }
                 }
-                this.imageListView1.Items[form.Index].Selected = true;
+                //this.imageListView1.Items[form.Index].Selected = true;
                 imageListView1.ResumeLayout();
                 this.imageListView1.EnsureVisible(form.Index);
             }
@@ -317,7 +317,7 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                int index = (int)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                int index = this.imageListView1.SelectedItems[0].Index;
                 ViewImageForm form = new ViewImageForm();
                 form.Result = new List<ImageInfo>();
                 foreach (ImageListViewItem item in this.imageListView1.Items)
@@ -359,7 +359,9 @@ namespace Ange
                         imageListView1.ResumeLayout();
                         this.imageListView1.Refresh();
                     }
-                    this.imageListView1.Items[form.Index].Selected = true;
+                    //this.imageListView1.Items[form.Index].Selected = true;
+                    //this.imageListView1.Items[form.Index].Update();
+                    //this.imageListView1.Items.FocusedItem = this.imageListView1.Items[form.Index];
                     this.imageListView1.EnsureVisible(form.Index);
                 }
             }
