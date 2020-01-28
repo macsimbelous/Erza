@@ -71,8 +71,14 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutocompleteMenu-ScintillaNET, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoCompleteMenu-ScintillaNET.1.6.2\lib\net461\AutocompleteMenu-ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="ImageListView, Version=13.7.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ImageListView.13.7.2\lib\net35\ImageListView.dll</HintPath>
+    </Reference>
+    <Reference Include="ScintillaNET, Version=3.6.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\jacobslusser.ScintillaNET.3.6.3\lib\net40\ScintillaNET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -192,6 +198,9 @@
   <ItemGroup>
     <Content Include="angelise_result.ico" />
     <Content Include="License.txt" />
+    <None Include="Resources\search25.png" />
+    <None Include="Resources\images25.png" />
+    <None Include="Resources\search32.png" />
     <None Include="Resources\remove.png" />
     <None Include="Resources\plus.png" />
     <None Include="Resources\images.png" />

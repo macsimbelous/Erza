@@ -29,6 +29,7 @@ using ErzaLib;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Manina.Windows.Forms;
+using AutocompleteMenuNS;
 
 namespace Ange
 {
@@ -57,10 +58,12 @@ namespace Ange
             adaptor = new CustomAdaptor();
             //this.imageListView1.ThumbnailSize = new Size(300, 225);
             //Загружвем список тегов
-            List<string> tags = new List<string>();
+            autocompleteMenu1.MaximumSize = new System.Drawing.Size(350, 200);
+            var columnWidth = new int[] { 250, 100 };
+            //List<string> tags = new List<string>();
             using (SQLiteCommand command = new SQLiteCommand(Erza))
             {
-                command.CommandText = "SELECT tag FROM tags ORDER BY tag ASC";
+                command.CommandText = "SELECT tag, count FROM tags ORDER BY tag ASC";
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -94,17 +97,13 @@ namespace Ange
                         {
                             continue;
                         }
-                        tags.Add(reader.GetString(0));
+                        //tags.Add(reader.GetString(0));
+                        //tags.Add(tag);
+                        autocompleteMenu1.AddItem(new MulticolumnAutocompleteItem(new[] { tag, reader.GetInt64(1).ToString() }, tag) { ColumnWidth = columnWidth });
                     }
                 }
             }
-
-            AutoCompleteStringCollection ts = new AutoCompleteStringCollection();
-            ts.AddRange(tags.ToArray());
-            this.tag_toolStripComboBox.AutoCompleteCustomSource = ts;
-            this.tag_toolStripComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
-            this.tag_toolStripComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            this.option_toolStripComboBox.SelectedIndex = 0;
+            this.option_comboBox.SelectedIndex = 0;
             this.DoubleBuffered = true;
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -343,8 +342,8 @@ namespace Ange
                             sb.Append(form.SelectedTags[i]);
                         }
                     }
-                    this.tags_toolStripSpringTextBox.Text = sb.ToString();
-                    this.search_toolStripButton.PerformClick();
+                    this.tags_textBox.Text = sb.ToString();
+                    this.search_button.PerformClick();
                 }
                 else
                 {
@@ -478,190 +477,13 @@ namespace Ange
             }
             return null;
         }
-        private void toolStripSpringTextBox1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                this.search_toolStripButton.PerformClick();
-
-            }
-        }
-        private void plus_toolStripButton_Click(object sender, EventArgs e)
-        {
-            if (tag_toolStripComboBox.Text.Length > 0)
-            {
-                if (this.tags_toolStripSpringTextBox.Text.Length <= 0)
-                {
-                    this.tags_toolStripSpringTextBox.Text = tag_toolStripComboBox.Text;
-                }
-                else
-                {
-                    this.tags_toolStripSpringTextBox.Text = this.tags_toolStripSpringTextBox.Text + " " + this.tag_toolStripComboBox.Text;
-                }
-            }
-        }
         private void search_toolStripButton_Click(object sender, EventArgs e)
         {
-            if (this.tags_toolStripSpringTextBox.Text.Length == 0)
-            {
-                imageListView1.SuspendLayout();
-                imageListView1.Items.Clear();
-                List<ImageInfo> Result = ErzaDB.GetAllImages(Form1.Erza);
-                foreach(ImageInfo img in Result)
-                {
-                    imageListView1.Items.Add(img, img.Hash, adaptor);
-                }
-                imageListView1.ResumeLayout();
-                imageListView1.EnsureVisible(0);
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Result.Count.ToString();
-                return;
-            }
-            if (SelectIsTags())
-            {
-                string[] temp = this.tags_toolStripSpringTextBox.Text.Split(' ');
-                List<string> tags = new List<string>();
-                foreach (string tag in temp)
-                {
-                    if (!String.IsNullOrEmpty(tag))
-                    {
-                        tags.Add(tag);
-                    }
-                }
-                if (tags.Count > 1)
-                {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, Form1.Erza);
-                    foreach (ImageInfo img in Result)
-                    {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
-                    }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
-                }
-                else
-                {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    List<ImageInfo> Result;
-                    if (tags.Count == 1)
-                    {
-                        Result = ErzaDB.GetImagesByTag(tags[0], Form1.Erza);
-                    }
-                    else
-                    {
-                        Result = ErzaDB.GetAllImages(Form1.Erza);
-                    }
-                    foreach (ImageInfo img in Result)
-                    {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
-                    }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
-                }
-                if (imageListView1.Items.Count > 0)
-                {
-                    imageListView1.EnsureVisible(0);
-                }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
-                return;
-            }
-            if (SelectIsTagsOr())
-            {
-                string[] temp = this.tags_toolStripSpringTextBox.Text.Split(' ');
-                List<string> tags = new List<string>();
-                foreach (string tag in temp)
-                {
-                    if (!String.IsNullOrEmpty(tag))
-                    {
-                        tags.Add(tag);
-                    }
-                }
-                if (tags.Count > 1)
-                {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, Form1.Erza);
-                    foreach (ImageInfo img in Result)
-                    {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
-                    }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
-                }
-                else
-                {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    List<ImageInfo> Result;
-                    if (tags.Count == 1)
-                    {
-                        Result = ErzaDB.GetImagesByTag(tags[0], Form1.Erza);
-                    }
-                    else
-                    {
-                        Result = ErzaDB.GetAllImages(Form1.Erza);
-                    }
-                    foreach (ImageInfo img in Result)
-                    {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
-                    }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
-                }
-                if (imageListView1.Items.Count > 0)
-                {
-                    this.imageListView1.EnsureVisible(0);
-                }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
-                return;
-            }
-            if (SelectIsPartTag())
-            {
-                imageListView1.SuspendLayout();
-                imageListView1.Items.Clear();
-                List<ImageInfo> Result = ErzaDB.GetImagesByPartTag(this.tags_toolStripSpringTextBox.Text, Form1.Erza);
-                foreach (ImageInfo img in Result)
-                {
-                    imageListView1.Items.Add(img, img.Hash, adaptor);
-                }
-                imageListView1.ResumeLayout();
-                imageListView1.EnsureVisible(0);
-                if (imageListView1.Items.Count > 0)
-                {
-                    this.imageListView1.EnsureVisible(0);
-                }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
-                return;
-            }
-            if (SelectIsMD5())
-            {
-                ImageInfo img = ErzaDB.GetImageWithOutTags(this.tags_toolStripSpringTextBox.Text, Form1.Erza);
-                if (img != null)
-                {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    imageListView1.Items.Add(img, img.Hash, adaptor);
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
-                    if (imageListView1.Items.Count > 0)
-                    {
-                        this.imageListView1.EnsureVisible(0);
-                    }
-                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
-                }
-                else
-                {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    imageListView1.ResumeLayout();
-                }
-                return;
-            }
+
         }
         private bool SelectIsTags()
         {
-            if(this.option_toolStripComboBox.Text == "Теги")
+            if(this.option_comboBox.Text == "Теги")
             {
                 return true;
             }
@@ -672,7 +494,7 @@ namespace Ange
         }
         private bool SelectIsTagsOr()
         {
-            if (this.option_toolStripComboBox.Text == "Теги ИЛИ")
+            if (this.option_comboBox.Text == "Теги ИЛИ")
             {
                 return true;
             }
@@ -683,7 +505,7 @@ namespace Ange
         }
         private bool SelectIsPartTag()
         {
-            if (this.option_toolStripComboBox.Text == "Часть тега")
+            if (this.option_comboBox.Text == "Часть тега")
             {
                 return true;
             }
@@ -694,7 +516,7 @@ namespace Ange
         }
         private bool SelectIsMD5()
         {
-            if (this.option_toolStripComboBox.Text == "MD5")
+            if (this.option_comboBox.Text == "MD5")
             {
                 return true;
             }
@@ -702,25 +524,6 @@ namespace Ange
             {
                 return false;
             }
-        }
-        private void slideshow_toolStripButton_Click(object sender, EventArgs e)
-        {
-            SlideShowForm form = new SlideShowForm();
-            form.Result = new List<ImageInfo>();
-            foreach (ImageListViewItem item in this.imageListView1.Items)
-            {
-                form.Result.Add((ImageInfo)item.VirtualItemKey);
-            }
-            form.Index = 0;
-            if (MessageBox.Show("Выводить слайды в случайном порядке?", "Слайдшоу", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
-            {
-                form.RandomShow = true;
-            }
-            else
-            {
-                form.RandomShow = false;
-            }
-            form.ShowDialog();
         }
         #region Custom Item Adaptor
         private class CustomAdaptor : ImageListView.ImageListViewItemAdaptor
@@ -822,6 +625,186 @@ namespace Ange
         private void imageListView1_ItemDoubleClick(object sender, ItemClickEventArgs e)
         {
             ViewImageInWindow();
+        }
+
+        private void slide_show_button_Click(object sender, EventArgs e)
+        {
+            SlideShowForm form = new SlideShowForm();
+            form.Result = new List<ImageInfo>();
+            foreach (ImageListViewItem item in this.imageListView1.Items)
+            {
+                form.Result.Add((ImageInfo)item.VirtualItemKey);
+            }
+            form.Index = 0;
+            if (MessageBox.Show("Выводить слайды в случайном порядке?", "Слайдшоу", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+            {
+                form.RandomShow = true;
+            }
+            else
+            {
+                form.RandomShow = false;
+            }
+            form.ShowDialog();
+        }
+
+        private void search_button_Click(object sender, EventArgs e)
+        {
+            if (this.tags_textBox.Text.Length == 0)
+            {
+                imageListView1.SuspendLayout();
+                imageListView1.Items.Clear();
+                List<ImageInfo> Result = ErzaDB.GetAllImages(Form1.Erza);
+                foreach (ImageInfo img in Result)
+                {
+                    imageListView1.Items.Add(img, img.Hash, adaptor);
+                }
+                imageListView1.ResumeLayout();
+                imageListView1.EnsureVisible(0);
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + Result.Count.ToString();
+                return;
+            }
+            if (SelectIsTags())
+            {
+                string[] temp = this.tags_textBox.Text.Split(' ');
+                List<string> tags = new List<string>();
+                foreach (string tag in temp)
+                {
+                    if (!String.IsNullOrEmpty(tag))
+                    {
+                        tags.Add(tag);
+                    }
+                }
+                if (tags.Count > 1)
+                {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, Form1.Erza);
+                    foreach (ImageInfo img in Result)
+                    {
+                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                    }
+                    imageListView1.ResumeLayout();
+                    imageListView1.EnsureVisible(0);
+                }
+                else
+                {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    List<ImageInfo> Result;
+                    if (tags.Count == 1)
+                    {
+                        Result = ErzaDB.GetImagesByTag(tags[0], Form1.Erza);
+                    }
+                    else
+                    {
+                        Result = ErzaDB.GetAllImages(Form1.Erza);
+                    }
+                    foreach (ImageInfo img in Result)
+                    {
+                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                    }
+                    imageListView1.ResumeLayout();
+                    imageListView1.EnsureVisible(0);
+                }
+                if (imageListView1.Items.Count > 0)
+                {
+                    imageListView1.EnsureVisible(0);
+                }
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                return;
+            }
+            if (SelectIsTagsOr())
+            {
+                string[] temp = this.tags_textBox.Text.Split(' ');
+                List<string> tags = new List<string>();
+                foreach (string tag in temp)
+                {
+                    if (!String.IsNullOrEmpty(tag))
+                    {
+                        tags.Add(tag);
+                    }
+                }
+                if (tags.Count > 1)
+                {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, Form1.Erza);
+                    foreach (ImageInfo img in Result)
+                    {
+                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                    }
+                    imageListView1.ResumeLayout();
+                    imageListView1.EnsureVisible(0);
+                }
+                else
+                {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    List<ImageInfo> Result;
+                    if (tags.Count == 1)
+                    {
+                        Result = ErzaDB.GetImagesByTag(tags[0], Form1.Erza);
+                    }
+                    else
+                    {
+                        Result = ErzaDB.GetAllImages(Form1.Erza);
+                    }
+                    foreach (ImageInfo img in Result)
+                    {
+                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                    }
+                    imageListView1.ResumeLayout();
+                    imageListView1.EnsureVisible(0);
+                }
+                if (imageListView1.Items.Count > 0)
+                {
+                    this.imageListView1.EnsureVisible(0);
+                }
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                return;
+            }
+            if (SelectIsPartTag())
+            {
+                imageListView1.SuspendLayout();
+                imageListView1.Items.Clear();
+                List<ImageInfo> Result = ErzaDB.GetImagesByPartTag(this.tags_textBox.Text, Form1.Erza);
+                foreach (ImageInfo img in Result)
+                {
+                    imageListView1.Items.Add(img, img.Hash, adaptor);
+                }
+                imageListView1.ResumeLayout();
+                imageListView1.EnsureVisible(0);
+                if (imageListView1.Items.Count > 0)
+                {
+                    this.imageListView1.EnsureVisible(0);
+                }
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                return;
+            }
+            if (SelectIsMD5())
+            {
+                ImageInfo img = ErzaDB.GetImageWithOutTags(this.tags_textBox.Text, Form1.Erza);
+                if (img != null)
+                {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    imageListView1.Items.Add(img, img.Hash, adaptor);
+                    imageListView1.ResumeLayout();
+                    imageListView1.EnsureVisible(0);
+                    if (imageListView1.Items.Count > 0)
+                    {
+                        this.imageListView1.EnsureVisible(0);
+                    }
+                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                }
+                else
+                {
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    imageListView1.ResumeLayout();
+                }
+                return;
+            }
         }
     }
 
