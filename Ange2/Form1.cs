@@ -477,10 +477,6 @@ namespace Ange
             }
             return null;
         }
-        private void search_toolStripButton_Click(object sender, EventArgs e)
-        {
-
-        }
         private bool SelectIsTags()
         {
             if(this.option_comboBox.Text == "Теги")
@@ -804,6 +800,15 @@ namespace Ange
                     imageListView1.ResumeLayout();
                 }
                 return;
+            }
+        }
+        private void tags_textBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    search_button.PerformClick();
+                    break;
             }
         }
     }

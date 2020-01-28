@@ -75,89 +75,89 @@
             this.recreate_preview_ToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 268);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(357, 388);
             // 
             // view_in_window_ToolStripMenuItem
             // 
             this.view_in_window_ToolStripMenuItem.Name = "view_in_window_ToolStripMenuItem";
-            this.view_in_window_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.view_in_window_ToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.view_in_window_ToolStripMenuItem.Text = "Просмотр в окне";
             this.view_in_window_ToolStripMenuItem.Click += new System.EventHandler(this.view_in_window_ToolStripMenuItem_Click);
             // 
             // view_fullscreen_ToolStripMenuItem
             // 
             this.view_fullscreen_ToolStripMenuItem.Name = "view_fullscreen_ToolStripMenuItem";
-            this.view_fullscreen_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.view_fullscreen_ToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.view_fullscreen_ToolStripMenuItem.Text = "Просморт на полный экран";
             this.view_fullscreen_ToolStripMenuItem.Click += new System.EventHandler(this.view_fullscreen_ToolStripMenuItem_Click);
             // 
             // openOuterSoftToolStripMenuItem
             // 
             this.openOuterSoftToolStripMenuItem.Name = "openOuterSoftToolStripMenuItem";
-            this.openOuterSoftToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.openOuterSoftToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.openOuterSoftToolStripMenuItem.Text = "Открыть во внешней программе";
             this.openOuterSoftToolStripMenuItem.Click += new System.EventHandler(this.openOuterSoftToolStripMenuItem_Click);
             // 
             // edittagsToolStripMenuItem
             // 
             this.edittagsToolStripMenuItem.Name = "edittagsToolStripMenuItem";
-            this.edittagsToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.edittagsToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.edittagsToolStripMenuItem.Text = "Редактировать теги";
             this.edittagsToolStripMenuItem.Click += new System.EventHandler(this.edittagsToolStripMenuItem_Click);
             // 
             // slideshowToolStripMenuItem
             // 
             this.slideshowToolStripMenuItem.Name = "slideshowToolStripMenuItem";
-            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.slideshowToolStripMenuItem.Text = "Слайдшоу";
             this.slideshowToolStripMenuItem.Click += new System.EventHandler(this.slideshowToolStripMenuItem_Click);
             // 
             // copyhashToolStripMenuItem
             // 
             this.copyhashToolStripMenuItem.Name = "copyhashToolStripMenuItem";
-            this.copyhashToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.copyhashToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.copyhashToolStripMenuItem.Text = "Копировать хэш";
             this.copyhashToolStripMenuItem.Click += new System.EventHandler(this.copyhashToolStripMenuItem_Click);
             // 
             // copytowallToolStripMenuItem
             // 
             this.copytowallToolStripMenuItem.Name = "copytowallToolStripMenuItem";
-            this.copytowallToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.copytowallToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.copytowallToolStripMenuItem.Text = "Копировать в обои";
             this.copytowallToolStripMenuItem.Click += new System.EventHandler(this.copytowallToolStripMenuItem_Click);
             // 
             // copytodirToolStripMenuItem
             // 
             this.copytodirToolStripMenuItem.Name = "copytodirToolStripMenuItem";
-            this.copytodirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.copytodirToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.copytodirToolStripMenuItem.Text = "Копировать в каталог";
             this.copytodirToolStripMenuItem.Click += new System.EventHandler(this.copytodirToolStripMenuItem_Click);
             // 
             // copyAllToDirToolStripMenuItem
             // 
             this.copyAllToDirToolStripMenuItem.Name = "copyAllToDirToolStripMenuItem";
-            this.copyAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.copyAllToDirToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.copyAllToDirToolStripMenuItem.Text = "Копировать всё в каталог";
             this.copyAllToDirToolStripMenuItem.Click += new System.EventHandler(this.copyAllToDirToolStripMenuItem_Click);
             // 
             // MoveAllToDirToolStripMenuItem
             // 
             this.MoveAllToDirToolStripMenuItem.Name = "MoveAllToDirToolStripMenuItem";
-            this.MoveAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.MoveAllToDirToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.MoveAllToDirToolStripMenuItem.Text = "Переместить всё в каталог";
             this.MoveAllToDirToolStripMenuItem.Click += new System.EventHandler(this.MoveAllToDirToolStripMenuItem_Click);
             // 
             // recreate_preview_ToolStripMenuItem
             // 
             this.recreate_preview_ToolStripMenuItem.Name = "recreate_preview_ToolStripMenuItem";
-            this.recreate_preview_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.recreate_preview_ToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.recreate_preview_ToolStripMenuItem.Text = "Пересоздать эскиз";
             this.recreate_preview_ToolStripMenuItem.Click += new System.EventHandler(this.recreate_preview_ToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(356, 32);
             this.deleteToolStripMenuItem.Text = "Удалить";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -172,16 +172,17 @@
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 668);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 1030);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1283, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1924, 32);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(136, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(204, 25);
             this.toolStripStatusLabel1.Text = "Изображений найдено:";
             // 
             // autocompleteMenu1
@@ -198,10 +199,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.autocompleteMenu1.SetAutocompleteMenu(this.tags_textBox, this.autocompleteMenu1);
             this.tags_textBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.tags_textBox.Location = new System.Drawing.Point(0, 4);
+            this.tags_textBox.Location = new System.Drawing.Point(0, 6);
+            this.tags_textBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tags_textBox.Name = "tags_textBox";
-            this.tags_textBox.Size = new System.Drawing.Size(1080, 29);
+            this.tags_textBox.Size = new System.Drawing.Size(1618, 40);
             this.tags_textBox.TabIndex = 8;
+            this.tags_textBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tags_textBox_KeyDown);
             // 
             // option_comboBox
             // 
@@ -214,18 +217,20 @@
             "Теги ИЛИ",
             "Часть тега",
             "MD5"});
-            this.option_comboBox.Location = new System.Drawing.Point(1086, 3);
+            this.option_comboBox.Location = new System.Drawing.Point(1629, 5);
+            this.option_comboBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.option_comboBox.Name = "option_comboBox";
-            this.option_comboBox.Size = new System.Drawing.Size(121, 32);
+            this.option_comboBox.Size = new System.Drawing.Size(180, 41);
             this.option_comboBox.TabIndex = 9;
             // 
             // search_button
             // 
             this.search_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.search_button.Image = global::Ange.Properties.Resources.search25;
-            this.search_button.Location = new System.Drawing.Point(1212, 3);
+            this.search_button.Location = new System.Drawing.Point(1818, 5);
+            this.search_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.search_button.Name = "search_button";
-            this.search_button.Size = new System.Drawing.Size(32, 32);
+            this.search_button.Size = new System.Drawing.Size(48, 49);
             this.search_button.TabIndex = 10;
             this.search_button.UseVisualStyleBackColor = true;
             this.search_button.Click += new System.EventHandler(this.search_button_Click);
@@ -234,9 +239,10 @@
             // 
             this.slide_show_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.slide_show_button.Image = global::Ange.Properties.Resources.images25;
-            this.slide_show_button.Location = new System.Drawing.Point(1248, 3);
+            this.slide_show_button.Location = new System.Drawing.Point(1872, 5);
+            this.slide_show_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.slide_show_button.Name = "slide_show_button";
-            this.slide_show_button.Size = new System.Drawing.Size(32, 32);
+            this.slide_show_button.Size = new System.Drawing.Size(48, 49);
             this.slide_show_button.TabIndex = 11;
             this.slide_show_button.UseVisualStyleBackColor = true;
             this.slide_show_button.Click += new System.EventHandler(this.slide_show_button_Click);
@@ -247,11 +253,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.imageListView1.ContextMenuStrip = this.contextMenuStrip1;
-            this.imageListView1.Location = new System.Drawing.Point(0, 41);
+            this.imageListView1.Location = new System.Drawing.Point(0, 63);
+            this.imageListView1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.imageListView1.Name = "imageListView1";
             this.imageListView1.PersistentCacheDirectory = "";
             this.imageListView1.PersistentCacheSize = ((long)(100));
-            this.imageListView1.Size = new System.Drawing.Size(1283, 627);
+            this.imageListView1.Size = new System.Drawing.Size(1924, 965);
             this.imageListView1.TabIndex = 7;
             this.imageListView1.ThumbnailSize = new System.Drawing.Size(300, 225);
             this.imageListView1.UseWIC = true;
@@ -260,9 +267,9 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1283, 690);
+            this.ClientSize = new System.Drawing.Size(1924, 1062);
             this.Controls.Add(this.slide_show_button);
             this.Controls.Add(this.search_button);
             this.Controls.Add(this.option_comboBox);
@@ -270,6 +277,7 @@
             this.Controls.Add(this.imageListView1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.Text = "Ange";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
