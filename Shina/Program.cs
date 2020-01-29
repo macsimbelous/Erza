@@ -448,7 +448,7 @@ namespace Shina
             var parser = new HtmlParser();
             try
             {
-                string page = DownloadString("https://chan.sankakucomplex.com/?tags=md5%3A000accdf872aae1e53935c46bdbcc668", BaseURL, proxy, UserAgent);
+                string page = DownloadString("https://chan.sankakucomplex.com/?tags=md5:" + md5, BaseURL, proxy, UserAgent);
                 var search = parser.ParseDocument(page);
                 var elem = search.QuerySelector("span.thumb");
                 string post_id = elem.Id.Replace("p", String.Empty);
