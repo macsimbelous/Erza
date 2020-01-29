@@ -44,34 +44,41 @@ namespace Maki
             EncoderParameters myEncoderParameters = new EncoderParameters(1);
             EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
             myEncoderParameters.Param[0] = myEncoderParameter;
-            SQLiteTransaction transact = conn.BeginTransaction();
-            foreach (string file in files)
+            List<string> files_to_preview = new List<string>();
+            for (int i=0;i< files.Length;i++)
             {
-                if (!ImageInfo.IsImageFile(file)) { continue; }
-                string hash = Path.GetFileNameWithoutExtension(file);
+                if (!ImageInfo.IsImageFile(files[i])) { continue; }
+                string hash = Path.GetFileNameWithoutExtension(files[i]);
                 if (ExistPreview(hash, conn))
                 {
-                    Console.WriteLine(file + " Уже есть в БД");
+                    Console.WriteLine($"[{i + 1}/{files.Length}] {files[i]} Уже есть в БД");
                 }
                 else
                 {
-                    Bitmap preview = CreateThumbnail(file, PreviewWidth, PreviewHeight);
-                    if (preview != null)
+                    files_to_preview.Add(files[i]);
+                }
+            }
+            Console.WriteLine("Добавляем превьюшки новых картинок.");
+            SQLiteTransaction transact = conn.BeginTransaction();
+            for (int i=0; i< files_to_preview.Count;i++)
+            {
+                string hash = Path.GetFileNameWithoutExtension(files_to_preview[i]);
+                Bitmap preview = CreateThumbnail(files_to_preview[i], PreviewWidth, PreviewHeight);
+                if (preview != null)
+                {
+                    using (MemoryStream stream = new MemoryStream())
                     {
-                        using (MemoryStream stream = new MemoryStream())
-                        {
-                            preview.Save(stream, jpgEncoder, myEncoderParameters);
-                            LoadPreviewToDB(hash, stream.ToArray(), conn);
-                        }
-                        Console.WriteLine(file + " Добавлен");
+                        preview.Save(stream, jpgEncoder, myEncoderParameters);
+                        LoadPreviewToDB(hash, stream.ToArray(), conn);
                     }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(file + " Ошибка!");
-                        Console.ResetColor();
-                        bad_files.Add(file);
-                    }
+                    Console.WriteLine($"[{i+1}/{files_to_preview.Count}] {files_to_preview[i]} Добавлен");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"{files_to_preview[i]} Ошибка!");
+                    Console.ResetColor();
+                    bad_files.Add(files_to_preview[i]);
                 }
             }
             transact.Commit();
