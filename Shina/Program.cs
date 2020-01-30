@@ -38,7 +38,11 @@ namespace Shina
     class Program
     {
         static int error = 0;
+#if DEBUG
+        static bool USE_PROXY = true;
+#else
         static bool USE_PROXY = false;
+#endif
         static MiniLogger log = null;
         static void Main(string[] args)
         {
@@ -137,7 +141,7 @@ namespace Shina
                     log.Write(ex.Message);
                     log.Write(ex.StackTrace);
                 }
-                Thread.Sleep(7000);
+                Thread.Sleep(3000);
             }
             Console.WriteLine("Запрошено:\t{0}\nПолучено:\t{1}\nОшибочно:\t{2}", hashs.Length, success, error);
             Connection.Close();
@@ -400,7 +404,7 @@ namespace Shina
                 }
             }
         }
-        #region Sankaku
+#region Sankaku
         static string[] GetTagsFromSankaku(string md5, string BaseURL, string UserAgent, WebProxy proxy, string RawCookies, out int SankakuPostId)
         {
             SankakuPostId = -1;
@@ -451,18 +455,27 @@ namespace Shina
                 string page = DownloadString("https://chan.sankakucomplex.com/?tags=md5:" + md5, BaseURL, proxy, UserAgent);
                 var search = parser.ParseDocument(page);
                 var elem = search.QuerySelector("span.thumb");
-                string post_id = elem.Id.Replace("p", String.Empty);
-                string strURL = BaseURL + "post/show/" + post_id;
-                string post = DownloadString(strURL, BaseURL, proxy, UserAgent);
-                var document = parser.ParseDocument(post);
-                string tags = document.Title.Replace(" | Sankaku Channel", String.Empty);
-                string[] arr = tags.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 0; i < arr.Length; i++)
+                if (elem != null)
                 {
-                    arr[i] = arr[i].Replace(' ', '_');
-                    Console.WriteLine(arr[i]);
+
+
+                    string post_id = elem.Id.Replace("p", String.Empty);
+                    string strURL = BaseURL + "post/show/" + post_id;
+                    string post = DownloadString(strURL, BaseURL, proxy, UserAgent);
+                    var document = parser.ParseDocument(post);
+                    string tags = document.Title.Replace(" | Sankaku Channel", String.Empty);
+                    string[] arr = tags.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        arr[i] = arr[i].Replace(' ', '_');
+                        //Console.WriteLine(arr[i]);
+                    }
+                    return arr;
                 }
-                return arr;
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
@@ -555,6 +568,6 @@ namespace Shina
             }
             return temp;
         }
-        #endregion
+#endregion
     }
 }
