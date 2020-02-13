@@ -69,7 +69,16 @@ namespace Maki
                     using (MemoryStream stream = new MemoryStream())
                     {
                         preview.Save(stream, jpgEncoder, myEncoderParameters);
-                        LoadPreviewToDB(hash, stream.ToArray(), conn);
+                        try
+                        {
+                            LoadPreviewToDB(hash, stream.ToArray(), conn);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(ex.Message);
+                            Console.ResetColor();
+                        }
                     }
                     Console.WriteLine($"[{i+1}/{files_to_preview.Count}] {files_to_preview[i]} Добавлен");
                 }
