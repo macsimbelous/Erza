@@ -624,7 +624,7 @@ namespace Shinon
         static bool ImageIsBig(string Path)
         {
             FileInfo fi = new FileInfo(Path);
-            if(fi.Length >= 8000000)
+            if(fi.Length >= 1000000)
             {
                 return true;
             }
@@ -635,14 +635,18 @@ namespace Shinon
                 {
                     return true;
                 }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Не удалось определить разрешение!");
                 Console.ResetColor();
+                return true;
             }
-            return false;
         }
         static Size GetImageSize(string Path)
         {
@@ -652,24 +656,20 @@ namespace Shinon
             }
             catch (Exception)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ImageHelper.GetDimensions не сработал переходим к второму варианту...");
+                Console.ResetColor();
             }
-            TagLib.File file = null;
-            try
+            TagLib.File file = TagLib.File.Create(Path);
+            var image = file as TagLib.Image.File;
+            if (image.Properties != null)
             {
-                file = TagLib.File.Create(Path);
-                var image = file as TagLib.Image.File;
-                if (image.Properties != null)
-                {
-                    Size s = new Size();
-                    s.Height = image.Properties.PhotoHeight;
-                    s.Width = image.Properties.PhotoWidth;
-                    return s;
-                }
+                Size s = new Size();
+                s.Height = image.Properties.PhotoHeight;
+                s.Width = image.Properties.PhotoWidth;
+                return s;
             }
-            catch (Exception)
-            {
-            }
-            throw new Exception();
+            throw new Exception("TagLib не сработал");
         }
         static Size GetImageSize2(string Path)
         {
