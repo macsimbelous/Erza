@@ -68,11 +68,31 @@ namespace Shinon
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("ОК");
                         Console.ResetColor();
-                        imgs[i].Tags = GetTagsFromIqdb(stream, client);
+                        try
+                        {
+                            imgs[i].Tags = GetTagsFromIqdb(stream, client);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Не удалось получить теги!");
+                            Console.WriteLine(ex.Message);
+                            Console.ResetColor();
+                        }
                     }
                     else
                     {
-                        imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, client);
+                        try
+                        {
+                            imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, client);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Не удалось получить теги!");
+                            Console.WriteLine(ex.Message);
+                            Console.ResetColor();
+                        }
                     }
                     Console.WriteLine($"Найдено {imgs[i].Tags.Count} тегов");
                     if (imgs[i].Tags.Count > 0)
@@ -85,6 +105,7 @@ namespace Shinon
                         Console.WriteLine("ОК");
                         Console.ResetColor();
                     }
+                    RemoveItemFromCache(imgs[i].ImageID);
                 }
                 catch (Exception ex)
                 {
@@ -93,7 +114,6 @@ namespace Shinon
                     Console.ResetColor();
                     error++;
                 }
-                RemoveItemFromCache(imgs[i].ImageID);
             }
             Console.WriteLine($"Ошибок: {error}");
             Connection.Close();

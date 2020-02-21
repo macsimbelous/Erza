@@ -128,6 +128,7 @@ namespace Ange
                 form.ShowDialog();
                 if (form.ResultChanged)
                 {
+                    imageListView1.Items.Clear();
                     foreach (ImageInfo img in form.Result)
                     {
                         imageListView1.Items.Add(img, img.Hash, adaptor);
@@ -622,7 +623,6 @@ namespace Ange
         {
             ViewImageInWindow();
         }
-
         private void slide_show_button_Click(object sender, EventArgs e)
         {
             SlideShowForm form = new SlideShowForm();
@@ -642,7 +642,6 @@ namespace Ange
             }
             form.ShowDialog();
         }
-
         private void search_button_Click(object sender, EventArgs e)
         {
             if (this.tags_textBox.Text.Length == 0)
