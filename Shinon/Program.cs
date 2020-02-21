@@ -78,6 +78,7 @@ namespace Shinon
                             Console.WriteLine("Не удалось получить теги!");
                             Console.WriteLine(ex.Message);
                             Console.ResetColor();
+                            continue;
                         }
                     }
                     else
@@ -92,6 +93,7 @@ namespace Shinon
                             Console.WriteLine("Не удалось получить теги!");
                             Console.WriteLine(ex.Message);
                             Console.ResetColor();
+                            continue;
                         }
                     }
                     Console.WriteLine($"Найдено {imgs[i].Tags.Count} тегов");
