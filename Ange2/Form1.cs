@@ -48,11 +48,11 @@ namespace Ange
         private void Form1_Load(object sender, EventArgs e)
         {
             //Form1.Erza = new SQLiteConnection("data source="+ Application.StartupPath + "\\Erza.sqlite");
-            Form1.Erza = new SQLiteConnection("data source=C:\\utils\\data\\Erza.sqlite");
+            Form1.Erza = new SQLiteConnection(Properties.Settings.Default.Erza);
             Form1.Erza.Open();
             //this.Previews = new SQLiteConnection("data source=" + Application.StartupPath + "\\Previews.sqlite");
             //this.Previews = new SQLiteConnection("data source=C:\\utils\\data\\Previews.sqlite");
-            Form1.Previews = new SQLiteConnection("data source=E:\\Previews.sqlite");
+            Form1.Previews = new SQLiteConnection(Properties.Settings.Default.Previews);
             Form1.Previews.Open();
             //this.brush = new SolidBrush(Color.Orange);
             adaptor = new CustomAdaptor();
@@ -105,11 +105,16 @@ namespace Ange
             }
             this.option_comboBox.SelectedIndex = 0;
             this.DoubleBuffered = true;
+            this.Size = Properties.Settings.Default.SizeWindow;
+            this.Location = Properties.Settings.Default.LocationWindow;
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Form1.Previews.Close();
             Form1.Erza.Close();
+            Properties.Settings.Default.SizeWindow = this.Size;
+            Properties.Settings.Default.LocationWindow = this.Location;
+            Properties.Settings.Default.Save();
             //this.brush.Dispose();
         }
         private void view_fullscreen_ToolStripMenuItem_Click(object sender, EventArgs e)
