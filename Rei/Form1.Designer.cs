@@ -44,6 +44,14 @@
             this.label5 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ps1_button = new System.Windows.Forms.Button();
+            this.bat_button = new System.Windows.Forms.Button();
+            this.getgelbooru_checkBox = new System.Windows.Forms.CheckBox();
+            this.getidol_checkBox = new System.Windows.Forms.CheckBox();
+            this.erza_checkBox = new System.Windows.Forms.CheckBox();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // listBox1
@@ -51,10 +59,12 @@
             this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 20;
             this.listBox1.Location = new System.Drawing.Point(3, 22);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(510, 615);
+            this.listBox1.Size = new System.Drawing.Size(510, 604);
             this.listBox1.TabIndex = 0;
             this.listBox1.SelectedValueChanged += new System.EventHandler(this.listBox1_SelectedValueChanged);
             // 
@@ -181,9 +191,10 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(0, 6);
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label5.Location = new System.Drawing.Point(2, 1);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(75, 13);
+            this.label5.Size = new System.Drawing.Size(110, 20);
             this.label5.TabIndex = 13;
             this.label5.Text = "Список тегов";
             // 
@@ -202,11 +213,77 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.ps1_button);
+            this.groupBox1.Controls.Add(this.bat_button);
+            this.groupBox1.Controls.Add(this.getgelbooru_checkBox);
+            this.groupBox1.Controls.Add(this.getidol_checkBox);
+            this.groupBox1.Controls.Add(this.erza_checkBox);
+            this.groupBox1.Location = new System.Drawing.Point(519, 351);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(359, 89);
+            this.groupBox1.TabIndex = 14;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Генерация скриптов закачьки";
+            // 
+            // ps1_button
+            // 
+            this.ps1_button.Location = new System.Drawing.Point(277, 48);
+            this.ps1_button.Name = "ps1_button";
+            this.ps1_button.Size = new System.Drawing.Size(75, 23);
+            this.ps1_button.TabIndex = 4;
+            this.ps1_button.Text = "PS1";
+            this.ps1_button.UseVisualStyleBackColor = true;
+            this.ps1_button.Click += new System.EventHandler(this.ps1_button_Click);
+            // 
+            // bat_button
+            // 
+            this.bat_button.Location = new System.Drawing.Point(277, 19);
+            this.bat_button.Name = "bat_button";
+            this.bat_button.Size = new System.Drawing.Size(75, 23);
+            this.bat_button.TabIndex = 3;
+            this.bat_button.Text = "BAT";
+            this.bat_button.UseVisualStyleBackColor = true;
+            this.bat_button.Click += new System.EventHandler(this.bat_button_Click);
+            // 
+            // getgelbooru_checkBox
+            // 
+            this.getgelbooru_checkBox.AutoSize = true;
+            this.getgelbooru_checkBox.Location = new System.Drawing.Point(6, 67);
+            this.getgelbooru_checkBox.Name = "getgelbooru_checkBox";
+            this.getgelbooru_checkBox.Size = new System.Drawing.Size(86, 17);
+            this.getgelbooru_checkBox.TabIndex = 2;
+            this.getgelbooru_checkBox.Text = "GetGelbooru";
+            this.getgelbooru_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // getidol_checkBox
+            // 
+            this.getidol_checkBox.AutoSize = true;
+            this.getidol_checkBox.Location = new System.Drawing.Point(6, 43);
+            this.getidol_checkBox.Name = "getidol_checkBox";
+            this.getidol_checkBox.Size = new System.Drawing.Size(59, 17);
+            this.getidol_checkBox.TabIndex = 1;
+            this.getidol_checkBox.Text = "Getidol";
+            this.getidol_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // erza_checkBox
+            // 
+            this.erza_checkBox.AutoSize = true;
+            this.erza_checkBox.Location = new System.Drawing.Point(6, 19);
+            this.erza_checkBox.Name = "erza_checkBox";
+            this.erza_checkBox.Size = new System.Drawing.Size(47, 17);
+            this.erza_checkBox.TabIndex = 0;
+            this.erza_checkBox.Text = "Erza";
+            this.erza_checkBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(883, 641);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.del_button);
@@ -226,6 +303,8 @@
             this.Text = "Rei";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -249,6 +328,13 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button bat_button;
+        private System.Windows.Forms.CheckBox getgelbooru_checkBox;
+        private System.Windows.Forms.CheckBox getidol_checkBox;
+        private System.Windows.Forms.CheckBox erza_checkBox;
+        private System.Windows.Forms.Button ps1_button;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 

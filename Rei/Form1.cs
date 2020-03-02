@@ -207,7 +207,15 @@ namespace Rei
                         command.Parameters.AddWithValue("type", ((TypeTag)type_comboBox.SelectedItem).Type);
                         command.Parameters.AddWithValue("description", description_textBox.Text);
                         command.Connection = Connection;
-                        command.ExecuteNonQuery();
+                        try
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("Такой тег уже есть!", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
                     }
                     Tags.Add(tag_textBox.Text);
                     listBox1.SelectedItem = tag_textBox.Text;
@@ -324,6 +332,61 @@ namespace Rei
             {
                 OutElement = Element;
                 return false;
+            }
+        }
+
+        private void bat_button_Click(object sender, EventArgs e)
+        {
+            this.saveFileDialog1.Filter = "BAT files (*.bat)|*.bat|All files (*.*)|*.*";
+            this.saveFileDialog1.DefaultExt = "bat";
+            if (this.saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(this.saveFileDialog1.FileName))
+                {
+                    foreach (string tag in Tags)
+                    {
+                        if (erza_checkBox.Checked)
+                        {
+                            file.WriteLine($"erza \"{tag}\"");
+                        }
+                        if (getgelbooru_checkBox.Checked)
+                        {
+                            file.WriteLine($"getgelbooru \"{tag}\"");
+                        }
+                        if (getidol_checkBox.Checked)
+                        {
+                            file.WriteLine($"getidol \"{tag}\"");
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ps1_button_Click(object sender, EventArgs e)
+        {
+            this.saveFileDialog1.Filter = "PS1 files (*.ps1)|*.ps1|All files (*.*)|*.*";
+            this.saveFileDialog1.DefaultExt = "ps1";
+            if (this.saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(this.saveFileDialog1.FileName))
+                {
+                    foreach (string temp in Tags)
+                    {
+                        string tag = temp.Replace("`", "``").Replace("\"", "`\"");
+                        if (erza_checkBox.Checked)
+                        {
+                            file.WriteLine($"erza \"{tag}\"");
+                        }
+                        if (getgelbooru_checkBox.Checked)
+                        {
+                            file.WriteLine($"getgelbooru \"{tag}\"");
+                        }
+                        if (getidol_checkBox.Checked)
+                        {
+                            file.WriteLine($"getidol \"{tag}\"");
+                        }
+                    }
+                }
             }
         }
     }
