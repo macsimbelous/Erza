@@ -24,7 +24,7 @@ using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.IO;
 using System.Threading;
-using Microsoft.WindowsAPICodePack.Taskbar;
+using System.Text.RegularExpressions;
 
 namespace Rena
 {
@@ -35,7 +35,6 @@ namespace Rena
         Thread thread;
         SynchronizationContext synchronizationContext;
         List<String> files;
-        TaskbarManager instanceTaskBar = TaskbarManager.Instance;
         public Form1()
         {
             InitializeComponent();
@@ -59,16 +58,15 @@ namespace Rena
         private void RefreshProgress(object progress) // это для вызова  через Пост/Сенд
         {
             progressBar1.Value = (int)progress;
-            instanceTaskBar.SetProgressValue((int)progress, files.Count);
         }
         private void EndProgress(object status)
         {
             this.start_button.Enabled = true;
             this.stop_button.Enabled = false;
-            instanceTaskBar.SetOverlayIcon(Rena.Properties.Resources.Icon1, "Готово");
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            folderBrowserDialog1.SelectedPath = Properties.Settings.Default.SelectedPath;
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 textBox1.Text = folderBrowserDialog1.SelectedPath;
@@ -125,7 +123,6 @@ namespace Rena
             this.abort = false;
             this.start_button.Enabled = false;
             this.stop_button.Enabled = true;
-            instanceTaskBar.SetOverlayIcon(null, "");
             if (this.radioButton_SHA1.Checked == true)
             {
                 synchronizationContext = SynchronizationContext.Current;
@@ -189,6 +186,7 @@ namespace Rena
         }
         private void md5_enc(List<String> fs)
         {
+            Regex rx = new Regex("^[a-f0-9]{32}$", RegexOptions.Compiled);
             MD5 hash_enc = MD5.Create();
             int c = 0;
             int dup = 0;
@@ -200,7 +198,10 @@ namespace Rena
                 }
                 if (IsImageFile(fs[i]))
                 {
-                    
+                    if (SkipFile_checkBox.Checked && IsMD5(Path.GetFileNameWithoutExtension(fs[i]), rx))
+                    {
+                        continue;
+                    }
                     FileStream fsData = new FileStream(fs[i], FileMode.Open, FileAccess.Read);
                     byte[] hash = hash_enc.ComputeHash(fsData);
                     fsData.Close();
@@ -264,68 +265,61 @@ namespace Rena
             synchronizationContext.Post(ConsoleMsg, "Файлов обработано: " + (c - dup).ToString() + " Дубликатов: " + dup.ToString());
             return;
         }
-        private bool IsImageFile(string s)
+        public static bool IsImageFile(string FilePath)
         {
-            int t = s.LastIndexOf('.');
-            if (t >= 0)
+            string ext = Path.GetExtension(FilePath);
+            switch (ext.ToLower())
             {
-                string ext = s.Substring(t).ToLower();
-                switch (ext)
-                {
-                    case ".jpg":
-                        return true;
-                    //break;
-                    case ".jpeg":
-                        return true;
-                    //break;
-                    case ".png":
-                        return true;
-                    //break;
-                    case ".bmp":
-                        return true;
-                    //break;
-                    case ".gif":
-                        return true;
-                    //break;
-                    case ".tif":
-                        return true;
-                    //break;
-                    case ".tiff":
-                        return true;
-                    //break;
-
-                }
+                case ".jpg":
+                    return true;
+                case ".jpeg":
+                    return true;
+                case ".png":
+                    return true;
+                case ".bmp":
+                    return true;
+                case ".gif":
+                    return true;
+                case ".tif":
+                    return true;
+                case ".tiff":
+                    return true;
             }
             return false;
         }
-        private List<String> get_files(string NamePath)
-        {
-            //StringList Dirs = new StringList();
-            List<String> Dirs = new List<string>();
-            //folderBrowserDialog1.ShowDialog();
-            List<String> fs = new List<string>();
-            Dirs.Add(NamePath);
-            for (int dirs_count = 0; dirs_count < Dirs.Count; dirs_count++)
-            {
-                string[] names = Directory.GetFiles(Dirs[dirs_count]);
-                for (int index = 0; index < names.Length; index++)
-                {
-                    fs.Add(names[index]);
-                }
-                names = Directory.GetDirectories(Dirs[dirs_count]);
-                for (int index = 0; index < names.Length; index++)
-                {
-                    Dirs.Add(names[index]);
-                }
-            }
-            return fs;
-        }
-
         private void stop_button_Click(object sender, EventArgs e)
         {
             this.abort = true;
             this.start_button.Enabled = true;
             this.stop_button.Enabled = false;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Properties.Settings.Default.SizeWindow = this.Size;
+            Properties.Settings.Default.LocationWindow = this.Location;
+            Properties.Settings.Default.SelectedPath = textBox1.Text;
+            Properties.Settings.Default.Save();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            this.DoubleBuffered = true;
+            this.Size = Properties.Settings.Default.SizeWindow;
+            this.Location = Properties.Settings.Default.LocationWindow;
+            textBox1.Text = Properties.Settings.Default.SelectedPath;
+        }
+        public static bool IsMD5(string Text, Regex rx)
+        {
+            Match match = rx.Match(Text);
+            if (match.Success)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

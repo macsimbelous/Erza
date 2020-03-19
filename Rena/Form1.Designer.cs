@@ -40,6 +40,7 @@
             this.checkBox_subdir = new System.Windows.Forms.CheckBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.stop_button = new System.Windows.Forms.Button();
+            this.SkipFile_checkBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -148,11 +149,22 @@
             this.stop_button.UseVisualStyleBackColor = true;
             this.stop_button.Click += new System.EventHandler(this.stop_button_Click);
             // 
+            // SkipFile_checkBox
+            // 
+            this.SkipFile_checkBox.AutoSize = true;
+            this.SkipFile_checkBox.Location = new System.Drawing.Point(196, 53);
+            this.SkipFile_checkBox.Name = "SkipFile_checkBox";
+            this.SkipFile_checkBox.Size = new System.Drawing.Size(239, 17);
+            this.SkipFile_checkBox.TabIndex = 10;
+            this.SkipFile_checkBox.Text = "Пропускать если имя соответствует хэшу";
+            this.SkipFile_checkBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(556, 315);
+            this.Controls.Add(this.SkipFile_checkBox);
             this.Controls.Add(this.stop_button);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.checkBox_subdir);
@@ -166,6 +178,8 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Rena";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -184,6 +198,7 @@
         private System.Windows.Forms.CheckBox checkBox_subdir;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button stop_button;
+        private System.Windows.Forms.CheckBox SkipFile_checkBox;
     }
 }
 
