@@ -98,7 +98,7 @@ namespace GetGelbooru
                 Console.WriteLine("###### {0}/{1} ######", (i + 1), post_links.Count);
                 for (int ie = 0; ie < Program.config.LimitError; ie++)
                 {
-                    if (DownloadImage(post_links[i], path, "http://gelbooru.com/index.php?page=post&s=list&tags=" + tags_bilder.ToString(), cookies))
+                    if (DownloadImage(post_links[i], path, "https://gelbooru.com/index.php?page=post&s=list&tags=" + tags_bilder.ToString(), cookies))
                     {
                         count_complit++;
                         Thread.Sleep(2500);
@@ -182,11 +182,11 @@ namespace GetGelbooru
                     Console.WriteLine("Достигнут лимит страниц.");
                     break;
                 }
-                string url = String.Format("http://gelbooru.com/index.php?page=post&s=list&tags={0}&pid={1}", Tag, pid);
+                string url = String.Format("https://gelbooru.com/index.php?page=post&s=list&tags={0}&pid={1}", Tag, pid);
                 Console.WriteLine($"({pid}) Загружаем и парсим: {url}");
                 try
                 {
-                    string page = DownloadStringFromGelbooru(url, "http://gelbooru.com/", Cookies);
+                    string page = DownloadStringFromGelbooru(url, "https://gelbooru.com/", Cookies);
                     if (page == null)
                     {
                         if (errors < Program.config.LimitError)
@@ -228,7 +228,7 @@ namespace GetGelbooru
             var document = parser.ParseDocument(Page);
             foreach (IElement element in document.QuerySelectorAll("div"))
             {
-                if (element.GetAttribute("class") == "thumbnail-preview")
+                if (element.GetAttribute("class") == "thumbnail-preview poopC")
                 {
                     foreach (IElement link_element in element.QuerySelectorAll("a"))
                     {
@@ -371,7 +371,7 @@ namespace GetGelbooru
         {
             try
             {
-                HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create("http://gelbooru.com/index.php?page=account&s=login&code=00");
+                HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create("https://gelbooru.com/index.php?page=account&s=login&code=00");
                 if (Program.config.UseProxy)
                 {
                     WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);

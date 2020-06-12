@@ -34,8 +34,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GetOptNet, Version=3.1.4.0, Culture=neutral, PublicKeyToken=c9bf2c3a9070fff0, processorArchitecture=MSIL">
-      <HintPath>..\packages\GetOptNet.3.1.4\lib\net47\GetOptNet.dll</HintPath>
+    <Reference Include="GetOptNet, Version=4.0.8.0, Culture=neutral, PublicKeyToken=c9bf2c3a9070fff0, processorArchitecture=MSIL">
+      <HintPath>..\packages\GetOptNet.4.0.8\lib\net48\GetOptNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
