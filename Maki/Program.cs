@@ -32,7 +32,7 @@ namespace Maki
         static void Main(string[] args)
         {
             const int PreviewWidth = 300;
-            const int PreviewHeight = 225;
+            const int  PreviewHeight = 225;
             //string previews = "data source=C:\\utils\\data\\previews.sqlite";
             string previews = "data source=E:\\previews.sqlite";
             List<string> bad_files = new List<string>();
@@ -121,10 +121,14 @@ namespace Maki
                 }
                 transact.Commit();
             }
-            using (SQLiteCommand command = conn.CreateCommand())
+            if ((args.Length > 0) && (args[0] == "--vacuum"))
             {
-                command.CommandText = "vacuum;";
-                command.ExecuteNonQuery();
+                Console.WriteLine("Сжимаем БД.");
+                using (SQLiteCommand command = conn.CreateCommand())
+                {
+                    command.CommandText = "vacuum;";
+                    command.ExecuteNonQuery();
+                }
             }
             conn.Close();
             foreach(string s in bad_files)
