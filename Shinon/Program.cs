@@ -14,21 +14,35 @@ using ErzaLib;
 using System.Text.RegularExpressions;
 using TagLib;
 using ImageDimensions;
+using SauceNET;
 
 namespace Shinon
 {
     class Program
     {
         static bool USE_PROXY = true;
+        static bool USE_IQDB = false;
+        static bool USE_SAUCENAO = true;
         static WebProxy proxy;
         static int Width = 800;
         static int Height = 800;
+        //SauceNao API key.
+        static string apiKey = "1bd2ae9f569df998e36cdc2ee9791fec4a157439";
         static SQLiteConnection Connection;
         static void Main(string[] args)
         {
             proxy = new WebProxy("nalsjn.ru", 3128);
             proxy.Credentials = new NetworkCredential(System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
-            IIqdbClient client = new IqdbClient();
+            IIqdbClient iqdb_client = null;
+            if (USE_IQDB)
+            {
+                iqdb_client = new IqdbClient();
+            }
+            SauceNETClient sn_client = null;
+            if (USE_SAUCENAO)
+            {
+                sn_client = new SauceNETClient(apiKey);
+            }
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
             List<ImageInfo> imgs;
@@ -70,7 +84,14 @@ namespace Shinon
                         Console.ResetColor();
                         try
                         {
-                            imgs[i].Tags = GetTagsFromIqdb(stream, client);
+                            if (USE_IQDB)
+                            {
+                                imgs[i].Tags = GetTagsFromIqdb(stream, iqdb_client);
+                            }
+                            if (USE_SAUCENAO)
+                            {
+                                var sauce = sn_client.GetSauceAsync("https://i.imgur.com/WRCuQAG.jpg");
+                            }
                         }
                         catch (Exception ex)
                         {
