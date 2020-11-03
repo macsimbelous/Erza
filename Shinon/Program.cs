@@ -116,7 +116,7 @@ namespace Shinon
                             }
                             if (USE_SAUCENAO)
                             {
-                                imgs[i].Tags = GetTagsFromSauceNao(new FileStream(@"D:\YandexDisk\mod\6c0bd552b6567953fea4d432d6da84ea.png", FileMode.Open), imgs[i].FilePath, sn_client);
+                                imgs[i].Tags = GetTagsFromSauceNao(new FileStream(imgs[i].FilePath, FileMode.Open), imgs[i].FilePath, sn_client);
                             }
                         }
                         catch (Exception ex)
