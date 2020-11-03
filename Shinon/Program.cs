@@ -198,22 +198,22 @@ namespace Shinon
                     switch (item.Source)
                     {
                         case IqdbApi.Enums.Source.Danbooru:
-                            temp = GetImageInfoFromDanbooru(item.Url, proxy);
+                            temp = GetTagsFromDanbooru(item.Url, proxy);
                             if (temp != null)
                                 tags.AddRange(tags);
                             break;
                         case IqdbApi.Enums.Source.Konachan:
-                            temp = GetImageInfoFromKonachan(item.Url, proxy);
+                            temp = GetTagsFromKonachan(item.Url, proxy);
                             if (temp != null)
                                 tags.AddRange(tags);
                             break;
                         case IqdbApi.Enums.Source.Yandere:
-                            temp = GetImageInfoFromYandere(item.Url, proxy);
+                            temp = GetTagsFromYandere(item.Url, proxy);
                             if (temp != null)
                                 tags.AddRange(tags);
                             break;
                         case IqdbApi.Enums.Source.Gelbooru:
-                            temp = GetImageInfoFromGelbooru(item.Url, proxy);
+                            temp = GetTagsFromGelbooru(item.Url, proxy);
                             if (temp != null)
                                 tags.AddRange(tags);
                             break;
@@ -242,23 +242,23 @@ namespace Shinon
                     {
                         if (s.Contains("yande.re"))
                         {
-                            tags.AddRange(GetTagsFromYandere(s.Substring(s.LastIndexOf('/') + 1)));
+                            tags.AddRange(GetTagsFromYandere(s.Substring(s.LastIndexOf('/') + 1), proxy));
                         }
                         if (s.Contains("konachan.com"))
                         {
-                            tags.AddRange(GetTagsFromKonachan(s.Substring(s.LastIndexOf('/') + 1)));
+                            tags.AddRange(GetTagsFromKonachan(s.Substring(s.LastIndexOf('/') + 1), proxy));
                         }
                         if (s.Contains("danbooru.donmai.us"))
                         {
-
+                            tags.AddRange(GetTagsFromDanbooru(s.Substring(s.LastIndexOf('/') + 1), proxy));
                         }
                         if (s.Contains("gelbooru.com"))
                         {
-                            tags.AddRange(GetImageInfoFromGelbooru(s, proxy));
+                            tags.AddRange(GetTagsFromGelbooru(s.Substring(s.LastIndexOf('=') + 1), proxy));
                         }
                         if (s.Contains("chan.sankakucomplex.com"))
                         {
-
+                            tags.AddRange(GetTagsFromSankaku(s, proxy));
                         }
                     }
                 }
@@ -410,15 +410,14 @@ namespace Shinon
         }
         #endregion
         #region Myparsers
-        static string[] GetImageInfoFromDanbooru(string hash, WebProxy proxy)
+        static string[] GetTagsFromDanbooru(string PostID, WebProxy proxy)
         {
             WebClient Client = new WebClient();
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
             }
-            string post = hash.Replace("//danbooru.donmai.us/posts/", String.Empty);
-            string strURL = String.Format("http://danbooru.donmai.us/posts/{0}.xml?login={1}&api_key={2}", post, "macsimbelous", "KlKXxNoiLFiamylZi1E6iIZGV3x5ylouv-YEBN49U64");
+            string strURL = String.Format("http://danbooru.donmai.us/posts/{0}.xml", PostID);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -436,16 +435,16 @@ namespace Shinon
             }
             catch (WebException ex)
             {
-                ex.GetType();
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
-                ex.GetType();
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -456,7 +455,7 @@ namespace Shinon
                 }
             }
         }
-        static string[] GetImageInfoFromKonachan(string hash, WebProxy proxy)
+        static string[] GetTagsFromKonachan(string PostID, WebProxy proxy)
         {
             WebClient Client;
             Client = new WebClient();
@@ -464,7 +463,7 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("http://konachan.com/post.xml?tags=id:{0}", hash.Replace("//konachan.com/post/show/", String.Empty));
+            string strURL = String.Format("http://konachan.com/post.xml?tags=id:{0}", PostID);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -480,20 +479,21 @@ namespace Shinon
                             return node.Attributes[j].Value.Split(' ');
                         }
                     }
-                    return null;
                 }
                 return null;
             }
             catch (WebException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -504,7 +504,7 @@ namespace Shinon
                 }
             }
         }
-        static string[] GetImageInfoFromYandere(string hash, WebProxy proxy)
+        static string[] GetTagsFromYandere(string PostID, WebProxy proxy)
         {
             WebClient Client;
             Client = new WebClient();
@@ -512,7 +512,7 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = "https://yande.re/post.xml?tags=id:" + hash.Replace("https://yande.re/post/show/", String.Empty);
+            string strURL = "https://yande.re/post.xml?tags=id:" + PostID;
             try
             {
                 Uri uri = new Uri(strURL);
@@ -528,20 +528,21 @@ namespace Shinon
                             return node.Attributes[j].Value.Split(' ');
                         }
                     }
-                    return null;
                 }
                 return null;
             }
             catch (WebException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -552,7 +553,7 @@ namespace Shinon
                 }
             }
         }
-        static string[] GetImageInfoFromGelbooru(string hash, WebProxy proxy)
+        static string[] GetTagsFromGelbooru(string PostID, WebProxy proxy)
         {
             WebClient Client;
             Client = new WebClient();
@@ -560,7 +561,7 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("https://gelbooru.com/index.php?page=dapi&s=post&q=index&id={0}", hash.Replace("//gelbooru.com/index.php?page=post&s=view&id=", String.Empty));
+            string strURL = String.Format("https://gelbooru.com/index.php?page=dapi&s=post&q=index&id={0}", PostID);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -577,20 +578,21 @@ namespace Shinon
                             return node.Attributes[j].Value.Split(' ');
                         }
                     }
-                    return null;
                 }
                 return null;
             }
             catch (WebException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -601,7 +603,6 @@ namespace Shinon
                 }
             }
         }
-
         static string[] GetTagsFromSankaku(string BaseURL, WebProxy proxy)
         {
             //string BaseURL = "https://chan.sankakucomplex.com/";
@@ -611,8 +612,7 @@ namespace Shinon
             //sankaku_cookies = GetSankakuCookies(BaseURL + "user/authenticate", proxy, ua);
             try
             {
-                string strURL = "https:" + BaseURL;
-                string post = DownloadStringFromSankaku(strURL, BaseURL, null, proxy, ua);
+                string post = DownloadStringFromSankaku(BaseURL, BaseURL, null, proxy, ua);
                 List<string> tags = new List<string>();
                 //string tags_string = null;
                 Regex rx = new Regex("<title>(.+)</title>");
@@ -635,44 +635,9 @@ namespace Shinon
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
-                //Thread.Sleep(120000);
-                return null;
-            }
-        }
-        static string GetSankakuCookies(string url, WebProxy proxy, string ua)
-        {
-            try
-            {
-                HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(url);
-                if (USE_PROXY)
-                {
-                    loginRequest.Proxy = proxy;
-                }
-
-                loginRequest.UserAgent = ua;
-                loginRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
-                loginRequest.ContentType = "application/x-www-form-urlencoded";
-                loginRequest.Headers.Add("Accept-Encoding: identity");
-                loginRequest.CookieContainer = new CookieContainer();
-                loginRequest.Method = "POST";
-                string PostData = String.Format("user%5Bname%5D={0}&user%5Bpassword%5D={1}", "macsimbelous", "050782");
-                Encoding encoding = Encoding.UTF8;
-                byte[] byte1 = encoding.GetBytes(PostData);
-                loginRequest.ContentLength = byte1.Length;
-                using (Stream st = loginRequest.GetRequestStream())
-                {
-                    st.Write(byte1, 0, byte1.Length);
-                    st.Close();
-                }
-                loginRequest.AllowAutoRedirect = false;
-                HttpWebResponse loginResponse = (HttpWebResponse)loginRequest.GetResponse();
-                return loginResponse.Headers["Set-Cookie"];
-            }
-            catch (WebException we)
-            {
-                Console.WriteLine(we.Message);
+                Console.ResetColor();
                 return null;
             }
         }
@@ -698,18 +663,6 @@ namespace Shinon
                 source = reader.ReadToEnd();
             }
             return source;
-        }
-        static List<int> ParseHTML_sankaku(string html)
-        {
-            List<int> temp = new List<int>();
-            Regex rx_digit = new Regex("[0-9]+", RegexOptions.Compiled);
-            Regex rx = new Regex(@"PostModeMenu\.click\([0-9]*\)", RegexOptions.Compiled);
-            MatchCollection matches = rx.Matches(html);
-            foreach (Match match in matches)
-            {
-                temp.Add(int.Parse(rx_digit.Match(match.Value).Value));
-            }
-            return temp;
         }
         #endregion
         static bool ImageIsBig(string Path)
@@ -770,183 +723,6 @@ namespace Shinon
                 {
                     Size s = new Size(sourceImage.Width, sourceImage.Height);
                     return s;
-                }
-            }
-        }
-        static string[] GetTagsFromYandere(string PostID)
-        {
-            List<string> tags = new List<string>();
-            WebClient Client = new WebClient();
-            if (USE_PROXY)
-            {
-                Client.Proxy = proxy;
-            }
-            string strURL = String.Format("https://yande.re/post.xml?tags={0}", "id:" + PostID);
-            //Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
-            try
-            {
-                Uri uri = new Uri(strURL);
-
-                string xml = Client.DownloadString(uri);
-                if (xml == null)
-                {
-                    return null;
-                }
-                XmlDocument mXML = new XmlDocument();
-                mXML.LoadXml(xml);
-                XmlNodeList nodeList = mXML.GetElementsByTagName("posts");
-                XmlNode node = nodeList.Item(0);
-                int nLocalPostsCount = 0;
-                //Определяем число постов
-                for (int i = 0; i < node.Attributes.Count; i++)
-                {
-                    if (node.Attributes[i].Name == "count") nLocalPostsCount = Convert.ToInt32(node.Attributes[i].Value);
-                }
-                if (nLocalPostsCount <= 0)
-                {
-                    return null;
-                }
-
-                nodeList = mXML.GetElementsByTagName("post");
-                //Парсим посты
-                node = nodeList.Item(0);
-                for (int j = 0; j < node.Attributes.Count; j++)
-                {
-                    //Тэги
-                    if (node.Attributes[j].Name == "tags")
-                    {
-                        tags.AddRange(node.Attributes[j].Value.Split(' ')); //Получаем массив тэгов
-                    }
-                }
-                if (tags.Count <= 0)
-                {
-                    return null;
-                }
-                return tags.ToArray();
-            }
-            catch (Exception we)
-            {
-                Console.WriteLine("Ошибка: " + we.Message);
-                return null;
-            }
-            finally
-            {
-                if (Client != null)
-                {
-                    Client.Dispose();
-                }
-            }
-        }
-        static string[] GetTagsFromKonachan(string PostID)
-        {
-            List<string> tags = new List<string>();
-            WebClient Client = new WebClient();
-            if (USE_PROXY)
-            {
-                Client.Proxy = proxy;
-            }
-            string strURL = String.Format("http://konachan.com/post.xml?tags={0}", "id:" + PostID);
-            //Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
-            try
-            {
-                Uri uri = new Uri(strURL);
-
-                string xml = Client.DownloadString(uri);
-                if (xml == null)
-                {
-                    return null;
-                }
-                XmlDocument mXML = new XmlDocument();
-                mXML.LoadXml(xml);
-                XmlNodeList nodeList = mXML.GetElementsByTagName("posts");
-                XmlNode node = nodeList.Item(0);
-                int nLocalPostsCount = 0;
-                //Определяем число постов
-                for (int i = 0; i < node.Attributes.Count; i++)
-                {
-                    if (node.Attributes[i].Name == "count") nLocalPostsCount = Convert.ToInt32(node.Attributes[i].Value);
-                }
-                if (nLocalPostsCount <= 0)
-                {
-                    return null;
-                }
-
-                nodeList = mXML.GetElementsByTagName("post");
-                //Парсим посты
-                node = nodeList.Item(0);
-                for (int j = 0; j < node.Attributes.Count; j++)
-                {
-                    //Тэги
-                    if (node.Attributes[j].Name == "tags")
-                    {
-                        tags.AddRange(node.Attributes[j].Value.Split(' ')); //Получаем массив тэгов
-                    }
-                }
-                if (tags.Count <= 0)
-                {
-                    return null;
-                }
-                return tags.ToArray();
-            }
-            catch (Exception we)
-            {
-                Console.WriteLine("Ошибка: " + we.Message);
-                return null;
-            }
-            finally
-            {
-                if (Client != null)
-                {
-                    Client.Dispose();
-                }
-            }
-        }
-        static string[] GetTagsFromDanbooru(string PostID)
-        {
-            List<string> tags = new List<string>();
-            WebClient Client = new WebClient();
-            if (USE_PROXY)
-            {
-                Client.Proxy = proxy;
-            }
-            string strURL = String.Format("http://danbooru.donmai.us/posts.xml?tags={0}", "id:" + PostID);
-            //Console.WriteLine("({0}/ХЗ) Загружаем и парсим: {1}", img_list.Count, strURL);
-            try
-            {
-                Uri uri = new Uri(strURL);
-                string xml = Client.DownloadString(uri);
-                if (xml == null)
-                {
-                    return null;
-                }
-                XmlDocument mXML = new XmlDocument();
-                mXML.LoadXml(xml);
-                XmlNodeList nodeList = mXML.GetElementsByTagName("post");
-                //Парсим посты
-                foreach (XmlNode node in nodeList)
-                {
-                    XmlElement tags_s = node["tag-string"];
-                    tags.AddRange(tags_s.InnerText.Split(' '));
-                }
-                if (tags.Count <= 0)
-                {
-                    return null;
-                }
-                else
-                {
-                    return tags.ToArray();
-                }
-            }
-            catch (Exception we)
-            {
-                Console.WriteLine("Ошибка: " + we.Message);
-                return null;
-            }
-            finally
-            {
-                if (Client != null)
-                {
-                    Client.Dispose();
                 }
             }
         }
