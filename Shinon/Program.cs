@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using TagLib;
 using ImageDimensions;
 using SauceNET;
+using SauceNao10.Core.Services;
 
 namespace Shinon
 {
@@ -38,10 +39,12 @@ namespace Shinon
             {
                 iqdb_client = new IqdbClient();
             }
-            SauceNETClient sn_client = null;
+            SauceNaoService sn_client = null;
             if (USE_SAUCENAO)
             {
-                sn_client = new SauceNETClient(apiKey);
+                //sn_client = new SauceNETClient(apiKey);
+                sn_client = new SauceNaoService();
+                sn_client.ApiKey = apiKey;
             }
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
@@ -65,7 +68,7 @@ namespace Shinon
                 imgs = GetImagesFromCache();
             }
             int error = 0;
-            for(int i = 0; i < imgs.Count; i++)
+            for (int i = 0; i < imgs.Count; i++)
             {
                 try
                 {
@@ -90,7 +93,7 @@ namespace Shinon
                             }
                             if (USE_SAUCENAO)
                             {
-                                var sauce = sn_client.GetSauceAsync("https://i.imgur.com/WRCuQAG.jpg");
+                                imgs[i].Tags = GetTagsFromSauceNao(stream, imgs[i].FilePath, sn_client);
                             }
                         }
                         catch (Exception ex)
@@ -106,7 +109,15 @@ namespace Shinon
                     {
                         try
                         {
-                            imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, client);
+
+                            if (USE_IQDB)
+                            {
+                                imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, iqdb_client);
+                            }
+                            if (USE_SAUCENAO)
+                            {
+                                imgs[i].Tags = GetTagsFromSauceNao(new FileStream(@"D:\YandexDisk\mod\6c0bd552b6567953fea4d432d6da84ea.png", FileMode.Open), imgs[i].FilePath, sn_client);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -188,7 +199,7 @@ namespace Shinon
                     {
                         case IqdbApi.Enums.Source.Danbooru:
                             temp = GetImageInfoFromDanbooru(item.Url, proxy);
-                            if(temp != null)
+                            if (temp != null)
                                 tags.AddRange(tags);
                             break;
                         case IqdbApi.Enums.Source.Konachan:
@@ -216,6 +227,43 @@ namespace Shinon
                 }
                 tags = tags.Distinct().ToList();
             }
+            return tags;
+        }
+        static List<string> GetTagsFromSauceNao(Stream IStream, string Name, SauceNaoService Client)
+        {
+            List<string> tags = new List<string>();
+            var searchResults = Client.GetSauceAsync(IStream, Name);
+            foreach (var result in searchResults.Result)
+            {
+                if (result.Similarity > 80.0 && result.Sources != null)
+                {
+                    //string source2 = sauce2.Result[0].Title;
+                    foreach (string s in result.Sources)
+                    {
+                        if (s.Contains("yande.re"))
+                        {
+                            tags.AddRange(GetTagsFromYandere(s.Substring(s.LastIndexOf('/') + 1)));
+                        }
+                        if (s.Contains("konachan.com"))
+                        {
+                            tags.AddRange(GetTagsFromKonachan(s.Substring(s.LastIndexOf('/') + 1)));
+                        }
+                        if (s.Contains("danbooru.donmai.us"))
+                        {
+
+                        }
+                        if (s.Contains("gelbooru.com"))
+                        {
+                            tags.AddRange(GetImageInfoFromGelbooru(s, proxy));
+                        }
+                        if (s.Contains("chan.sankakucomplex.com"))
+                        {
+
+                        }
+                    }
+                }
+            }
+            tags = tags.Distinct().ToList();
             return tags;
         }
         static List<ImageInfo> GetImagesWithoutTags()
@@ -667,7 +715,7 @@ namespace Shinon
         static bool ImageIsBig(string Path)
         {
             FileInfo fi = new FileInfo(Path);
-            if(fi.Length >= 1000000)
+            if (fi.Length >= 1000000)
             {
                 return true;
             }
@@ -722,6 +770,183 @@ namespace Shinon
                 {
                     Size s = new Size(sourceImage.Width, sourceImage.Height);
                     return s;
+                }
+            }
+        }
+        static string[] GetTagsFromYandere(string PostID)
+        {
+            List<string> tags = new List<string>();
+            WebClient Client = new WebClient();
+            if (USE_PROXY)
+            {
+                Client.Proxy = proxy;
+            }
+            string strURL = String.Format("https://yande.re/post.xml?tags={0}", "id:" + PostID);
+            //Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
+            try
+            {
+                Uri uri = new Uri(strURL);
+
+                string xml = Client.DownloadString(uri);
+                if (xml == null)
+                {
+                    return null;
+                }
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(xml);
+                XmlNodeList nodeList = mXML.GetElementsByTagName("posts");
+                XmlNode node = nodeList.Item(0);
+                int nLocalPostsCount = 0;
+                //Определяем число постов
+                for (int i = 0; i < node.Attributes.Count; i++)
+                {
+                    if (node.Attributes[i].Name == "count") nLocalPostsCount = Convert.ToInt32(node.Attributes[i].Value);
+                }
+                if (nLocalPostsCount <= 0)
+                {
+                    return null;
+                }
+
+                nodeList = mXML.GetElementsByTagName("post");
+                //Парсим посты
+                node = nodeList.Item(0);
+                for (int j = 0; j < node.Attributes.Count; j++)
+                {
+                    //Тэги
+                    if (node.Attributes[j].Name == "tags")
+                    {
+                        tags.AddRange(node.Attributes[j].Value.Split(' ')); //Получаем массив тэгов
+                    }
+                }
+                if (tags.Count <= 0)
+                {
+                    return null;
+                }
+                return tags.ToArray();
+            }
+            catch (Exception we)
+            {
+                Console.WriteLine("Ошибка: " + we.Message);
+                return null;
+            }
+            finally
+            {
+                if (Client != null)
+                {
+                    Client.Dispose();
+                }
+            }
+        }
+        static string[] GetTagsFromKonachan(string PostID)
+        {
+            List<string> tags = new List<string>();
+            WebClient Client = new WebClient();
+            if (USE_PROXY)
+            {
+                Client.Proxy = proxy;
+            }
+            string strURL = String.Format("http://konachan.com/post.xml?tags={0}", "id:" + PostID);
+            //Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
+            try
+            {
+                Uri uri = new Uri(strURL);
+
+                string xml = Client.DownloadString(uri);
+                if (xml == null)
+                {
+                    return null;
+                }
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(xml);
+                XmlNodeList nodeList = mXML.GetElementsByTagName("posts");
+                XmlNode node = nodeList.Item(0);
+                int nLocalPostsCount = 0;
+                //Определяем число постов
+                for (int i = 0; i < node.Attributes.Count; i++)
+                {
+                    if (node.Attributes[i].Name == "count") nLocalPostsCount = Convert.ToInt32(node.Attributes[i].Value);
+                }
+                if (nLocalPostsCount <= 0)
+                {
+                    return null;
+                }
+
+                nodeList = mXML.GetElementsByTagName("post");
+                //Парсим посты
+                node = nodeList.Item(0);
+                for (int j = 0; j < node.Attributes.Count; j++)
+                {
+                    //Тэги
+                    if (node.Attributes[j].Name == "tags")
+                    {
+                        tags.AddRange(node.Attributes[j].Value.Split(' ')); //Получаем массив тэгов
+                    }
+                }
+                if (tags.Count <= 0)
+                {
+                    return null;
+                }
+                return tags.ToArray();
+            }
+            catch (Exception we)
+            {
+                Console.WriteLine("Ошибка: " + we.Message);
+                return null;
+            }
+            finally
+            {
+                if (Client != null)
+                {
+                    Client.Dispose();
+                }
+            }
+        }
+        static string[] GetTagsFromDanbooru(string PostID)
+        {
+            List<string> tags = new List<string>();
+            WebClient Client = new WebClient();
+            if (USE_PROXY)
+            {
+                Client.Proxy = proxy;
+            }
+            string strURL = String.Format("http://danbooru.donmai.us/posts.xml?tags={0}", "id:" + PostID);
+            //Console.WriteLine("({0}/ХЗ) Загружаем и парсим: {1}", img_list.Count, strURL);
+            try
+            {
+                Uri uri = new Uri(strURL);
+                string xml = Client.DownloadString(uri);
+                if (xml == null)
+                {
+                    return null;
+                }
+                XmlDocument mXML = new XmlDocument();
+                mXML.LoadXml(xml);
+                XmlNodeList nodeList = mXML.GetElementsByTagName("post");
+                //Парсим посты
+                foreach (XmlNode node in nodeList)
+                {
+                    XmlElement tags_s = node["tag-string"];
+                    tags.AddRange(tags_s.InnerText.Split(' '));
+                }
+                if (tags.Count <= 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return tags.ToArray();
+                }
+            }
+            catch (Exception we)
+            {
+                Console.WriteLine("Ошибка: " + we.Message);
+                return null;
+            }
+            finally
+            {
+                if (Client != null)
+                {
+                    Client.Dispose();
                 }
             }
         }
