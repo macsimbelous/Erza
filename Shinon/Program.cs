@@ -242,23 +242,43 @@ namespace Shinon
                     {
                         if (s.Contains("yande.re"))
                         {
-                            tags.AddRange(GetTagsFromYandere(s.Substring(s.LastIndexOf('/') + 1), proxy));
+                            string[] t = GetTagsFromYandere(s.Substring(s.LastIndexOf('/') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
                         }
                         if (s.Contains("konachan.com"))
                         {
-                            tags.AddRange(GetTagsFromKonachan(s.Substring(s.LastIndexOf('/') + 1), proxy));
+                            string[] t = GetTagsFromKonachan(s.Substring(s.LastIndexOf('/') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
                         }
                         if (s.Contains("danbooru.donmai.us"))
                         {
-                            tags.AddRange(GetTagsFromDanbooru(s.Substring(s.LastIndexOf('/') + 1), proxy));
+                            string[] t = GetTagsFromDanbooru(s.Substring(s.LastIndexOf('/') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
                         }
                         if (s.Contains("gelbooru.com"))
                         {
-                            tags.AddRange(GetTagsFromGelbooru(s.Substring(s.LastIndexOf('=') + 1), proxy));
+                            string[] t = GetTagsFromGelbooru(s.Substring(s.LastIndexOf('=') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
                         }
                         if (s.Contains("chan.sankakucomplex.com"))
                         {
-                            tags.AddRange(GetTagsFromSankaku(s, proxy));
+                            string[] t = GetTagsFromSankaku(s, proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
                         }
                     }
                 }
