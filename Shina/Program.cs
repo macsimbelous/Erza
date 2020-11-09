@@ -141,7 +141,7 @@ namespace Shina
                     log.Write(ex.Message);
                     log.Write(ex.StackTrace);
                 }
-                Thread.Sleep(5000);
+                Thread.Sleep(7000);
             }
             Console.WriteLine("Запрошено:\t{0}\nПолучено:\t{1}\nОшибочно:\t{2}", hashs.Length, success, error);
             Connection.Close();

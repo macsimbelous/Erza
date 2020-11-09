@@ -14,21 +14,38 @@ using ErzaLib;
 using System.Text.RegularExpressions;
 using TagLib;
 using ImageDimensions;
+using SauceNET;
+using SauceNao10.Core.Services;
 
 namespace Shinon
 {
     class Program
     {
         static bool USE_PROXY = true;
+        static bool USE_IQDB = false;
+        static bool USE_SAUCENAO = true;
         static WebProxy proxy;
         static int Width = 800;
         static int Height = 800;
+        //SauceNao API key.
+        static string apiKey = "1bd2ae9f569df998e36cdc2ee9791fec4a157439";
         static SQLiteConnection Connection;
         static void Main(string[] args)
         {
             proxy = new WebProxy("nalsjn.ru", 3128);
             proxy.Credentials = new NetworkCredential(System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
-            IIqdbClient client = new IqdbClient();
+            IIqdbClient iqdb_client = null;
+            if (USE_IQDB)
+            {
+                iqdb_client = new IqdbClient();
+            }
+            SauceNaoService sn_client = null;
+            if (USE_SAUCENAO)
+            {
+                //sn_client = new SauceNETClient(apiKey);
+                sn_client = new SauceNaoService();
+                sn_client.ApiKey = apiKey;
+            }
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
             List<ImageInfo> imgs;
@@ -51,7 +68,7 @@ namespace Shinon
                 imgs = GetImagesFromCache();
             }
             int error = 0;
-            for(int i = 0; i < imgs.Count; i++)
+            for (int i = 0; i < imgs.Count; i++)
             {
                 try
                 {
@@ -70,7 +87,14 @@ namespace Shinon
                         Console.ResetColor();
                         try
                         {
-                            imgs[i].Tags = GetTagsFromIqdb(stream, client);
+                            if (USE_IQDB)
+                            {
+                                imgs[i].Tags = GetTagsFromIqdb(stream, iqdb_client);
+                            }
+                            if (USE_SAUCENAO)
+                            {
+                                imgs[i].Tags = GetTagsFromSauceNao(stream, imgs[i].FilePath, sn_client);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -85,7 +109,15 @@ namespace Shinon
                     {
                         try
                         {
-                            imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, client);
+
+                            if (USE_IQDB)
+                            {
+                                imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, iqdb_client);
+                            }
+                            if (USE_SAUCENAO)
+                            {
+                                imgs[i].Tags = GetTagsFromSauceNao(new FileStream(imgs[i].FilePath, FileMode.Open), imgs[i].FilePath, sn_client);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -172,22 +204,22 @@ namespace Shinon
                     switch (item.Source)
                     {
                         case IqdbApi.Enums.Source.Danbooru:
-                            temp = GetImageInfoFromDanbooru(item.Url, proxy);
-                            if(temp != null)
+                            temp = GetTagsFromDanbooru(item.Url, proxy);
+                            if (temp != null)
                                 tags.AddRange(tags);
                             break;
                         case IqdbApi.Enums.Source.Konachan:
-                            temp = GetImageInfoFromKonachan(item.Url, proxy);
+                            temp = GetTagsFromKonachan(item.Url, proxy);
                             if (temp != null)
                                 tags.AddRange(tags);
                             break;
                         case IqdbApi.Enums.Source.Yandere:
-                            temp = GetImageInfoFromYandere(item.Url, proxy);
+                            temp = GetTagsFromYandere(item.Url, proxy);
                             if (temp != null)
                                 tags.AddRange(tags);
                             break;
                         case IqdbApi.Enums.Source.Gelbooru:
-                            temp = GetImageInfoFromGelbooru(item.Url, proxy);
+                            temp = GetTagsFromGelbooru(item.Url, proxy);
                             if (temp != null)
                                 tags.AddRange(tags);
                             break;
@@ -201,6 +233,63 @@ namespace Shinon
                 }
                 tags = tags.Distinct().ToList();
             }
+            return tags;
+        }
+        static List<string> GetTagsFromSauceNao(Stream IStream, string Name, SauceNaoService Client)
+        {
+            List<string> tags = new List<string>();
+            var searchResults = Client.GetSauceAsync(IStream, Name);
+            foreach (var result in searchResults.Result)
+            {
+                if (result.Similarity > 80.0 && result.Sources != null)
+                {
+                    //string source2 = sauce2.Result[0].Title;
+                    foreach (string s in result.Sources)
+                    {
+                        if (s.Contains("yande.re"))
+                        {
+                            string[] t = GetTagsFromYandere(s.Substring(s.LastIndexOf('/') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
+                        }
+                        if (s.Contains("konachan.com"))
+                        {
+                            string[] t = GetTagsFromKonachan(s.Substring(s.LastIndexOf('/') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
+                        }
+                        if (s.Contains("danbooru.donmai.us"))
+                        {
+                            string[] t = GetTagsFromDanbooru(s.Substring(s.LastIndexOf('/') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
+                        }
+                        if (s.Contains("gelbooru.com"))
+                        {
+                            string[] t = GetTagsFromGelbooru(s.Substring(s.LastIndexOf('=') + 1), proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
+                        }
+                        if (s.Contains("chan.sankakucomplex.com"))
+                        {
+                            string[] t = GetTagsFromSankaku(s, proxy);
+                            if (t != null)
+                            {
+                                tags.AddRange(t);
+                            }
+                        }
+                    }
+                }
+            }
+            tags = tags.Distinct().ToList();
             return tags;
         }
         static List<ImageInfo> GetImagesWithoutTags()
@@ -347,15 +436,14 @@ namespace Shinon
         }
         #endregion
         #region Myparsers
-        static string[] GetImageInfoFromDanbooru(string hash, WebProxy proxy)
+        static string[] GetTagsFromDanbooru(string PostID, WebProxy proxy)
         {
             WebClient Client = new WebClient();
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
             }
-            string post = hash.Replace("//danbooru.donmai.us/posts/", String.Empty);
-            string strURL = String.Format("http://danbooru.donmai.us/posts/{0}.xml?login={1}&api_key={2}", post, "macsimbelous", "KlKXxNoiLFiamylZi1E6iIZGV3x5ylouv-YEBN49U64");
+            string strURL = String.Format("http://danbooru.donmai.us/posts/{0}.xml", PostID);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -373,16 +461,16 @@ namespace Shinon
             }
             catch (WebException ex)
             {
-                ex.GetType();
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
-                ex.GetType();
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -393,7 +481,7 @@ namespace Shinon
                 }
             }
         }
-        static string[] GetImageInfoFromKonachan(string hash, WebProxy proxy)
+        static string[] GetTagsFromKonachan(string PostID, WebProxy proxy)
         {
             WebClient Client;
             Client = new WebClient();
@@ -401,7 +489,7 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("http://konachan.com/post.xml?tags=id:{0}", hash.Replace("//konachan.com/post/show/", String.Empty));
+            string strURL = String.Format("http://konachan.com/post.xml?tags=id:{0}", PostID);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -417,20 +505,21 @@ namespace Shinon
                             return node.Attributes[j].Value.Split(' ');
                         }
                     }
-                    return null;
                 }
                 return null;
             }
             catch (WebException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -441,7 +530,7 @@ namespace Shinon
                 }
             }
         }
-        static string[] GetImageInfoFromYandere(string hash, WebProxy proxy)
+        static string[] GetTagsFromYandere(string PostID, WebProxy proxy)
         {
             WebClient Client;
             Client = new WebClient();
@@ -449,7 +538,7 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = "https://yande.re/post.xml?tags=id:" + hash.Replace("https://yande.re/post/show/", String.Empty);
+            string strURL = "https://yande.re/post.xml?tags=id:" + PostID;
             try
             {
                 Uri uri = new Uri(strURL);
@@ -465,20 +554,21 @@ namespace Shinon
                             return node.Attributes[j].Value.Split(' ');
                         }
                     }
-                    return null;
                 }
                 return null;
             }
             catch (WebException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -489,7 +579,7 @@ namespace Shinon
                 }
             }
         }
-        static string[] GetImageInfoFromGelbooru(string hash, WebProxy proxy)
+        static string[] GetTagsFromGelbooru(string PostID, WebProxy proxy)
         {
             WebClient Client;
             Client = new WebClient();
@@ -497,7 +587,7 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("https://gelbooru.com/index.php?page=dapi&s=post&q=index&id={0}", hash.Replace("//gelbooru.com/index.php?page=post&s=view&id=", String.Empty));
+            string strURL = String.Format("https://gelbooru.com/index.php?page=dapi&s=post&q=index&id={0}", PostID);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -514,20 +604,21 @@ namespace Shinon
                             return node.Attributes[j].Value.Split(' ');
                         }
                     }
-                    return null;
                 }
                 return null;
             }
             catch (WebException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
+                Console.ResetColor();
                 return null;
             }
             finally
@@ -538,7 +629,6 @@ namespace Shinon
                 }
             }
         }
-
         static string[] GetTagsFromSankaku(string BaseURL, WebProxy proxy)
         {
             //string BaseURL = "https://chan.sankakucomplex.com/";
@@ -548,8 +638,7 @@ namespace Shinon
             //sankaku_cookies = GetSankakuCookies(BaseURL + "user/authenticate", proxy, ua);
             try
             {
-                string strURL = "https:" + BaseURL;
-                string post = DownloadStringFromSankaku(strURL, BaseURL, null, proxy, ua);
+                string post = DownloadStringFromSankaku(BaseURL, BaseURL, null, proxy, ua);
                 List<string> tags = new List<string>();
                 //string tags_string = null;
                 Regex rx = new Regex("<title>(.+)</title>");
@@ -572,44 +661,9 @@ namespace Shinon
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
-                //error++;
-                //Thread.Sleep(120000);
-                return null;
-            }
-        }
-        static string GetSankakuCookies(string url, WebProxy proxy, string ua)
-        {
-            try
-            {
-                HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(url);
-                if (USE_PROXY)
-                {
-                    loginRequest.Proxy = proxy;
-                }
-
-                loginRequest.UserAgent = ua;
-                loginRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
-                loginRequest.ContentType = "application/x-www-form-urlencoded";
-                loginRequest.Headers.Add("Accept-Encoding: identity");
-                loginRequest.CookieContainer = new CookieContainer();
-                loginRequest.Method = "POST";
-                string PostData = String.Format("user%5Bname%5D={0}&user%5Bpassword%5D={1}", "macsimbelous", "050782");
-                Encoding encoding = Encoding.UTF8;
-                byte[] byte1 = encoding.GetBytes(PostData);
-                loginRequest.ContentLength = byte1.Length;
-                using (Stream st = loginRequest.GetRequestStream())
-                {
-                    st.Write(byte1, 0, byte1.Length);
-                    st.Close();
-                }
-                loginRequest.AllowAutoRedirect = false;
-                HttpWebResponse loginResponse = (HttpWebResponse)loginRequest.GetResponse();
-                return loginResponse.Headers["Set-Cookie"];
-            }
-            catch (WebException we)
-            {
-                Console.WriteLine(we.Message);
+                Console.ResetColor();
                 return null;
             }
         }
@@ -636,23 +690,11 @@ namespace Shinon
             }
             return source;
         }
-        static List<int> ParseHTML_sankaku(string html)
-        {
-            List<int> temp = new List<int>();
-            Regex rx_digit = new Regex("[0-9]+", RegexOptions.Compiled);
-            Regex rx = new Regex(@"PostModeMenu\.click\([0-9]*\)", RegexOptions.Compiled);
-            MatchCollection matches = rx.Matches(html);
-            foreach (Match match in matches)
-            {
-                temp.Add(int.Parse(rx_digit.Match(match.Value).Value));
-            }
-            return temp;
-        }
         #endregion
         static bool ImageIsBig(string Path)
         {
             FileInfo fi = new FileInfo(Path);
-            if(fi.Length >= 1000000)
+            if (fi.Length >= 1000000)
             {
                 return true;
             }
