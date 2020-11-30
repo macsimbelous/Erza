@@ -31,6 +31,7 @@ using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Text.Json;
 using ErzaLib;
 
 namespace GetIdol
@@ -38,6 +39,7 @@ namespace GetIdol
     class Program
     {
         static CookieCollection sankaku_cookies = null;
+        static string AuthToken = null;
         static string RawCookies = null;
         static int StartPage = 1;
         static int MaxPage = 0;
@@ -86,7 +88,8 @@ namespace GetIdol
             int temp = 0;
             for (; ; )
             {
-                sankaku_cookies = GetSankakuCookies(Program.config.BaseURL + "user/authenticate");
+                //sankaku_cookies = GetSankakuCookies(Program.config.BaseURL + "user/authenticate");
+                AuthToken = GetAuthTokenFromSankaku("https://capi-v2.sankakucomplex.com/auth/token", config.UserAgent, config.SankakuLogin, config.SankakuPassword);
                 if (sankaku_cookies != null)
                 {
                     Console.WriteLine("Готово");
@@ -318,9 +321,14 @@ namespace GetIdol
         static bool DownloadImageFromSankaku(CacheItem Item, string dir, CookieCollection cookies)
         {
             Thread.Sleep(Program.config.TimeOut);
-            string post = GetPostPage(Item.PostID, cookies, Item.Referer);
+            string post = GetPostPage(Item.PostID);
             if (post == null) { return false; }
-            string url = GetOriginalUrlFromPostPage(post);
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.IgnoreNullValues = true;
+            SankakuJson[] sankakuJson = JsonSerializer.Deserialize<SankakuJson[]>(post, jsonSerializerOptions);
+            if(sankakuJson.Length == 0) { return false; }
+            string url = sankakuJson[0].file_url;
+            //string url = GetOriginalUrlFromPostPage(post);
             if (url == null)
             {
                 Console.WriteLine("URL Картинки не получен!");
@@ -334,10 +342,22 @@ namespace GetIdol
             Console.Write("Получаем теги и добавляем в БД...");
             //DateTime start_db = DateTime.Now;
             string hash = Path.GetFileNameWithoutExtension(url);
-            int tc = GetTagsFromSankaku(hash, post);
+            //int tc = GetTagsFromSankaku(hash, post);
+            List<string> tags = new List<string>();
+            foreach(tag t in sankakuJson[0].tags)
+            {
+                tags.Add(t.name);
+            }
+            ImageInfo img = new ImageInfo();
+            img.Hash = sankakuJson[0].md5;
+            img.Tags.AddRange(tags);
+            img.IsDeleted = false;
+            SQLiteTransaction transact = Program.connection.BeginTransaction();
+            ErzaDB.LoadImageToErza(img, Program.connection);
+            transact.Commit();
             //DateTime stop_db = DateTime.Now;
             //Console.WriteLine("{0} секунд", (stop_db - start_db).TotalSeconds);
-            Console.WriteLine($"{tc} OK");
+            Console.WriteLine($"{tags.Count} OK");
             if (ExistImage(hash))
             {
                 Console.WriteLine("Уже скачан: {0}", store_file);
@@ -367,13 +387,13 @@ namespace GetIdol
             Stream rStream = null;
             try
             {
-                httpWRQ.Referer = Program.config.BaseURL + "post/show/" + Item.PostID.ToString();
+                //httpWRQ.Referer = Program.config.BaseURL + "post/show/" + Item.PostID.ToString();
                 httpWRQ.UserAgent = Program.config.UserAgent;
-                httpWRQ.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+                httpWRQ.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
                 httpWRQ.Headers.Add("Accept-Encoding: identity");
                 //httpWRQ.CookieContainer = new CookieContainer();
                 //httpWRQ.CookieContainer.Add(cookies);
-                httpWRQ.Headers.Add(HttpRequestHeader.Cookie, RawCookies);
+                //httpWRQ.Headers.Add(HttpRequestHeader.Cookie, RawCookies);
                 httpWRQ.Timeout = 60 * 1000;
                 wrp = httpWRQ.GetResponse();
                 if (fi.Exists)
@@ -452,16 +472,16 @@ namespace GetIdol
                 }
             }
         }
-        static string GetPostPage(long npost, CookieCollection cookies, string Referer)
+        static string GetPostPage(long npost)
         {
             Random rnd = new Random();
-            string strURL = Program.config.BaseURL + "post/show/" + npost.ToString();
+            string strURL = Program.config.BaseURL + "?tags=id:" + npost.ToString();
             Console.WriteLine("Загружаем и парсим пост: " + strURL);
             while (true)
             {
                 try
                 {
-                    return DownloadStringFromSankaku(strURL, Program.config.BaseURL + "post/show/" + rnd.Next(10000, 50000), cookies);
+                    return DownloadStringFromSankaku(strURL, null);
                 }
                 catch (WebException we)
                 {
@@ -505,36 +525,8 @@ namespace GetIdol
         }
         static List<CacheItem> GetImageInfoFromSankaku(string tag)
         {
-            /*if (sankaku_cookies == null)
-            {
-                int temp = 0;
-                for (; ; )
-                {
-                    sankaku_cookies = GetSankakuCookies(Program.config.BaseURL + "user/authenticate");
-                    if (sankaku_cookies != null)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (temp < Program.config.LimitErrors)
-                        {
-                            temp++;
-                            Thread.Sleep(Program.config.TimeOut);
-                            continue;
-                        }
-                        else
-                        {
-                            Console.Write("Не удалось получить куки!");
-                            Environment.Exit(1);
-                        }
-                    }
-                }
-            }*/
             List<CacheItem> imgs = new List<CacheItem>();
 
-            string url = String.Format("{0}?tags={1}", Program.config.BaseURL, tag);
-            string prev_url = Program.config.BaseURL;
             int error = 0;
             int page_count = 1;
             while (true)
@@ -547,16 +539,21 @@ namespace GetIdol
                         break;
                     }
                     Thread.Sleep(Program.config.TimeOut);
+                    string url = String.Format("{0}?tags={1}", Program.config.BaseURL, tag);
                     Console.WriteLine("({0}) Загружаем и парсим: {1}", imgs.Count, url);
-                    string text = DownloadStringFromSankaku(url, prev_url, sankaku_cookies);
+                    string json = DownloadStringFromSankaku(url, null);
                     if (page_count >= StartPage)
                     {
                         //imgs.AddRange(ParseHTML_sankaku(text));
-                        List<long> temp = ParseHTML_sankaku(text);
-                        foreach(long id in temp)
+                        JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions();
+                        jsonSerializerOptions.IgnoreNullValues = true;
+                        SankakuJson[] sankakuJson = JsonSerializer.Deserialize<SankakuJson[]>(json, jsonSerializerOptions);
+                        
+                        //List<long> temp = ParseHTML_sankaku(text);
+                        foreach (SankakuJson sj in sankakuJson)
                         {
                             CacheItem item = new CacheItem();
-                            item.PostID = id;
+                            item.PostID = sj.id;
                             item.Referer = url;
                             item.Tag = tag;
                             imgs.Add(item);
@@ -568,13 +565,6 @@ namespace GetIdol
                     }
                     page_count++;
                     error = 0;
-                    prev_url = url;
-                    url = GetNextPage(text);
-                    if (url == null)
-                    {
-                        Console.WriteLine("Все страницы получены.");
-                        break;
-                    }
                 }
                 catch (WebException we)
                 {
@@ -598,31 +588,6 @@ namespace GetIdol
                     Thread.Sleep(Program.config.TimeOutError);
                 }
             }
-            /*int i = Program.StartPage;
-            while (true)
-            {
-                if (Program.MaxPage >= 0)
-                {
-                    if (i >= Program.StartPage + Program.MaxPage) { break; }
-                }
-                Thread.Sleep(Program.config.TimeOut);
-                Console.Write("({0}/ХЗ) ", imgs.Count);
-                //DateTime start = DateTime.Now;
-                string text = DownloadHTML(Program.config.BaseURL, tag, i, sankaku_cookies);
-                //MyWait(start, 5000);
-                if (text != null)
-                {
-                    List<int> posts = ParseHTML_sankaku(text);
-                    if (posts.Count > 0)
-                    {
-                        imgs.AddRange(posts);
-                        i++;
-                        continue;
-                    }
-                    else break;
-                }
-                else break;
-            }*/
             return imgs;
         }
         static string GetNextPage(string text)
@@ -676,7 +641,7 @@ namespace GetIdol
                 return null;
             }
         }
-        static string DownloadStringFromSankaku(string url, string referer, CookieCollection cookies)
+        static string DownloadStringFromSankaku(string url, string referer)
         {
             HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(url);
             if (Program.config.UseProxy)
@@ -686,11 +651,7 @@ namespace GetIdol
                 downloadRequest.Proxy = myProxy;
             }
             downloadRequest.UserAgent = Program.config.UserAgent;
-            downloadRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
-            downloadRequest.Headers.Add("Accept-Encoding: identity");
-            downloadRequest.Headers.Add(HttpRequestHeader.Cookie, RawCookies);
-            //downloadRequest.CookieContainer = new CookieContainer();
-            //downloadRequest.CookieContainer.Add(cookies);
+            downloadRequest.Headers.Add("authorization:Bearer " + AuthToken);
             if (referer != null)
             {
                 downloadRequest.Referer = referer;
@@ -701,6 +662,38 @@ namespace GetIdol
                 source = reader.ReadToEnd();
             }
             return source;
+        }
+        static string GetAuthTokenFromSankaku(string URL, string UserAgent, string Login, string Password)
+        {
+            HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(URL);
+            if (Program.config.UseProxy)
+            {
+                WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                downloadRequest.Proxy = myProxy;
+            }
+            downloadRequest.UserAgent = UserAgent;
+            downloadRequest.Method = "POST";
+            auth_sankaku authsan = new auth_sankaku();
+            authsan.login = Login;
+            authsan.password = Password;
+            string PostData = JsonSerializer.Serialize<auth_sankaku>(authsan);
+            downloadRequest.ContentLength = PostData.Length;
+            downloadRequest.ContentType = "application/json";
+
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] loginDataBytes = encoding.GetBytes(PostData);
+            downloadRequest.ContentLength = loginDataBytes.Length;
+            Stream stream = downloadRequest.GetRequestStream();
+            stream.Write(loginDataBytes, 0, loginDataBytes.Length);
+
+            string source;
+            using (StreamReader reader = new StreamReader(downloadRequest.GetResponse().GetResponseStream()))
+            {
+                source = reader.ReadToEnd();
+            }
+            taken_class token = JsonSerializer.Deserialize<taken_class>(source);
+            return token.access_token;
         }
         static List<long> ParseHTML_sankaku(string html)
         {
@@ -1072,5 +1065,78 @@ namespace GetIdol
         public long PostID;
         public string Referer;
         public string Tag;
+    }
+    public class SankakuJson
+    {
+        public int id { get; set; }
+        public string rating { get; set; }
+        public string status { get; set; }
+        public author_class author { get; set; }
+        public string sample_url { get; set; }
+        public int sample_width { get; set; }
+        public int sample_height { get; set; }
+        public string preview_url { get; set; }
+        public int preview_width { get; set; }
+        public int preview_height { get; set; }
+        public string file_url { get; set; }
+        public int width { get; set; }
+        public int height { get; set; }
+        public int file_size { get; set; }
+        public string file_type { get; set; }
+        public created_at_class created_at { get; set; }
+        public bool has_children { get; set; }
+        public bool has_comments { get; set; }
+        public bool has_notes { get; set; }
+        public bool is_favorited { get; set; }
+        public int? user_vote { get; set; }
+        public string md5 { get; set; }
+        public int? parent_id { get; set; }
+        public int change { get; set; }
+        public int fav_count { get; set; }
+        //public string recommended_posts { get; set; }
+        public int recommended_score { get; set; }
+        public int vote_count { get; set; }
+        public int total_score { get; set; }
+        public int? comment_count { get; set; }
+        public string source { get; set; }
+        public bool in_visible_pool { get; set; }
+        public bool is_premium { get; set; }
+        public float? sequence { get; set; }
+        public IList<tag> tags { get; set; }
+    }
+    public class author_class
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string avatar { get; set; }
+        public string avatar_rating { get; set; }
+    }
+    public class created_at_class
+    {
+        public string json_class { get; set; }
+        public int s { get; set; }
+        public int n { get; set; }
+    }
+    public class tag
+    {
+        public int id { get; set; }
+        public string name_en { get; set; }
+        public string name_ja { get; set; }
+        public int type { get; set; }
+        public int count { get; set; }
+        public int post_count { get; set; }
+        public int pool_count { get; set; }
+        public string locale { get; set; }
+        public string rating { get; set; }
+        public string name { get; set; }
+    }
+    public class auth_sankaku
+    {
+        public string login { get; set; }
+        public string password { get; set; }
+    }
+    public class taken_class
+    {
+        public string access_token { get; set; }
     }
 }
