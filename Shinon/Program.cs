@@ -158,6 +158,27 @@ namespace Shinon
             using (var fs = new FileStream(FilePath, FileMode.Open))
             {
                 var searchResults = Client.SearchFile(fs);
+                if (searchResults.Result != null && searchResults.Result.Matches != null)
+                {
+                    foreach (IqdbApi.Models.Match item in searchResults.Result.Matches)
+                    {
+                        if (item.Similarity > 90)
+                        {
+                            Console.WriteLine($"URL {item.Url} Тегов {item.Tags.Count}");
+                            tags.AddRange(item.Tags);
+                        }
+                    }
+                    tags = tags.Distinct().ToList();
+                }
+            }
+            return tags;
+        }
+        static List<string> GetTagsFromIqdb(Stream stream, IIqdbClient Client)
+        {
+            List<string> tags = new List<string>();
+            var searchResults = Client.SearchFile(stream);
+            if (searchResults.Result != null && searchResults.Result.Matches != null)
+            {
                 foreach (IqdbApi.Models.Match item in searchResults.Result.Matches)
                 {
                     if (item.Similarity > 90)
@@ -168,21 +189,6 @@ namespace Shinon
                 }
                 tags = tags.Distinct().ToList();
             }
-            return tags;
-        }
-        static List<string> GetTagsFromIqdb(Stream stream, IIqdbClient Client)
-        {
-            List<string> tags = new List<string>();
-            var searchResults = Client.SearchFile(stream);
-            foreach (IqdbApi.Models.Match item in searchResults.Result.Matches)
-            {
-                if (item.Similarity > 90)
-                {
-                    Console.WriteLine($"URL {item.Url} Тегов {item.Tags.Count}");
-                    tags.AddRange(item.Tags);
-                }
-            }
-            tags = tags.Distinct().ToList();
             return tags;
         }
         static List<string> GetTagsFromIqdb2(string FilePath, IIqdbClient Client)
