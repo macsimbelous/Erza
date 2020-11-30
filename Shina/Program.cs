@@ -32,6 +32,8 @@ using AngleSharp;
 //using AngleSharp.Parser.Html;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Shina
 {
@@ -63,7 +65,7 @@ namespace Shina
             NpgsqlConnection Connection = new NpgsqlConnection(csb.ConnectionString);
             Connection.Open();
             //Sankaku
-            string BaseURL = "https://chan.sankakucomplex.com/";
+            string BaseURL = "https://capi-v2.sankakucomplex.com/posts";
             string UserAgent = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
             WebProxy proxy = new WebProxy("138.197.190.23", 3128);
             proxy.Credentials = new NetworkCredential("maksim", "48sf54ro");
@@ -80,7 +82,8 @@ namespace Shina
                     int SankakuPostId;
                     Console.WriteLine("Запрашивая теги для хэша: {0}\t{1}\\{2}", hashs[i], i + 1, hashs.Length);
                     //Sankaku
-                    temp = GetTagsFromSankakuByAngle(hashs[i], BaseURL, UserAgent, proxy, out SankakuPostId);
+                    //temp = GetTagsFromSankakuByAngle(hashs[i], BaseURL, UserAgent, proxy, out SankakuPostId);
+                    temp = GetTagsFromSankakuByAPI(hashs[i], BaseURL, UserAgent, proxy, out SankakuPostId);
                     if (temp != null)
                     {
                         tags.AddRange(temp);
@@ -485,6 +488,35 @@ namespace Shina
                 return null;
             }
         }
+        static string[] GetTagsFromSankakuByAPI(string md5, string BaseURL, string UserAgent, WebProxy proxy, out int SankakuPostId)
+        {
+            SankakuPostId = -1;
+            try
+            {
+                string text = DownloadStringFromSankaku(BaseURL + "?tags=md5:" + md5, null, null, proxy, UserAgent);
+                JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions();
+                jsonSerializerOptions.IgnoreNullValues = true;
+                SankakuJson[] sankakuJson = JsonSerializer.Deserialize<SankakuJson[]>(text, jsonSerializerOptions);
+
+                List<string> tags = new List<string>();
+                if (sankakuJson.Length > 0)
+                {
+                    SankakuPostId = sankakuJson[0].id;
+                    foreach(tag t in sankakuJson[0].tags)
+                    {
+                        tags.Add(t.name);
+                    }
+                }
+                return tags.ToArray();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                error++;
+                Thread.Sleep(120000);
+                return null;
+            }
+        }
         static string DownloadString(string Url, string Referer, WebProxy Proxy, string UserAgent)
         {
             using (WebClient client = new WebClient())
@@ -569,5 +601,69 @@ namespace Shina
             return temp;
         }
 #endregion
+    }
+    public class SankakuJson
+    {
+        public int id { get; set; }
+        public string rating { get; set; }
+        public string status { get; set; }
+        public author_class author { get; set; }
+        public string sample_url { get; set; }
+        public int sample_width { get; set; }
+        public int sample_height { get; set; }
+        public string preview_url { get; set; }
+        public int preview_width { get; set; }
+        public int preview_height { get; set; }
+        public string file_url { get; set; }
+        public int width { get; set; }
+        public int height { get; set; }
+        public int file_size { get; set; }
+        public string file_type { get; set; }
+        public created_at_class created_at { get; set; }
+        public bool has_children { get; set; }
+        public bool has_comments { get; set; }
+        public bool has_notes { get; set; }
+        public bool is_favorited { get; set; }
+        public int? user_vote { get; set; }
+        public string md5 { get; set; }
+        public int? parent_id { get; set; }
+        public int change { get; set; }
+        public int fav_count { get; set; }
+        public int recommended_posts { get; set; }
+        public int recommended_score { get; set; }
+        public int vote_count { get; set; }
+        public int total_score { get; set; }
+        public int? comment_count { get; set; }
+        public string source { get; set; }
+        public bool in_visible_pool { get; set; }
+        public bool is_premium { get; set; }
+        public float? sequence { get; set; }
+        public IList<tag> tags { get; set; }
+    }
+    public class author_class
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string avatar { get; set; }
+        public string avatar_rating { get; set; }
+    }
+    public class created_at_class
+    {
+        public string json_class { get; set; }
+        public int s { get; set; }
+        public int n { get; set; }
+    }
+    public class tag
+    {
+        public int id { get; set; }
+        public string name_en { get; set; }
+        public string name_ja { get; set; }
+        public int type { get; set; }
+        public int count { get; set; }
+        public int post_count { get; set; }
+        public int pool_count { get; set; }
+        public string locale { get; set; }
+        public string rating { get; set; }
+        public string name { get; set; }
     }
 }
