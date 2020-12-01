@@ -578,6 +578,11 @@ namespace GetIdol
                             Console.WriteLine("Ошибка 404! прекращаем получение ссылок.");
                             break;
                         }
+                        if (errorResponse.StatusCode == HttpStatusCode.BadRequest)
+                        {
+                            Console.WriteLine("Ошибка 400! прекращаем получение ссылок.");
+                            break;
+                        }
                     }
                     error++;
                     if (error >= Program.config.LimitErrors)
