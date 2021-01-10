@@ -232,7 +232,7 @@ namespace GetGelbooru
                 {
                     foreach (IElement link_element in element.QuerySelectorAll("a"))
                     {
-                        links.Add("https:" + link_element.GetAttribute("href"));
+                        links.Add(link_element.GetAttribute("href"));
                     }
                 }
             }
