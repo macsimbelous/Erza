@@ -629,8 +629,8 @@ namespace Shina
         public int? parent_id { get; set; }
         public int change { get; set; }
         public int fav_count { get; set; }
-        public int recommended_posts { get; set; }
-        public int recommended_score { get; set; }
+        public object recommended_posts { get; set; }
+        public int? recommended_score { get; set; }
         public int vote_count { get; set; }
         public int total_score { get; set; }
         public int? comment_count { get; set; }

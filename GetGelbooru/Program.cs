@@ -226,13 +226,13 @@ namespace GetGelbooru
             List<string> links = new List<string>();
             var parser = new HtmlParser();
             var document = parser.ParseDocument(Page);
-            foreach (IElement element in document.QuerySelectorAll("div"))
+            foreach (IElement element in document.QuerySelectorAll("article"))
             {
-                if (element.GetAttribute("class") == "thumbnail-preview poopC")
+                if (element.GetAttribute("class") == "thumbnail-preview")
                 {
                     foreach (IElement link_element in element.QuerySelectorAll("a"))
                     {
-                        links.Add("https:" + link_element.GetAttribute("href"));
+                        links.Add(link_element.GetAttribute("href"));
                     }
                 }
             }

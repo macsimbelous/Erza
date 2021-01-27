@@ -13,17 +13,16 @@ using System.Drawing;
 using ErzaLib;
 using System.Text.RegularExpressions;
 using TagLib;
+using System.Threading;
 using ImageDimensions;
-using SauceNET;
-using SauceNao10.Core.Services;
 
 namespace Shinon
 {
     class Program
     {
         static bool USE_PROXY = true;
-        static bool USE_IQDB = false;
-        static bool USE_SAUCENAO = true;
+
+
         static WebProxy proxy;
         static int Width = 800;
         static int Height = 800;
@@ -35,17 +34,10 @@ namespace Shinon
             proxy = new WebProxy("nalsjn.ru", 3128);
             proxy.Credentials = new NetworkCredential(System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
             IIqdbClient iqdb_client = null;
-            if (USE_IQDB)
-            {
+
                 iqdb_client = new IqdbClient();
-            }
-            SauceNaoService sn_client = null;
-            if (USE_SAUCENAO)
-            {
-                //sn_client = new SauceNETClient(apiKey);
-                sn_client = new SauceNaoService();
-                sn_client.ApiKey = apiKey;
-            }
+            
+
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
             List<ImageInfo> imgs;
@@ -70,6 +62,7 @@ namespace Shinon
             int error = 0;
             for (int i = 0; i < imgs.Count; i++)
             {
+                //Thread.Sleep(15000);
                 try
                 {
                     if (imgs[i].FilePath == null || !System.IO.File.Exists(imgs[i].FilePath))
@@ -87,14 +80,9 @@ namespace Shinon
                         Console.ResetColor();
                         try
                         {
-                            if (USE_IQDB)
-                            {
+
                                 imgs[i].Tags = GetTagsFromIqdb(stream, iqdb_client);
-                            }
-                            if (USE_SAUCENAO)
-                            {
-                                imgs[i].Tags = GetTagsFromSauceNao(stream, imgs[i].FilePath, sn_client);
-                            }
+
                         }
                         catch (Exception ex)
                         {
@@ -110,14 +98,7 @@ namespace Shinon
                         try
                         {
 
-                            if (USE_IQDB)
-                            {
-                                imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, iqdb_client);
-                            }
-                            if (USE_SAUCENAO)
-                            {
-                                imgs[i].Tags = GetTagsFromSauceNao(new FileStream(imgs[i].FilePath, FileMode.Open), imgs[i].FilePath, sn_client);
-                            }
+                            imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, iqdb_client);
                         }
                         catch (Exception ex)
                         {
@@ -233,63 +214,6 @@ namespace Shinon
                 }
                 tags = tags.Distinct().ToList();
             }
-            return tags;
-        }
-        static List<string> GetTagsFromSauceNao(Stream IStream, string Name, SauceNaoService Client)
-        {
-            List<string> tags = new List<string>();
-            var searchResults = Client.GetSauceAsync(IStream, Name);
-            foreach (var result in searchResults.Result)
-            {
-                if (result.Similarity > 80.0 && result.Sources != null)
-                {
-                    //string source2 = sauce2.Result[0].Title;
-                    foreach (string s in result.Sources)
-                    {
-                        if (s.Contains("yande.re"))
-                        {
-                            string[] t = GetTagsFromYandere(s.Substring(s.LastIndexOf('/') + 1), proxy);
-                            if (t != null)
-                            {
-                                tags.AddRange(t);
-                            }
-                        }
-                        if (s.Contains("konachan.com"))
-                        {
-                            string[] t = GetTagsFromKonachan(s.Substring(s.LastIndexOf('/') + 1), proxy);
-                            if (t != null)
-                            {
-                                tags.AddRange(t);
-                            }
-                        }
-                        if (s.Contains("danbooru.donmai.us"))
-                        {
-                            string[] t = GetTagsFromDanbooru(s.Substring(s.LastIndexOf('/') + 1), proxy);
-                            if (t != null)
-                            {
-                                tags.AddRange(t);
-                            }
-                        }
-                        if (s.Contains("gelbooru.com"))
-                        {
-                            string[] t = GetTagsFromGelbooru(s.Substring(s.LastIndexOf('=') + 1), proxy);
-                            if (t != null)
-                            {
-                                tags.AddRange(t);
-                            }
-                        }
-                        if (s.Contains("chan.sankakucomplex.com"))
-                        {
-                            string[] t = GetTagsFromSankaku(s, proxy);
-                            if (t != null)
-                            {
-                                tags.AddRange(t);
-                            }
-                        }
-                    }
-                }
-            }
-            tags = tags.Distinct().ToList();
             return tags;
         }
         static List<ImageInfo> GetImagesWithoutTags()

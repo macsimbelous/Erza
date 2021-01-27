@@ -90,7 +90,7 @@ namespace GetIdol
             {
                 //sankaku_cookies = GetSankakuCookies(Program.config.BaseURL + "user/authenticate");
                 AuthToken = GetAuthTokenFromSankaku("https://capi-v2.sankakucomplex.com/auth/token", config.UserAgent, config.SankakuLogin, config.SankakuPassword);
-                if (sankaku_cookies != null)
+                if (AuthToken != null)
                 {
                     Console.WriteLine("Готово");
                     break;
@@ -539,7 +539,7 @@ namespace GetIdol
                         break;
                     }
                     Thread.Sleep(Program.config.TimeOut);
-                    string url = String.Format("{0}?tags={1}", Program.config.BaseURL, tag);
+                    string url = String.Format("{0}?tags={1}&page={2}", Program.config.BaseURL, tag, page_count);
                     Console.WriteLine("({0}) Загружаем и парсим: {1}", imgs.Count, url);
                     string json = DownloadStringFromSankaku(url, null);
                     if (page_count >= StartPage)
@@ -558,6 +558,7 @@ namespace GetIdol
                             item.Tag = tag;
                             imgs.Add(item);
                         }
+                        if(sankakuJson.Length < 20) { break; }
                     }
                     else
                     {
@@ -575,6 +576,11 @@ namespace GetIdol
                         if (errorResponse.StatusCode == HttpStatusCode.NotFound)
                         {
                             Console.WriteLine("Ошибка 404! прекращаем получение ссылок.");
+                            break;
+                        }
+                        if (errorResponse.StatusCode == HttpStatusCode.BadRequest)
+                        {
+                            Console.WriteLine("Ошибка 400! прекращаем получение ссылок.");
                             break;
                         }
                     }
