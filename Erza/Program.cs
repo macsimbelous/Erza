@@ -1114,9 +1114,9 @@ namespace Erza
                 Uri uri = new Uri("http://konachan.com/post/show/" + img.konachan_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
                 return uri.AbsoluteUri;
             }
-            if (url.LastIndexOf("http://sonohara.donmai.us/") >= 0)
+            if (url.LastIndexOf("https://danbooru.donmai.us/") >= 0)
             {
-                Uri uri = new Uri("http://danbooru.donmai.us/post/show/" + img.danbooru_post_id.ToString() + "/" + img.GetStringOfTags().Replace(' ', '-'));
+                Uri uri = new Uri("https://danbooru.donmai.us/posts/" + img.danbooru_post_id.ToString());
                 return uri.AbsoluteUri;
             }
             if (url.LastIndexOf("https://yande.re/") >= 0)
@@ -1142,7 +1142,7 @@ namespace Erza
             try
             {
                 httpWRQ.Referer = referer;
-                httpWRQ.UserAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)";
+                httpWRQ.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0";
                 httpWRQ.Timeout = 60 * 1000;
                 wrp = httpWRQ.GetResponse();
                 if (fi.Exists)
