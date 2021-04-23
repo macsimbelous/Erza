@@ -57,8 +57,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.1.0.0-alpha-844\lib\net472\AngleSharp.dll</HintPath>
+    <Reference Include="AngleSharp, Version=0.15.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.0.15.0\lib\net472\AngleSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -99,9 +99,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) C:\utils\bin\$(TargetFileName) /Y
-copy $(TargetDir)AngleSharp.dll C:\utils\bin\AngleSharp.dll /Y
-copy $(TargetDir)AngleSharp.xml C:\utils\bin\AngleSharp.xml /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /l /s /e /y</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

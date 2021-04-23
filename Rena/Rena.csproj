@@ -155,8 +155,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) C:\utils\gui\Rena\$(TargetFileName) /Y
-copy $(TargetDir) C:\utils\gui\Rena\ /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /l /s /e /y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
