@@ -186,6 +186,6 @@
     <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /l /s /e /y</PostBuildEvent>
+    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /y</PostBuildEvent>
   </PropertyGroup>
 </Project>

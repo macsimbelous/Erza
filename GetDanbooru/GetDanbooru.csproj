@@ -84,6 +84,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /l /s /e /y</PostBuildEvent>
+    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /y</PostBuildEvent>
   </PropertyGroup>
 </Project>
