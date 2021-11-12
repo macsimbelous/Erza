@@ -41,6 +41,7 @@ namespace Ange
         public static SQLiteConnection Erza;
         //SolidBrush brush;
         private CustomAdaptor adaptor;
+
         public Form1()
         {
             InitializeComponent();

@@ -37,6 +37,7 @@ namespace Ange
         public SQLiteConnection Erza;
         //public Form1 main_form;
         BindingList<TagInfo> Tags;
+        private List<string> Tags_Cache = null;
         FileStream fs = null;
         public bool ResultChanged = false;
         //Colors
@@ -368,8 +369,12 @@ namespace Ange
         {
             AddTagForm form = new AddTagForm();
             form.Erza = this.Erza;
-            //form.Tags = ErzaDB.GetAllTags(Erza);
-            if(form.ShowDialog() == DialogResult.OK)
+            /*if(this.Tags_Cache == null) 
+            {
+                this.Tags_Cache = ErzaDB.GetAllTags(Erza);
+            }
+            form.Tags = this.Tags_Cache;*/
+            if (form.ShowDialog() == DialogResult.OK)
             {
                 ErzaDB.AddTagToImage(Result[this.Index].ImageID, form.NewTag, Erza);
                 List<TagInfo> temp = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza);
