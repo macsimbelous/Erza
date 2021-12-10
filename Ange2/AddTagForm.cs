@@ -56,11 +56,25 @@ namespace Ange
             {
                 temp = ErzaDB.SearchTags(ts, false, true, Erza);
             }
-            this.comboBox1.DataSource = temp;
-            this.comboBox1.DroppedDown = true;
-            this.comboBox1.Text = ts;
-            this.comboBox1.SelectionStart = ts.Length;
-            Cursor.Current = Cursors.Default;
+            if (temp.Count > 0)
+            {
+                this.comboBox1.DataSource = temp;
+                this.comboBox1.DroppedDown = true;
+
+                this.comboBox1.Text = ts;
+                this.comboBox1.SelectionStart = ts.Length;
+                Cursor.Current = Cursors.Default;
+            }
+            else
+            {
+                //this.comboBox1.DroppedDown = false;
+                //temp = new List<string>();
+                temp.Add(ts);
+                this.comboBox1.DataSource = temp;
+                this.comboBox1.Text = ts;
+                this.comboBox1.SelectionStart = ts.Length;
+                Cursor.Current = Cursors.Default;
+            }
         }
     }
 }

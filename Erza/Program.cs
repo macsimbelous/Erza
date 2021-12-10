@@ -239,7 +239,7 @@ namespace Erza
                     myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
                     Client.Proxy = myProxy;
                 }
-                string strURL = String.Format("http://danbooru.donmai.us/posts.xml?tags={0}&page={1}&login={2}&api_key={3}&limit={4}", tag, nPage, Program.config.DanbooruLogin, Program.config.DanbooruAPIKey, DANBOORU_LIMIT_POSTS);
+                string strURL = String.Format("https://danbooru.donmai.us/posts.xml?tags={0}&page={1}&login={2}&api_key={3}&limit={4}", tag, nPage, Program.config.DanbooruLogin, Program.config.DanbooruAPIKey, DANBOORU_LIMIT_POSTS);
                 Console.WriteLine("({0}/ХЗ) Загружаем и парсим: {1}", img_list.Count, strURL);
                 try
                 {
