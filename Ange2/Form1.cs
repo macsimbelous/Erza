@@ -38,6 +38,7 @@ namespace Ange
         private const int PreviewWidth = 300;
         private const int PreviewHeight = 225;
         public static SQLiteConnection Previews;
+        public static string PreviewPath = "F:\\test";
         public static SQLiteConnection Erza;
         //SolidBrush brush;
         private CustomAdaptor adaptor;
@@ -537,7 +538,8 @@ namespace Ange
             }
             private Image GetPreview(string hash)
             {
-                using (SQLiteCommand command = new SQLiteCommand(Form1.Previews))
+                return Image.FromFile(PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg");
+                /*using (SQLiteCommand command = new SQLiteCommand(Form1.Previews))
                 {
                     command.CommandText = "SELECT preview FROM previews WHERE hash = @hash;";
                     command.Parameters.AddWithValue("hash", hash);
@@ -553,7 +555,7 @@ namespace Ange
                     {
                         return null;
                     }
-                }
+                }*/
             }
             private Image GetPreview(long image_id)
             {
