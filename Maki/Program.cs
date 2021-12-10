@@ -29,16 +29,17 @@ namespace Maki
 {
     class Program
     {
+        public static string PreviewPath = "E:\\previews";
         static void Main(string[] args)
         {
             const int PreviewWidth = 300;
             const int  PreviewHeight = 225;
             //string previews = "data source=C:\\utils\\data\\previews.sqlite";
-            string previews = "data source=E:\\previews.sqlite";
+            //string previews = "data source=E:\\previews.sqlite";
             List<string> bad_files = new List<string>();
             //string previews = @"data source=C:\Users\maksim\Source\Repos\Erza\Ange\bin\Debug\Previews.sqlite";
-            SQLiteConnection conn = new SQLiteConnection(previews);
-            conn.Open();
+            //SQLiteConnection conn = new SQLiteConnection(previews);
+            //conn.Open();
             string[] files = Directory.GetFiles("F:\\AnimeArt", "*.*", SearchOption.AllDirectories);
             ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
             EncoderParameters myEncoderParameters = new EncoderParameters(1);
@@ -49,7 +50,7 @@ namespace Maki
             {
                 if (!ImageInfo.IsImageFile(files[i])) { continue; }
                 string hash = Path.GetFileNameWithoutExtension(files[i]);
-                if (ExistPreview(hash, conn))
+                if (ExistPreview(hash))
                 {
                     Console.WriteLine($"[{i + 1}/{files.Length}] {files[i]} Уже есть в БД");
                 }
@@ -59,28 +60,31 @@ namespace Maki
                 }
             }
             Console.WriteLine("Добавляем превьюшки новых картинок.");
-            SQLiteTransaction transact = conn.BeginTransaction();
+            //SQLiteTransaction transact = conn.BeginTransaction();
             for (int i=0; i< files_to_preview.Count;i++)
             {
                 string hash = Path.GetFileNameWithoutExtension(files_to_preview[i]);
                 Bitmap preview = CreateThumbnail(files_to_preview[i], PreviewWidth, PreviewHeight);
                 if (preview != null)
                 {
-                    using (MemoryStream stream = new MemoryStream())
+                    string dest_file = PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg";
+                    Directory.CreateDirectory(PreviewPath + "\\" + hash[0] + "\\" + hash[1]);
+                    try
                     {
-                        preview.Save(stream, jpgEncoder, myEncoderParameters);
-                        try
+                        using (FileStream bw = new FileStream(dest_file, FileMode.Create))
                         {
-                            LoadPreviewToDB(hash, stream.ToArray(), conn);
+                            preview.Save(bw, jpgEncoder, myEncoderParameters);
+                            bw.Close();
                         }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine(ex.Message);
-                            Console.ResetColor();
-                        }
+                        Console.WriteLine($"[{i + 1}/{files_to_preview.Count}] {files_to_preview[i]} Добавлен");
                     }
-                    Console.WriteLine($"[{i+1}/{files_to_preview.Count}] {files_to_preview[i]} Добавлен");
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(ex.Message);
+                        Console.ResetColor();
+                    }
+                    
                 }
                 else
                 {
@@ -90,22 +94,23 @@ namespace Maki
                     bad_files.Add(files_to_preview[i]);
                 }
             }
-            transact.Commit();
-            List<string> hashs = ReadAllHashFromPrewiewsDB(conn);
+            //transact.Commit();
+            List<string> hashs = ReadAllHashFromPrewiewsDB();
             Console.WriteLine();
             string erzadb = "data source=C:\\utils\\data\\erza.sqlite";
             using (SQLiteConnection erza_conn = new SQLiteConnection(erzadb))
             {
                 erza_conn.Open();
-                transact = conn.BeginTransaction();
                 foreach (string hash in hashs)
                 {
+                    string dest_file = PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg";
                     ImageInfo img = ErzaDB.GetImageWithOutTags(hash, erza_conn);
                     if (img != null)
                     {
                         if (img.IsDeleted)
                         {
-                            RomovePreviewFromDB(hash, conn);
+                            //RomovePreviewFromDB(hash, conn);
+                            File.Delete(dest_file);
                             Console.WriteLine("{0} Удалён!", hash);
                         }
                         else
@@ -115,44 +120,22 @@ namespace Maki
                     }
                     else
                     {
-                        RomovePreviewFromDB(hash, conn);
+                        //RomovePreviewFromDB(hash, conn);
+                        File.Delete(dest_file);
                         Console.WriteLine("{0} Удалён!", hash);
                     }
                 }
-                transact.Commit();
+
             }
-            if ((args.Length > 0) && (args[0] == "--vacuum"))
-            {
-                Console.WriteLine("Сжимаем БД.");
-                using (SQLiteCommand command = conn.CreateCommand())
-                {
-                    command.CommandText = "vacuum;";
-                    command.ExecuteNonQuery();
-                }
-            }
-            conn.Close();
             foreach(string s in bad_files)
             {
                 Console.WriteLine(s);
             }
             Console.WriteLine($"Ошибок {bad_files.Count}");
         }
-        public static bool ExistPreview(string hash, SQLiteConnection conn)
+        public static bool ExistPreview(string hash)
         {
-            using(SQLiteCommand command = new SQLiteCommand(conn))
-            {
-                command.CommandText = "SELECT hash FROM previews WHERE hash = @hash";
-                command.Parameters.AddWithValue("hash", hash);
-                object o = command.ExecuteScalar();
-                if(o == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
+            return File.Exists(PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg");
         }
         public static Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
         {
@@ -225,44 +208,20 @@ namespace Maki
             }
             return null;
         }
-        public static void LoadPreviewToDB(string Hash, byte[] Preview, SQLiteConnection Connection)
+
+        public static List<string> ReadAllHashFromPrewiewsDB()
         {
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
-            {
-                command.CommandText = "INSERT INTO previews(hash, preview) VALUES(@hash, @preview);";
-                command.Parameters.AddWithValue("hash", Hash);
-                command.Parameters.AddWithValue("preview", Preview);
-                command.ExecuteNonQuery();
-            }
-        }
-        public static List<string> ReadAllHashFromPrewiewsDB(SQLiteConnection Connection)
-        {
+            string[] files = Directory.GetFiles(PreviewPath, "*.*", SearchOption.AllDirectories);
             List<string> hashs = new List<string>();
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            foreach(string file in files)
             {
-                command.CommandText = "SELECT hash FROM previews";
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                if (ImageInfo.IsImageFile(file))
                 {
-                    int count = 0;
-                    while (reader.Read())
-                    {
-                        string hash = (string)reader["hash"];
-                        hashs.Add(hash);
-                        count++;
-                        Console.Write("Считано: {0:##########}\r", count);
-                    }
+                    hashs.Add(file);
                 }
             }
             return hashs;
         }
-        public static void RomovePreviewFromDB(string Hash, SQLiteConnection Connection)
-        {
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
-            {
-                command.CommandText = "DELETE FROM previews WHERE hash = @hash";
-                command.Parameters.AddWithValue("hash", Hash);
-                command.ExecuteNonQuery();
-            }
-        }
+
     }
 }

@@ -37,8 +37,8 @@ namespace Ange
     {
         private const int PreviewWidth = 300;
         private const int PreviewHeight = 225;
-        public static SQLiteConnection Previews;
-        public static string PreviewPath = "F:\\test";
+        //public static SQLiteConnection Previews;
+        public static string PreviewPath = "E:\\previews";
         public static SQLiteConnection Erza;
         //SolidBrush brush;
         private CustomAdaptor adaptor;
@@ -54,8 +54,8 @@ namespace Ange
             Form1.Erza.Open();
             //this.Previews = new SQLiteConnection("data source=" + Application.StartupPath + "\\Previews.sqlite");
             //this.Previews = new SQLiteConnection("data source=C:\\utils\\data\\Previews.sqlite");
-            Form1.Previews = new SQLiteConnection(Properties.Settings.Default.Previews);
-            Form1.Previews.Open();
+            //Form1.Previews = new SQLiteConnection(Properties.Settings.Default.Previews);
+            //Form1.Previews.Open();
             //this.brush = new SolidBrush(Color.Orange);
             adaptor = new CustomAdaptor();
             //this.imageListView1.ThumbnailSize = new Size(300, 225);
@@ -112,8 +112,8 @@ namespace Ange
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Form1.Previews.Close();
-            Form1.Erza.Close();
+            //Form1.Previews.Close();
+            //Form1.Erza.Close();
             Properties.Settings.Default.SizeWindow = this.Size;
             Properties.Settings.Default.LocationWindow = this.Location;
             Properties.Settings.Default.Save();
@@ -388,10 +388,12 @@ namespace Ange
                     {
                         if (preview != null)
                         {
-                            using (MemoryStream stream = new MemoryStream())
+                            string dest_file = PreviewPath + "\\" + img.Hash[0] + "\\" + img.Hash[1] + "\\" + img.Hash + ".jpg";
+                            Directory.CreateDirectory(PreviewPath + "\\" + img.Hash[0] + "\\" + img.Hash[1]);
+                            using (FileStream bw = new FileStream(dest_file, FileMode.Create))
                             {
-                                preview.Save(stream, jpgEncoder, myEncoderParameters);
-                                UpdatePreviewToDB(img.Hash, stream.ToArray(), Previews);
+                                preview.Save(bw, jpgEncoder, myEncoderParameters);
+                                bw.Close();
                             }
                             item.Update();
                         }
@@ -401,17 +403,6 @@ namespace Ange
                         }
                     }
                 }
-            }
-        }
-        public void UpdatePreviewToDB(string Hash, byte[] Preview, SQLiteConnection Connection)
-        {
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
-            {
-                //command.CommandText = "UPDATE previews SET preview = @preview WHERE hash = @hash";
-                command.CommandText = "INSERT INTO previews(hash, preview) VALUES(@hash, @preview) ON CONFLICT(hash) DO UPDATE SET preview = @preview;";
-                command.Parameters.AddWithValue("hash", Hash);
-                command.Parameters.AddWithValue("preview", Preview);
-                command.ExecuteNonQuery();
             }
         }
         public Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
@@ -535,48 +526,17 @@ namespace Ange
             public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
             {
                 ImageInfo img = (ImageInfo)key;
-                return GetPreview(img.Hash);
-            }
-            private Image GetPreview(string hash)
-            {
-                return Image.FromFile(PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg");
-                /*using (SQLiteCommand command = new SQLiteCommand(Form1.Previews))
+                //return GetPreview(img.Hash);
+                Image prev = null;
+                try
                 {
-                    command.CommandText = "SELECT preview FROM previews WHERE hash = @hash;";
-                    command.Parameters.AddWithValue("hash", hash);
-                    byte[] tmp = (byte[])command.ExecuteScalar();
-                    if (tmp != null)
-                    {
-                        using (MemoryStream stream = new MemoryStream(tmp))
-                        {
-                            return new Bitmap(Image.FromStream(stream));
-                        }
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }*/
-            }
-            private Image GetPreview(long image_id)
-            {
-                using (SQLiteCommand command = new SQLiteCommand(Form1.Previews))
-                {
-                    command.CommandText = "SELECT preview FROM previews WHERE image_id = @image_id;";
-                    command.Parameters.AddWithValue("image_id", image_id);
-                    byte[] tmp = (byte[])command.ExecuteScalar();
-                    if (tmp != null)
-                    {
-                        using (MemoryStream stream = new MemoryStream(tmp))
-                        {
-                            return new Bitmap(Image.FromStream(stream));
-                        }
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    prev = Image.FromFile(PreviewPath + "\\" + img.Hash[0] + "\\" + img.Hash[1] + "\\" + img.Hash + ".jpg");
                 }
+                catch (Exception ex)
+                {
+                    prev = null;
+                }
+                return prev;
             }
             public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
             {
@@ -604,21 +564,28 @@ namespace Ange
                 //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FileSize, string.Empty, string.Empty));
                 //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FilePath, string.Empty, string.Empty));
                 //details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FolderName, string.Empty, string.Empty));
-                List<TagInfo> tag_list = ErzaDB.GetTagsByImageID(img.ImageID, Erza);
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < tag_list.Count; i++)
+                try
                 {
-                    if (i == 0)
+                    List<TagInfo> tag_list = ErzaDB.GetTagsByImageID(img.ImageID, Erza);
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < tag_list.Count; i++)
                     {
-                        sb.Append(tag_list[i].Tag);
+                        if (i == 0)
+                        {
+                            sb.Append(tag_list[i].Tag);
+                        }
+                        else
+                        {
+                            sb.Append(' ');
+                            sb.Append(tag_list[i].Tag);
+                        }
                     }
-                    else
-                    {
-                        sb.Append(' ');
-                        sb.Append(tag_list[i].Tag);
-                    }
+                    details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.UserComment, string.Empty, sb.ToString()));
                 }
-                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.UserComment, string.Empty, sb.ToString()));
+                catch (Exception ex)
+                {
+                    details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.UserComment, string.Empty, string.Empty));
+                }
                 return details.ToArray();
             }
             public override void Dispose()
@@ -817,6 +784,11 @@ namespace Ange
                     search_button.PerformClick();
                     break;
             }
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Form1.Erza.Close();
         }
     }
 
