@@ -24,6 +24,9 @@ using ErzaLib;
 using System.IO;
 using System.Data;
 using System.Data.SQLite;
+using ImageMagick;
+using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 
 namespace Maki
 {
@@ -37,6 +40,7 @@ namespace Maki
             //string previews = "data source=C:\\utils\\data\\previews.sqlite";
             //string previews = "data source=E:\\previews.sqlite";
             List<string> bad_files = new List<string>();
+            Regex rx = new Regex("^[a-f0-9]{32}$", RegexOptions.Compiled);
             //string previews = @"data source=C:\Users\maksim\Source\Repos\Erza\Ange\bin\Debug\Previews.sqlite";
             //SQLiteConnection conn = new SQLiteConnection(previews);
             //conn.Open();
@@ -61,10 +65,36 @@ namespace Maki
             }
             Console.WriteLine("Добавляем превьюшки новых картинок.");
             //SQLiteTransaction transact = conn.BeginTransaction();
+            var p_size = new MagickGeometry(PreviewWidth, PreviewHeight);
+            CreateSubDirs(PreviewPath);
             for (int i=0; i< files_to_preview.Count;i++)
             {
-                string hash = Path.GetFileNameWithoutExtension(files_to_preview[i]);
-                Bitmap preview = CreateThumbnail(files_to_preview[i], PreviewWidth, PreviewHeight);
+                try
+                {
+                    string hash = Path.GetFileNameWithoutExtension(files_to_preview[i]);
+                    if (!IsMD5(hash, rx))
+                    {
+                       hash = ComputeMD5(files_to_preview[i]);
+                    }
+                    string dest_file = PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg";
+
+                    //Directory.CreateDirectory(PreviewPath + "\\" + hash[0] + "\\" + hash[1]);
+                    using (MagickImage img = new MagickImage(files_to_preview[i]))
+                    {
+                        img.Resize(p_size);
+                        img.SetCompression(CompressionMethod.JPEG);
+                        img.Quality = 80;
+                        img.Write(dest_file);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(ex.ToString());
+                    Console.ResetColor();
+                    bad_files.Add(files_to_preview[i]);
+                }
+                /*Bitmap preview = CreateThumbnail(files_to_preview[i], PreviewWidth, PreviewHeight);
                 if (preview != null)
                 {
                     string dest_file = PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg";
@@ -92,7 +122,7 @@ namespace Maki
                     Console.WriteLine($"{files_to_preview[i]} Ошибка!");
                     Console.ResetColor();
                     bad_files.Add(files_to_preview[i]);
-                }
+                }*/
             }
             //transact.Commit();
             List<string> hashs = ReadAllHashFromPrewiewsDB();
@@ -127,6 +157,29 @@ namespace Maki
                 }
 
             }
+            /*List<string> exist_files = new List<string>();
+            foreach (string file in files)
+            {
+                if (ImageInfo.IsImageFile(file))
+                {
+                    exist_files.Add(Path.GetFileNameWithoutExtension(file));
+                }
+            }
+            exist_files.Sort();
+            for(int i = 0; i < hashs.Count; i++)
+            {
+                string hash = hashs[i];
+                int index = exist_files.BinarySearch(hash);
+                if(index < 0)
+                {
+                    File.Delete(PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg");
+                    Console.WriteLine("{0} Удалён!", hash);
+                }
+                else
+                {
+                    Console.WriteLine("{0} Присутствует!", hash);
+                }
+            }*/
             foreach(string s in bad_files)
             {
                 Console.WriteLine(s);
@@ -217,11 +270,45 @@ namespace Maki
             {
                 if (ImageInfo.IsImageFile(file))
                 {
-                    hashs.Add(file);
+                    hashs.Add(Path.GetFileNameWithoutExtension(file));
                 }
             }
             return hashs;
         }
-
+        public static bool IsMD5(string Text, Regex rx)
+        {
+            Match match = rx.Match(Text);
+            if (match.Success)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public static string ComputeMD5(string FilePath)
+        {
+            MD5 hash_enc = MD5.Create();
+            FileStream fsData = new FileStream(FilePath, FileMode.Open, FileAccess.Read);
+            byte[] hash = hash_enc.ComputeHash(fsData);
+            fsData.Close();
+            return BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
+        }
+        public static void CreateSubDirs(string Path)
+        {
+            string[] Hex = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
+            foreach (string first in Hex)
+            {
+                foreach (string second in Hex)
+                {
+                    string p = Path + "\\" + first + "\\" + second;
+                    if (!Directory.Exists(p))
+                    {
+                        Directory.CreateDirectory(p);
+                    }
+                }
+            }
+        }
     }
 }
