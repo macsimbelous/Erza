@@ -69,6 +69,7 @@ namespace Maki
             CreateSubDirs(PreviewPath);
             for (int i=0; i< files_to_preview.Count;i++)
             {
+                Console.Write($"[{i+1}/{files_to_preview.Count}] {files_to_preview[i]}...");
                 try
                 {
                     string hash = Path.GetFileNameWithoutExtension(files_to_preview[i]);
@@ -86,11 +87,15 @@ namespace Maki
                         img.Quality = 80;
                         img.Write(dest_file);
                     }
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Успех!");
+                    Console.ResetColor();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(ex.ToString());
+                    //Console.WriteLine(ex.ToString());
+                    Console.WriteLine("Ошибка!");
                     Console.ResetColor();
                     bad_files.Add(files_to_preview[i]);
                 }
