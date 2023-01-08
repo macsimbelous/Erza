@@ -233,6 +233,7 @@ namespace Erza
             for (; ; )
             {
                 WebClient Client = new WebClient();
+                Client.Headers["User-Agent"] = Program.config.UserAgent;
                 if (Program.config.UseProxy)
                 {
                     WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
