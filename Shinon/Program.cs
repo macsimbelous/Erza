@@ -20,9 +20,8 @@ namespace Shinon
 {
     class Program
     {
+        static string UserAgent = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
         static bool USE_PROXY = true;
-
-
         static WebProxy proxy;
         static int Width = 800;
         static int Height = 800;
@@ -31,12 +30,12 @@ namespace Shinon
         static SQLiteConnection Connection;
         static void Main(string[] args)
         {
-            proxy = new WebProxy("nalsjn.ru", 3128);
+            proxy = new WebProxy("nalsjn.ru", 8888);
             proxy.Credentials = new NetworkCredential(System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
             IIqdbClient iqdb_client = null;
 
-                iqdb_client = new IqdbClient();
-            
+            iqdb_client = new IqdbClient();
+
 
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
@@ -71,44 +70,20 @@ namespace Shinon
                         continue;
                     }
                     Console.WriteLine($"[{i}/{imgs.Count}] Ишем дубликаты для {imgs[i].FilePath}...");
-                    if (ImageIsBig(imgs[i].FilePath))
+                    try
                     {
-                        Console.Write($"Слишком большой, уменьшаем...");
-                        Stream stream = CreatePreviewStream(imgs[i].FilePath);
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("ОК");
+                        string temp = "E:\\previews\\" + imgs[i].Hash[0] + "\\" + imgs[i].Hash[1] + "\\" + imgs[i].Hash + ".jpg";
+                        imgs[i].Tags = GetTagsFromIqdb2(temp, iqdb_client);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Не удалось получить теги!");
+                        Console.WriteLine(ex.Message);
                         Console.ResetColor();
-                        try
-                        {
-
-                                imgs[i].Tags = GetTagsFromIqdb(stream, iqdb_client);
-
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("Не удалось получить теги!");
-                            Console.WriteLine(ex.Message);
-                            Console.ResetColor();
-                            continue;
-                        }
+                        continue;
                     }
-                    else
-                    {
-                        try
-                        {
 
-                            imgs[i].Tags = GetTagsFromIqdb(imgs[i].FilePath, iqdb_client);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("Не удалось получить теги!");
-                            Console.WriteLine(ex.Message);
-                            Console.ResetColor();
-                            continue;
-                        }
-                    }
                     Console.WriteLine($"Найдено {imgs[i].Tags.Count} тегов");
                     if (imgs[i].Tags.Count > 0)
                     {
@@ -180,7 +155,8 @@ namespace Shinon
                 var searchResults = Client.SearchFile(fs);
                 foreach (IqdbApi.Models.Match item in searchResults.Result.Matches)
                 {
-                    if (item.Similarity < 90) { continue; }
+                    if (item.Similarity <= 90) { continue; }
+                    tags.AddRange(item.Tags);
                     string[] temp = null;
                     switch (item.Source)
                     {
@@ -363,11 +339,12 @@ namespace Shinon
         static string[] GetTagsFromDanbooru(string PostID, WebProxy proxy)
         {
             WebClient Client = new WebClient();
+            Client.Headers["User-Agent"] = UserAgent;
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("http://danbooru.donmai.us/posts/{0}.xml", PostID);
+            string strURL = String.Format("{0}.xml", PostID);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -386,14 +363,14 @@ namespace Shinon
             catch (WebException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"DanBooru: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"DanBooru: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
@@ -407,13 +384,14 @@ namespace Shinon
         }
         static string[] GetTagsFromKonachan(string PostID, WebProxy proxy)
         {
-            WebClient Client;
-            Client = new WebClient();
+            WebClient Client = new WebClient();
+            Client.Headers["User-Agent"] = UserAgent;
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("http://konachan.com/post.xml?tags=id:{0}", PostID);
+            string temp = PostID.Substring(PostID.LastIndexOf('/')+1);
+            string strURL = String.Format("http://konachan.com/post.xml?tags=id:{0}", temp);
             try
             {
                 Uri uri = new Uri(strURL);
@@ -435,14 +413,14 @@ namespace Shinon
             catch (WebException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"KonaChan: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"KonaChan: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
@@ -456,13 +434,14 @@ namespace Shinon
         }
         static string[] GetTagsFromYandere(string PostID, WebProxy proxy)
         {
-            WebClient Client;
-            Client = new WebClient();
+            WebClient Client = new WebClient();
+            Client.Headers["User-Agent"] = UserAgent;
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
             }
-            string strURL = "https://yande.re/post.xml?tags=id:" + PostID;
+            string temp = PostID.Substring(PostID.LastIndexOf('/')+1);
+            string strURL = "https://yande.re/post.xml?tags=id:" + temp;
             try
             {
                 Uri uri = new Uri(strURL);
@@ -484,14 +463,14 @@ namespace Shinon
             catch (WebException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Yandere: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Yandere: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
@@ -505,13 +484,13 @@ namespace Shinon
         }
         static string[] GetTagsFromGelbooru(string PostID, WebProxy proxy)
         {
-            WebClient Client;
-            Client = new WebClient();
+            WebClient Client = new WebClient();
+            Client.Headers["User-Agent"] = UserAgent;
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("https://gelbooru.com/index.php?page=dapi&s=post&q=index&id={0}", PostID);
+            string strURL = PostID.Replace("page=post", "page=dapi");
             try
             {
                 Uri uri = new Uri(strURL);
@@ -534,14 +513,14 @@ namespace Shinon
             catch (WebException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"GelBooru: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
             catch (XmlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"GelBooru: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
@@ -556,13 +535,13 @@ namespace Shinon
         static string[] GetTagsFromSankaku(string BaseURL, WebProxy proxy)
         {
             //string BaseURL = "https://chan.sankakucomplex.com/";
-            string ua = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
+            //string ua = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
             //WebProxy proxy = new WebProxy("128.199.50.53", 8888);
             //proxy.Credentials = new NetworkCredential("maksim", "48sf54ro");
             //sankaku_cookies = GetSankakuCookies(BaseURL + "user/authenticate", proxy, ua);
             try
             {
-                string post = DownloadStringFromSankaku(BaseURL, BaseURL, null, proxy, ua);
+                string post = DownloadStringFromSankaku(BaseURL, BaseURL, null, proxy, UserAgent);
                 List<string> tags = new List<string>();
                 //string tags_string = null;
                 Regex rx = new Regex("<title>(.+)</title>");
@@ -586,7 +565,7 @@ namespace Shinon
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"SanKaku: {ex.Message}");
                 Console.ResetColor();
                 return null;
             }
