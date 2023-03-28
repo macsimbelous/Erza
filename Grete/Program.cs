@@ -6,24 +6,27 @@ using System.Drawing;
 using Shipwreck.Phash.Bitmaps;
 using System.Diagnostics.Metrics;
 using System.Threading;
+using System.Collections.Concurrent;
+using System.IO;
 
 namespace Grete
 {
     internal class Program
     {
-        static Queue<ImageInfo> image_queue;
-        static SQLiteConnection connection;
-        static Thread[] threads;
-        static bool abort = false;
+        static Queue<ImageInfo> image_queue = new Queue<ImageInfo>();
+        static SQLiteConnection connection = new SQLiteConnection(@"data source = C:\utils\data\erza.sqlite");
         static int LIMIT_THREADS = Environment.ProcessorCount;
+        static Thread[] threads = new Thread[LIMIT_THREADS];
+        static Thread WriterThread = new Thread(Writer);
+        static bool abort = false;
         static object locker = new object();
         static object locker2 = new object();
         static int count = 0;
+        static ConcurrentQueue<PhashInfo> WriteBuffer = new ConcurrentQueue<PhashInfo>();
         static void Main(string[] args)
         {
             //List<ImageInfo> imgs = new List<ImageInfo>();
-            image_queue = new Queue<ImageInfo>();
-            connection = new SQLiteConnection(@"data source = C:\utils\data\erza.sqlite");
+            //connection = new SQLiteConnection(@"data source = C:\utils\data\erza.sqlite");
             connection.Open();
             using (SQLiteCommand command = new SQLiteCommand(connection))
             {
@@ -61,13 +64,16 @@ namespace Grete
             //}
             int size_queue = image_queue.Count;
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
-            threads = new Thread[LIMIT_THREADS];
+            //threads = new Thread[LIMIT_THREADS];
             for (int i = 0; i < LIMIT_THREADS; i++)
             {
                 threads[i] = new Thread(Calculate);
                 threads[i].Name = "Поток " + i.ToString();
                 threads[i].Start();
             }
+            //WriterThread = new Thread(Writer);
+            WriterThread.Name = "Writer";
+            WriterThread.Start();
             while (true)
             {
                 Console.Write($"\r{count}\\{size_queue}");
@@ -89,6 +95,10 @@ namespace Grete
                     break;
                 }
             }
+            while (WriterThread.IsAlive)
+            {
+                Thread.Sleep(0);
+            }
             connection.Close();
         }
         public static void Calculate()
@@ -109,9 +119,11 @@ namespace Grete
                 }
                 try
                 {
+                    PhashInfo img = new PhashInfo();
+                    img.ImageID = file.ImageID;
                     //PHash
                     var bitmap = (Bitmap)Image.FromFile(file.FilePath);
-                    var phash = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage());
+                    img.pHash = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage()).Coefficients;
                     bitmap.Dispose();
                     bitmap = null;
                     //ImageInfo img = new ImageInfo();
@@ -119,17 +131,48 @@ namespace Grete
                     //img.MD5 = md5_enc(file);
                     //img.MD5 = file;
                     //string phash = BitConverter.ToString(hash.Coefficents).Replace("-", string.Empty).ToLower();
+                    
+
+                    WriteBuffer.Enqueue(img);
                     lock (locker2)
+                    {
+                        count++;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+        }
+        public static void Writer()
+        {
+            List<PhashInfo> images = new List<PhashInfo>();
+            while (!abort)
+            {
+                try
+                {
+                    PhashInfo img;
+                    int i = 0;
+                    while (WriteBuffer.TryDequeue(out img))
+                    {
+                        images.Add(img);
+                        i++;
+                        if (i >= 10) { break; }
+                    }
+                    SQLiteTransaction transaction = connection.BeginTransaction();
+                    foreach (PhashInfo temp in images)
                     {
                         using (SQLiteCommand insert_command = new SQLiteCommand(connection))
                         {
                             insert_command.CommandText = "insert into phashs (image_id, phash) values (@image_id, @phash)";
-                            insert_command.Parameters.AddWithValue("image_id", file.ImageID);
-                            insert_command.Parameters.AddWithValue("phash", phash.Coefficients);
+                            insert_command.Parameters.AddWithValue("image_id", temp.ImageID);
+                            insert_command.Parameters.AddWithValue("phash", temp.pHash);
                             insert_command.ExecuteNonQuery();
                         }
-                        count++;
                     }
+                    transaction.Commit();
+                    images.Clear();
                 }
                 catch (Exception)
                 {
@@ -160,9 +203,18 @@ namespace Grete
                     break;
                 }
             }
+            while (WriterThread.IsAlive)
+            {
+                Thread.Sleep(0);
+            }
             connection.Close();
-            Console.WriteLine("Exit");
+            Console.WriteLine("\nExit");
             Environment.Exit(0);
         }
+    }
+    class PhashInfo
+    {
+        public long ImageID = -1;
+        public byte[]? pHash;
     }
 }
