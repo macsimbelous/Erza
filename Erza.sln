@@ -1,54 +1,56 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29519.87
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Erza", "Erza\Erza.csproj", "{FB05786A-9BF6-4909-97DA-03529030812B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Erza", "Erza\Erza.csproj", "{FB05786A-9BF6-4909-97DA-03529030812B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0} = {5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anew", "Anew\Anew.csproj", "{2F43B969-F5DE-4B72-B533-C371FBD14AF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Anew", "Anew\Anew.csproj", "{2F43B969-F5DE-4B72-B533-C371FBD14AF3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0} = {5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shina", "Shina\Shina.csproj", "{1DAA7001-BA72-4B99-968C-21CBEE174CA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shina", "Shina\Shina.csproj", "{1DAA7001-BA72-4B99-968C-21CBEE174CA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErzaLib", "ErzaLib\ErzaLib.csproj", "{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ErzaLib", "ErzaLib\ErzaLib.csproj", "{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Euphemia", "Euphemia\Euphemia.csproj", "{3063084B-0995-4295-B269-41C01BCCEB06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Euphemia", "Euphemia\Euphemia.csproj", "{3063084B-0995-4295-B269-41C01BCCEB06}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0} = {5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rena", "Rena\Rena.csproj", "{BFAA8DDB-12D8-41FB-863D-96EB011E96C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rena", "Rena\Rena.csproj", "{BFAA8DDB-12D8-41FB-863D-96EB011E96C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetIdol", "GetIdol\GetIdol.csproj", "{1770536D-0033-4CC7-91B0-393A1977823F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetIdol", "GetIdol\GetIdol.csproj", "{1770536D-0033-4CC7-91B0-393A1977823F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetGelbooru", "GetGelbooru\GetGelbooru.csproj", "{1F4B9B3D-01A5-4032-B54B-05FA6007C68C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetGelbooru", "GetGelbooru\GetGelbooru.csproj", "{1F4B9B3D-01A5-4032-B54B-05FA6007C68C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0} = {5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetDanbooru", "GetDanbooru\GetDanbooru.csproj", "{26ACD7B5-2B6D-4A1F-957A-F4BB55E17A21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetDanbooru", "GetDanbooru\GetDanbooru.csproj", "{26ACD7B5-2B6D-4A1F-957A-F4BB55E17A21}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0} = {5BD393D7-4FA7-4C1B-A791-B13D7E26E8E0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maki", "Maki\Maki.csproj", "{41F1C95A-A266-4DB9-ABB3-417F56DBBAED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maki", "Maki\Maki.csproj", "{41F1C95A-A266-4DB9-ABB3-417F56DBBAED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eris", "Eris\Eris.csproj", "{4B43BCBA-6831-463D-B59A-A06F4408E664}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eris", "Eris\Eris.csproj", "{4B43BCBA-6831-463D-B59A-A06F4408E664}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagiri", "Sagiri\Sagiri.csproj", "{D19259EF-8DBA-486F-8AD1-61DE6F3FFD08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sagiri", "Sagiri\Sagiri.csproj", "{D19259EF-8DBA-486F-8AD1-61DE6F3FFD08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rei", "Rei\Rei.csproj", "{160FFAFE-19A3-42F3-857E-83E10A5D2107}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rei", "Rei\Rei.csproj", "{160FFAFE-19A3-42F3-857E-83E10A5D2107}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ange", "Ange2\Ange.csproj", "{4BF361E1-CAA7-45AF-AB1F-E13061DFA2A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ange", "Ange2\Ange.csproj", "{4BF361E1-CAA7-45AF-AB1F-E13061DFA2A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shinon", "Shinon\Shinon.csproj", "{37A7D378-0D72-4D8B-AE9D-26448E7AAE0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shinon", "Shinon\Shinon.csproj", "{37A7D378-0D72-4D8B-AE9D-26448E7AAE0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maple", "Maple\Maple.csproj", "{7C9525B7-A7E2-4576-A4CD-ABDDEB1B5EB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maple", "Maple\Maple.csproj", "{7C9525B7-A7E2-4576-A4CD-ABDDEB1B5EB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grete", "Grete\Grete.csproj", "{FEAAE50F-D88B-4C97-B230-36CB618C15F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -308,6 +310,22 @@ Global
 		{7C9525B7-A7E2-4576-A4CD-ABDDEB1B5EB3}.Release|x64.Build.0 = Release|x64
 		{7C9525B7-A7E2-4576-A4CD-ABDDEB1B5EB3}.Release|x86.ActiveCfg = Release|Any CPU
 		{7C9525B7-A7E2-4576-A4CD-ABDDEB1B5EB3}.Release|x86.Build.0 = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|x64.Build.0 = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Debug|x86.Build.0 = Debug|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|x64.ActiveCfg = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|x64.Build.0 = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|x86.ActiveCfg = Release|Any CPU
+		{FEAAE50F-D88B-4C97-B230-36CB618C15F6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
