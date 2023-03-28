@@ -37,6 +37,7 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /y
 </PostBuildEvent>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
