@@ -30,6 +30,9 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Manina.Windows.Forms;
 using AutocompleteMenuNS;
+using System.Security.Policy;
+using Shipwreck.Phash;
+using System.Reflection;
 
 namespace Ange
 {
@@ -260,7 +263,7 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                if (MessageBox.Show("Удалить выбранные(" + this.imageListView1.SelectedItems.Count .ToString() + ") изображения?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                if (MessageBox.Show("Удалить выбранные(" + this.imageListView1.SelectedItems.Count.ToString() + ") изображения?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     RemoveImages();
                 }
@@ -292,7 +295,7 @@ namespace Ange
                 ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 System.Diagnostics.Process.Start(img.FilePath);
             }
-            
+
         }
         private void MoveAllToDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -338,7 +341,7 @@ namespace Ange
                 {
                     //this.textBox1.Text = form.SelectedTag;
                     StringBuilder sb = new StringBuilder();
-                    for(int i=0;i< form.SelectedTags.Count; i++)
+                    for (int i = 0; i < form.SelectedTags.Count; i++)
                     {
                         if (i == 0)
                         {
@@ -478,7 +481,7 @@ namespace Ange
         }
         private bool SelectIsTags()
         {
-            if(this.option_comboBox.Text == "Теги")
+            if (this.option_comboBox.Text == "Теги")
             {
                 return true;
             }
@@ -789,6 +792,55 @@ namespace Ange
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             Form1.Erza.Close();
+        }
+
+        private void find_similar_ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                ImageInfo img = (ImageInfo)imageListView1.SelectedItems[0].VirtualItemKey;
+                byte[] phash;
+                List<long> similars = new List<long>();
+                long count = 0;
+                using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM phashs WHERE image_id = @image_id", Erza))
+                {
+                    command.Parameters.AddWithValue("image_id", img.ImageID);
+                    object o = command.ExecuteScalar();
+                    if (o == null)
+                    {
+                        MessageBox.Show("Нет Phash");
+                        return;
+                    }
+                    phash = o as byte[];
+                }
+                using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from phashs;", Erza))
+                {
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        long imageid = (long)reader["image_id"];
+                        byte[] current_phash = (byte[])reader["phash"];
+                        double result = ImagePhash.GetCrossCorrelation(phash, current_phash);
+                        if (result > 0.95)
+                        {
+                            similars.Add(imageid);
+
+                        }
+                    }
+                    reader.Close();
+                }
+                imageListView1.SuspendLayout();
+                imageListView1.Items.Clear();
+                foreach (long imageid in similars)
+                {
+                    ImageInfo temp = ErzaDB.GetImageWithOutTags(imageid, Erza);
+                    imageListView1.Items.Add(temp, temp.Hash, adaptor);
+                    count++;
+                }
+                imageListView1.ResumeLayout();
+                imageListView1.EnsureVisible(0);
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + count.ToString();
+            }
         }
     }
 
