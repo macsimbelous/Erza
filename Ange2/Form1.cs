@@ -408,6 +408,7 @@ namespace Ange
                 }
             }
         }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Ожидание>")]
         public Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
         {
             System.Drawing.Bitmap bmpOut;
@@ -465,6 +466,7 @@ namespace Ange
 
             return bmpOut;
         }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Ожидание>")]
         public ImageCodecInfo GetEncoder(ImageFormat format)
         {
 

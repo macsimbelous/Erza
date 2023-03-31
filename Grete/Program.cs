@@ -8,6 +8,8 @@ using System.Diagnostics.Metrics;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Data;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Grete
 {
@@ -99,6 +101,29 @@ namespace Grete
             {
                 Thread.Sleep(0);
             }
+            List<long> ids = new List<long>();
+            using (SQLiteCommand command = new SQLiteCommand(connection))
+            {
+                command.CommandText = "SELECT phashs.image_id FROM phashs LEFT OUTER JOIN images on phashs.image_id = images.image_id WHERE images.file_path IS NULL;";
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        ids.Add(reader.GetInt64(0));
+                    }
+                }
+            }
+            SQLiteTransaction transaction = connection.BeginTransaction();
+            foreach (long id in ids)
+            {
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "DELETE FROM phashs WHERE image_id = @image_id";
+                    command.Parameters.AddWithValue("image_id", id);
+                    command.ExecuteNonQuery();
+                }
+            }
+            transaction.Commit();
             connection.Close();
         }
         public static void Calculate()
@@ -122,7 +147,7 @@ namespace Grete
                     PhashInfo img = new PhashInfo();
                     img.ImageID = file.ImageID;
                     //PHash
-                    var bitmap = (Bitmap)Image.FromFile(file.FilePath);
+                    var bitmap = (Bitmap)System.Drawing.Image.FromFile(file.FilePath);
                     img.pHash = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage()).Coefficients;
                     bitmap.Dispose();
                     bitmap = null;

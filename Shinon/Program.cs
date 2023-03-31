@@ -57,6 +57,18 @@ namespace Shinon
             else
             {
                 imgs = GetImagesFromCache();
+                List<ImageInfo> temp = GetNewImages();
+                Console.Write("Добавляем в Кэш...");
+                SQLiteTransaction transact = Program.Connection.BeginTransaction();
+                foreach (ImageInfo img in temp)
+                {
+                    InsertItemFromCache(img.ImageID);
+                }
+                transact.Commit();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("ОК");
+                Console.ResetColor();
+                imgs.InsertRange(0, temp);
             }
             int error = 0;
             for (int i = 0; i < imgs.Count; i++)
@@ -230,6 +242,28 @@ namespace Shinon
             using (SQLiteCommand command = new SQLiteCommand())
             {
                 command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM shinon_cache LEFT OUTER JOIN images on shinon_cache.image_id = images.image_id WHERE images.file_path IS NOT NULL;";
+                command.Connection = Connection;
+                SQLiteDataReader reader = command.ExecuteReader();
+                //int count = 0;
+                while (reader.Read())
+                {
+                    ImageInfo img = new ImageInfo();
+                    img.Hash = (string)reader["hash"];
+                    img.ImageID = (long)reader["image_id"];
+                    img.FilePath = (string)reader["file_path"];
+                    imgs.Add(img);
+                    //count++;
+                }
+                reader.Close();
+            }
+            return imgs;
+        }
+        static List<ImageInfo> GetNewImages()
+        {
+            List<ImageInfo> imgs = new List<ImageInfo>();
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN shinon_cache on images.image_id = shinon_cache.image_id WHERE shinon_cache.image_id IS NULL AND images.is_deleted = 0;";
                 command.Connection = Connection;
                 SQLiteDataReader reader = command.ExecuteReader();
                 //int count = 0;
