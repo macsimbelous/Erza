@@ -61,9 +61,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
   </ItemGroup>
-  <PropertyGroup>
-    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /y</PostBuildEvent>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

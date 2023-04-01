@@ -32,7 +32,5 @@
     </PackageReference>
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
   </ItemGroup>
-  <PropertyGroup>
-    <PostBuildEvent>xcopy $(TargetDir) C:\utils\erza\ /y</PostBuildEvent>
-  </PropertyGroup>
+  <PropertyGroup />
 </Project>

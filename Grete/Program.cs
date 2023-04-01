@@ -23,7 +23,12 @@ namespace Grete
         static bool abort = false;
         static object locker = new object();
         static object locker2 = new object();
-        static int count = 0;
+        static object locker3 = new object();
+        static int c_count = 0;
+        static int ce_count = 0;
+        static int w_count = 0;
+        static int we_count = 0;
+        static int size_queue = 0;
         static ConcurrentQueue<PhashInfo> WriteBuffer = new ConcurrentQueue<PhashInfo>();
         static void Main(string[] args)
         {
@@ -64,7 +69,7 @@ namespace Grete
             //    }
             //    Console.WriteLine($"[{i+1}\\{imgs.Count}] ID: {imgs[i].ImageID}");
             //}
-            int size_queue = image_queue.Count;
+            size_queue = image_queue.Count;
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
             //threads = new Thread[LIMIT_THREADS];
             for (int i = 0; i < LIMIT_THREADS; i++)
@@ -78,7 +83,7 @@ namespace Grete
             WriterThread.Start();
             while (true)
             {
-                Console.Write($"\r{count}\\{size_queue}");
+                Console.Write($"\rC: {c_count}\\CE: {ce_count}\\W: {w_count}\\WE: {we_count}\\{size_queue}");
                 bool alive = false;
                 foreach (Thread thread in threads)
                 {
@@ -156,23 +161,27 @@ namespace Grete
                     //img.MD5 = md5_enc(file);
                     //img.MD5 = file;
                     //string phash = BitConverter.ToString(hash.Coefficents).Replace("-", string.Empty).ToLower();
-                    
+
 
                     WriteBuffer.Enqueue(img);
                     lock (locker2)
                     {
-                        count++;
+                        c_count++;
                     }
                 }
                 catch (Exception)
                 {
-
+                    lock (locker3)
+                    {
+                        ce_count++;
+                    }
                 }
             }
         }
         public static void Writer()
         {
             List<PhashInfo> images = new List<PhashInfo>();
+            int l_count = 0;
             while (!abort)
             {
                 try
@@ -185,6 +194,7 @@ namespace Grete
                         i++;
                         if (i >= 10) { break; }
                     }
+                    l_count = images.Count;
                     SQLiteTransaction transaction = connection.BeginTransaction();
                     foreach (PhashInfo temp in images)
                     {
@@ -197,11 +207,16 @@ namespace Grete
                         }
                     }
                     transaction.Commit();
+                    w_count = w_count + images.Count;
                     images.Clear();
                 }
                 catch (Exception)
                 {
-
+                    we_count++;
+                }
+                if (l_count >= size_queue)
+                {
+                    return;
                 }
             }
         }

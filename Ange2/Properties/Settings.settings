@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Ange.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Previews" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">data source=E:\\Previews.sqlite</Value>
-    </Setting>
     <Setting Name="Erza" Type="System.String" Scope="Application">
       <Value Profile="(Default)">data source=C:\\utils\\data\\Erza.sqlite</Value>
     </Setting>

@@ -263,7 +263,7 @@ namespace Shinon
             List<ImageInfo> imgs = new List<ImageInfo>();
             using (SQLiteCommand command = new SQLiteCommand())
             {
-                command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN shinon_cache on images.image_id = shinon_cache.image_id WHERE shinon_cache.image_id IS NULL AND images.is_deleted = 0;";
+                command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN shinon_cache on images.image_id = shinon_cache.image_id LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE shinon_cache.image_id IS NULL AND images.is_deleted = 0 AND image_tags.image_id IS NULL;";
                 command.Connection = Connection;
                 SQLiteDataReader reader = command.ExecuteReader();
                 //int count = 0;

@@ -22,8 +22,4 @@
     <ProjectReference Include="..\ErzaLib\ErzaLib.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy $(TargetDir) C:\utils\erza\ /y" />
-  </Target>
-
 </Project>
