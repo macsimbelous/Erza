@@ -502,7 +502,7 @@ namespace GetGelbooru
             }
             httpWRQ.Referer = Referer;
             httpWRQ.UserAgent = UserAgent;
-            httpWRQ.Timeout = 60 * 1000;
+            //httpWRQ.Timeout = 60 * 1000;
             httpWRQ.CookieContainer = new CookieContainer();
             httpWRQ.CookieContainer.Add(Cookies);
             WebResponse wrp = null;
@@ -524,7 +524,7 @@ namespace GetGelbooru
                 }
                 long cnt = 0;
                 rStream = wrp.GetResponseStream();
-                rStream.ReadTimeout = 60 * 1000;
+                //rStream.ReadTimeout = 60 * 1000;
                 using (FileStream fs = new FileStream(FilePath, FileMode.Create))
                 {
                     byte[] buffer = new byte[1024];

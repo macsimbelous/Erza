@@ -1143,7 +1143,7 @@ namespace Erza
             {
                 httpWRQ.Referer = referer;
                 httpWRQ.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0";
-                httpWRQ.Timeout = 60 * 1000;
+                //httpWRQ.Timeout = 60 * 1000;
                 wrp = httpWRQ.GetResponse();
                 if (fi.Exists)
                 {
@@ -1159,7 +1159,7 @@ namespace Erza
                 }
                 long cnt = 0;
                 rStream = wrp.GetResponseStream();
-                rStream.ReadTimeout = 60 * 1000;
+                //rStream.ReadTimeout = 60 * 1000;
                 using (FileStream fs = new FileStream(filename, FileMode.Create))
                 {
                     byte[] buffer = new byte[1024];
