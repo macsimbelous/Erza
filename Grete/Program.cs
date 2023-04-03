@@ -190,31 +190,35 @@ namespace Grete
                     int i = 0;
                     while (WriteBuffer.TryDequeue(out img))
                     {
+                        w_count++;
                         images.Add(img);
                         i++;
                         if (i >= 10) { break; }
                     }
-                    l_count = images.Count;
-                    SQLiteTransaction transaction = connection.BeginTransaction();
-                    foreach (PhashInfo temp in images)
+                    //l_count = images.Count;
+                    if (images.Count > 0)
                     {
-                        using (SQLiteCommand insert_command = new SQLiteCommand(connection))
+                        SQLiteTransaction transaction = connection.BeginTransaction();
+                        foreach (PhashInfo temp in images)
                         {
-                            insert_command.CommandText = "insert into phashs (image_id, phash) values (@image_id, @phash)";
-                            insert_command.Parameters.AddWithValue("image_id", temp.ImageID);
-                            insert_command.Parameters.AddWithValue("phash", temp.pHash);
-                            insert_command.ExecuteNonQuery();
+                            using (SQLiteCommand insert_command = new SQLiteCommand(connection))
+                            {
+                                insert_command.CommandText = "insert into phashs (image_id, phash) values (@image_id, @phash)";
+                                insert_command.Parameters.AddWithValue("image_id", temp.ImageID);
+                                insert_command.Parameters.AddWithValue("phash", temp.pHash);
+                                insert_command.ExecuteNonQuery();
+                            }
                         }
+                        transaction.Commit();
                     }
-                    transaction.Commit();
-                    w_count = w_count + images.Count;
+                    //w_count = w_count + images.Count;
                     images.Clear();
                 }
                 catch (Exception)
                 {
                     we_count++;
                 }
-                if (l_count >= size_queue)
+                if (w_count >= size_queue)
                 {
                     return;
                 }
