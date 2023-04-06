@@ -141,6 +141,7 @@ namespace Grete
                     try
                     {
                         file = image_queue.Dequeue();
+                        c_count++;
                     }
                     catch (InvalidOperationException)
                     {
@@ -164,10 +165,6 @@ namespace Grete
 
 
                     WriteBuffer.Enqueue(img);
-                    lock (locker2)
-                    {
-                        c_count++;
-                    }
                 }
                 catch (Exception)
                 {
