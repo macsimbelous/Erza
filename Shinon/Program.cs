@@ -524,34 +524,32 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = PostID.Replace("page=post", "page=dapi");
+            //string strURL = PostID.Replace("page=post", "page=dapi");
             try
             {
-                Uri uri = new Uri(strURL);
-                XmlDocument mXML = new XmlDocument();
-                //string s = Client.DownloadString(uri);
-                mXML.LoadXml(Client.DownloadString(uri));
-                XmlNodeList nodeList = mXML.GetElementsByTagName("post");
-                foreach (XmlNode node in nodeList)
+                Uri uri = new Uri(PostID);
+                string post = Client.DownloadString(uri);
+                List<string> tags = new List<string>();
+                Regex rx = new Regex("<title>(.+)</title>");
+                Match match = rx.Match(post);
+                if (match.Success)
                 {
-                    for (int j = 0; j < node.Attributes.Count; j++)
+                    string temp = match.Value.Substring(("<title>").Length);
+                    temp = temp.Replace(" - Image View -  | Gelbooru - Free Anime and Hentai Gallery</title>", String.Empty);
+                    tags.AddRange(temp.Split(','));
+                    for (int i = 0; i < tags.Count; i++)
                     {
-                        if (node.Attributes[j].Name == "tags")
-                        {
-                            return node.Attributes[j].Value.Split(' ');
-                        }
+                        tags[i] = tags[i].TrimStart(' ').Replace(' ', '_');
+                        tags[i] = tags[i].Replace("&amp;#039;", "'");
                     }
+                    return tags.ToArray();
                 }
-                return null;
+                else
+                {
+                    return null;
+                }
             }
-            catch (WebException ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"GelBooru: {ex.Message}");
-                Console.ResetColor();
-                return null;
-            }
-            catch (XmlException ex)
+            catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"GelBooru: {ex.Message}");
