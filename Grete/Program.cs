@@ -178,12 +178,11 @@ namespace Grete
         public static void Writer()
         {
             List<PhashInfo> images = new List<PhashInfo>();
-            int l_count = 0;
             while (!abort)
             {
                 try
                 {
-                    PhashInfo img;
+                    PhashInfo? img;
                     int i = 0;
                     while (WriteBuffer.TryDequeue(out img))
                     {
@@ -192,7 +191,6 @@ namespace Grete
                         i++;
                         if (i >= 10) { break; }
                     }
-                    //l_count = images.Count;
                     if (images.Count > 0)
                     {
                         SQLiteTransaction transaction = connection.BeginTransaction();
@@ -208,14 +206,13 @@ namespace Grete
                         }
                         transaction.Commit();
                     }
-                    //w_count = w_count + images.Count;
                     images.Clear();
                 }
                 catch (Exception)
                 {
                     we_count++;
                 }
-                if (w_count >= size_queue)
+                if (w_count >= size_queue - ce_count)
                 {
                     return;
                 }
