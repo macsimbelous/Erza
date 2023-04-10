@@ -21,7 +21,7 @@ namespace Shinon
 {
     class Program
     {
-        static string UserAgent = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
+        static string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
         static bool USE_PROXY = true;
         static WebProxy proxy;
         static int Width = 800;
@@ -212,9 +212,9 @@ namespace Shinon
             string post;
             using (var multipartFormContent = new MultipartFormDataContent())
             {
-                var fileStreamContent = new StreamContent(System.IO.File.OpenRead(".\\c6a00d0b35505ad28f884d8bd8ebbda4.jpg"));
+                var fileStreamContent = new StreamContent(System.IO.File.OpenRead(FilePath));
                 fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-                multipartFormContent.Add(fileStreamContent, name: "file", fileName: "c6a00d0b35505ad28f884d8bd8ebbda4.jpg");
+                multipartFormContent.Add(fileStreamContent, name: "file", fileName: Path.GetFileName(FilePath));
                 var response = Client.PostAsync("search.php", multipartFormContent);
                 response.Result.EnsureSuccessStatusCode();
                 post = response.Result.Content.ReadAsStringAsync().Result;
@@ -379,7 +379,7 @@ namespace Shinon
             catch (WebException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"DanBooru: {ex.Message}");
+                Console.WriteLine($"DanBooru: {ex.Message} {strURL}");
                 Console.ResetColor();
                 return null;
             }
