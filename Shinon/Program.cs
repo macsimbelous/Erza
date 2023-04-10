@@ -8,13 +8,14 @@ using IqdbApi;
 using System.IO;
 using System.Net;
 using System.Xml;
-using System.Drawing.Imaging;
-using System.Drawing;
 using ErzaLib;
 using System.Text.RegularExpressions;
-using TagLib;
 using System.Threading;
-using ImageDimensions;
+using System.Net.Http;
+using AngleSharp.Dom.Events;
+using AngleSharp.Dom;
+using AngleSharp;
+using System.Net.Http.Headers;
 
 namespace Shinon
 {
@@ -32,11 +33,11 @@ namespace Shinon
         {
             proxy = new WebProxy("nalsjn.ru", 8888);
             proxy.Credentials = new NetworkCredential(System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
+            HttpClient saucenao_client = new HttpClient();
+            saucenao_client.BaseAddress = new Uri("https://saucenao.com/");
+            saucenao_client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
             IIqdbClient iqdb_client = null;
-
             iqdb_client = new IqdbClient();
-
-
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
             List<ImageInfo> imgs;
@@ -86,6 +87,7 @@ namespace Shinon
                     {
                         string temp = "E:\\previews\\" + imgs[i].Hash[0] + "\\" + imgs[i].Hash[1] + "\\" + imgs[i].Hash + ".jpg";
                         imgs[i].Tags = GetTagsFromIqdb2(temp, iqdb_client);
+                        imgs[i].Tags.AddRange(GetTagsFromSauceNao(temp, saucenao_client));
                     }
                     catch (Exception ex)
                     {
@@ -204,6 +206,55 @@ namespace Shinon
             }
             return tags;
         }
+        static List<string> GetTagsFromSauceNao(string FilePath, HttpClient Client)
+        {
+            List<string> tags = new List<string>();
+            string post;
+            using (var multipartFormContent = new MultipartFormDataContent())
+            {
+                var fileStreamContent = new StreamContent(System.IO.File.OpenRead(".\\c6a00d0b35505ad28f884d8bd8ebbda4.jpg"));
+                fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                multipartFormContent.Add(fileStreamContent, name: "file", fileName: "c6a00d0b35505ad28f884d8bd8ebbda4.jpg");
+                var response = Client.PostAsync("search.php", multipartFormContent);
+                response.Result.EnsureSuccessStatusCode();
+                post = response.Result.Content.ReadAsStringAsync().Result;
+            }
+            IConfiguration config = Configuration.Default;
+            IBrowsingContext context = BrowsingContext.New(config);
+            IDocument document = context.OpenAsync(req => req.Content(post)).Result;
+            var links = document.QuerySelectorAll("a").ToList();
+            foreach (var link in links)
+            {
+                String url = link.Attributes.GetNamedItem("href").Value;
+                string[] temp_tags = null;
+                if (url.IndexOf("https://danbooru.donmai.us/") >= 0)
+                {
+                    temp_tags = GetTagsFromDanbooru(url, proxy);
+                    if (temp_tags != null) tags.AddRange(tags);
+                }
+                if (url.IndexOf("https://konachan.com/") >= 0)
+                {
+                    temp_tags = GetTagsFromKonachan(url, proxy);
+                    if (temp_tags != null) tags.AddRange(tags);
+                }
+                if (url.IndexOf("https://yande.re/") >= 0)
+                {
+                    temp_tags = GetTagsFromYandere(url, proxy);
+                    if (temp_tags != null) tags.AddRange(tags);
+                }
+                if (url.IndexOf("https://gelbooru.com/") >= 0)
+                {
+                    temp_tags = GetTagsFromGelbooru(url, proxy);
+                    if (temp_tags != null) tags.AddRange(tags);
+                }
+                if (url.IndexOf("https://chan.sankakucomplex.com/") >= 0)
+                {
+                    temp_tags = GetTagsFromSankaku(url, proxy);
+                    if (temp_tags != null) tags.AddRange(tags);
+                }
+            }
+            return tags.Distinct().ToList();
+        }
         static List<ImageInfo> GetImagesWithoutTags()
         {
             List<ImageInfo> imgs = new List<ImageInfo>();
@@ -300,75 +351,6 @@ namespace Shinon
                 command.ExecuteNonQuery();
             }
         }
-        #region Create Preview
-        static Stream CreatePreviewStream(string FilePath)
-        {
-            ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
-            EncoderParameters myEncoderParameters = new EncoderParameters(1);
-            EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
-            myEncoderParameters.Param[0] = myEncoderParameter;
-            Bitmap preview = CreateThumbnail(FilePath, Width, Height);
-            MemoryStream stream = new MemoryStream();
-            preview.Save(stream, jpgEncoder, myEncoderParameters);
-            stream.Seek(0, SeekOrigin.Begin);
-            return stream;
-        }
-        static Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
-        {
-            Bitmap bmpOut = null;
-            try
-            {
-                Bitmap loBMP = new Bitmap(lcFilename);
-                ImageFormat loFormat = loBMP.RawFormat;
-
-                int lnNewWidth = 0;
-                int lnNewHeight = 0;
-
-                if (loBMP.Width < lnWidth && loBMP.Height < lnHeight)
-                    return loBMP;
-
-                float temp = (float)loBMP.Width / (float)lnWidth;
-                if ((int)((float)loBMP.Height / temp) > lnHeight)
-                {
-                    temp = (float)loBMP.Height / (float)lnHeight;
-                    lnNewWidth = (int)((float)loBMP.Width / temp);
-                    lnNewHeight = lnHeight;
-                }
-                else
-                {
-                    lnNewWidth = lnWidth;
-                    lnNewHeight = (int)((float)loBMP.Height / temp);
-                }
-                bmpOut = new Bitmap(lnNewWidth, lnNewHeight);
-                Graphics g = Graphics.FromImage(bmpOut);
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.FillRectangle(Brushes.White, 0, 0, lnNewWidth, lnNewHeight);
-                g.DrawImage(loBMP, 0, 0, lnNewWidth, lnNewHeight);
-
-                loBMP.Dispose();
-            }
-            catch
-            {
-                return null;
-            }
-
-            return bmpOut;
-        }
-        static ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-
-            foreach (ImageCodecInfo codec in codecs)
-            {
-                if (codec.FormatID == format.Guid)
-                {
-                    return codec;
-                }
-            }
-            return null;
-        }
-        #endregion
         #region Myparsers
         static string[] GetTagsFromDanbooru(string PostID, WebProxy proxy)
         {
@@ -626,66 +608,5 @@ namespace Shinon
             return source;
         }
         #endregion
-        static bool ImageIsBig(string Path)
-        {
-            FileInfo fi = new FileInfo(Path);
-            if (fi.Length >= 1000000)
-            {
-                return true;
-            }
-            try
-            {
-                Size s = GetImageSize2(Path);
-                if (s.Width >= 7500 || s.Height >= 7500)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Не удалось определить разрешение!");
-                Console.ResetColor();
-                return true;
-            }
-        }
-        static Size GetImageSize(string Path)
-        {
-            try
-            {
-                return ImageHelper.GetDimensions(Path);
-            }
-            catch (Exception)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("ImageHelper.GetDimensions не сработал переходим к второму варианту...");
-                Console.ResetColor();
-            }
-            TagLib.File file = TagLib.File.Create(Path);
-            var image = file as TagLib.Image.File;
-            if (image.Properties != null)
-            {
-                Size s = new Size();
-                s.Height = image.Properties.PhotoHeight;
-                s.Width = image.Properties.PhotoWidth;
-                return s;
-            }
-            throw new Exception("TagLib не сработал");
-        }
-        static Size GetImageSize2(string Path)
-        {
-            using (Stream stream = System.IO.File.OpenRead(Path))
-            {
-                using (Image sourceImage = Image.FromStream(stream, false, false))
-                {
-                    Size s = new Size(sourceImage.Width, sourceImage.Height);
-                    return s;
-                }
-            }
-        }
     }
 }
