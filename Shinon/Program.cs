@@ -87,7 +87,7 @@ namespace Shinon
                     {
                         string temp = "E:\\previews\\" + imgs[i].Hash[0] + "\\" + imgs[i].Hash[1] + "\\" + imgs[i].Hash + ".jpg";
                         imgs[i].Tags = GetTagsFromIqdb2(temp, iqdb_client);
-                        imgs[i].Tags.AddRange(GetTagsFromSauceNao(temp, saucenao_client));
+                        //imgs[i].Tags.AddRange(GetTagsFromSauceNao(temp, saucenao_client));
                     }
                     catch (Exception ex)
                     {
@@ -360,7 +360,7 @@ namespace Shinon
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("{0}.xml", PostID);
+            string strURL = String.Format("{0}.xml", PostID).Replace("/show/", "/");
             try
             {
                 Uri uri = new Uri(strURL);
