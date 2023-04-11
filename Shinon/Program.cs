@@ -24,15 +24,13 @@ namespace Shinon
         static string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
         static bool USE_PROXY = true;
         static WebProxy proxy;
-        static int Width = 800;
-        static int Height = 800;
-        //SauceNao API key.
-        static string apiKey = "1bd2ae9f569df998e36cdc2ee9791fec4a157439";
         static SQLiteConnection Connection;
+        static string DanBooruLogin;
+        static string DanBooruAPIKey;
         static void Main(string[] args)
         {
             proxy = new WebProxy("nalsjn.ru", 8888);
-            proxy.Credentials = new NetworkCredential(System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), System.IO.File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
+            proxy.Credentials = new NetworkCredential(File.ReadAllText(@"C:\utils\cfg\Shinon\login.txt"), File.ReadAllText(@"C:\utils\cfg\Shinon\password.txt"));
             HttpClient saucenao_client = new HttpClient();
             saucenao_client.BaseAddress = new Uri("https://saucenao.com/");
             saucenao_client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
@@ -40,6 +38,8 @@ namespace Shinon
             iqdb_client = new IqdbClient();
             Connection = new SQLiteConnection(@"data source=C:\utils\data\erza.sqlite");
             Connection.Open();
+            DanBooruLogin = File.ReadAllText(@"C:\utils\cfg\Shinon\danbooru-login.txt");
+            DanBooruAPIKey = File.ReadAllText(@"C:\utils\cfg\Shinon\danbooru-apikey.txt");
             List<ImageInfo> imgs;
             if (CountItemOnCache() <= 0)
             {
@@ -356,11 +356,12 @@ namespace Shinon
         {
             WebClient Client = new WebClient();
             Client.Headers["User-Agent"] = UserAgent;
+            Client.Headers["Referer"] = "https://danbooru.donmai.us/";
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
             }
-            string strURL = String.Format("{0}.xml", PostID).Replace("/show/", "/");
+            string strURL = String.Format("{0}.xml?login={1}&api_key={2}", PostID.Replace("/show/", "/"), DanBooruLogin, DanBooruAPIKey);
             try
             {
                 Uri uri = new Uri(strURL);
