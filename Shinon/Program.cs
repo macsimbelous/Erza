@@ -58,18 +58,18 @@ namespace Shinon
             else
             {
                 imgs = GetImagesFromCache();
-                List<ImageInfo> temp = GetNewImages();
-                Console.Write("Добавляем в Кэш...");
-                SQLiteTransaction transact = Program.Connection.BeginTransaction();
-                foreach (ImageInfo img in temp)
-                {
-                    InsertItemFromCache(img.ImageID);
-                }
-                transact.Commit();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("ОК");
-                Console.ResetColor();
-                imgs.InsertRange(0, temp);
+                //List<ImageInfo> temp = GetNewImages();
+                //Console.Write("Добавляем в Кэш...");
+                //SQLiteTransaction transact = Program.Connection.BeginTransaction();
+                //foreach (ImageInfo img in temp)
+                //{
+                //    InsertItemFromCache(img.ImageID);
+                //}
+                //transact.Commit();
+                //Console.ForegroundColor = ConsoleColor.Green;
+                //Console.WriteLine("ОК");
+                //Console.ResetColor();
+                //imgs.InsertRange(0, temp);
             }
             int error = 0;
             for (int i = 0; i < imgs.Count; i++)
