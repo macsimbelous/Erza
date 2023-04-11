@@ -355,8 +355,8 @@ namespace Shinon
         static string[] GetTagsFromDanbooru(string PostID, WebProxy proxy)
         {
             WebClient Client = new WebClient();
-            Client.Headers["User-Agent"] = UserAgent;
-            Client.Headers["Referer"] = "https://danbooru.donmai.us/";
+            Client.Headers["User-Agent"] = "Mozilla / 5.0(Windows NT 6.2; WOW64) AppleWebKit / 537.36(KHTML, like Gecko) Chrome / 34.0.1847.116 Safari / 537.36";
+            //Client.Headers["Referer"] = "https://danbooru.donmai.us/";
             if (USE_PROXY)
             {
                 Client.Proxy = proxy;
