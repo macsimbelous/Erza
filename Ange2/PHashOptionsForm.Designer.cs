@@ -84,6 +84,7 @@
             Controls.Add(numericUpDown1);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             Name = "PHashOptionsForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Степень совпадения";
             Load += PHashOptionsForm_Load;
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();

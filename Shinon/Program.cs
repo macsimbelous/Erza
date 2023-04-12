@@ -118,6 +118,7 @@ namespace Shinon
                     Console.ResetColor();
                     error++;
                 }
+                //Thread.Sleep(5000);
             }
             Console.WriteLine($"Ошибок: {error}");
             Connection.Close();
