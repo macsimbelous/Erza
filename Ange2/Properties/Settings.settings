@@ -11,5 +11,8 @@
     <Setting Name="SizeWindow" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">1299, 729</Value>
     </Setting>
+    <Setting Name="similar" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

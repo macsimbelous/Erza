@@ -800,48 +800,53 @@ namespace Ange
         {
             if (this.imageListView1.SelectedItems.Count > 0)
             {
-                ImageInfo img = (ImageInfo)imageListView1.SelectedItems[0].VirtualItemKey;
-                byte[] phash;
-                List<long> similars = new List<long>();
-                long count = 0;
-                using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM phashs WHERE image_id = @image_id", Erza))
+                PHashOptionsForm form = new PHashOptionsForm();
+                if(form.ShowDialog() == DialogResult.OK)
                 {
-                    command.Parameters.AddWithValue("image_id", img.ImageID);
-                    object o = command.ExecuteScalar();
-                    if (o == null)
+                    ImageInfo img = (ImageInfo)imageListView1.SelectedItems[0].VirtualItemKey;
+                    byte[] phash;
+                    List<long> similars = new List<long>();
+                    long count = 0;
+                    using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM phashs WHERE image_id = @image_id", Erza))
                     {
-                        MessageBox.Show("Нет Phash");
-                        return;
-                    }
-                    phash = o as byte[];
-                }
-                using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from phashs;", Erza))
-                {
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        long imageid = (long)reader["image_id"];
-                        byte[] current_phash = (byte[])reader["phash"];
-                        double result = ImagePhash.GetCrossCorrelation(phash, current_phash);
-                        if (result > 0.95)
+                        command.Parameters.AddWithValue("image_id", img.ImageID);
+                        object o = command.ExecuteScalar();
+                        if (o == null)
                         {
-                            similars.Add(imageid);
-
+                            MessageBox.Show("Нет Phash");
+                            return;
                         }
+                        phash = o as byte[];
                     }
-                    reader.Close();
+                    using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from phashs;", Erza))
+                    {
+                        SQLiteDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            long imageid = (long)reader["image_id"];
+                            byte[] current_phash = (byte[])reader["phash"];
+                            double result = ImagePhash.GetCrossCorrelation(phash, current_phash);
+                            if (result > form.similar)
+                            {
+                                similars.Add(imageid);
+
+                            }
+                        }
+                        reader.Close();
+                    }
+                    imageListView1.SuspendLayout();
+                    imageListView1.Items.Clear();
+                    foreach (long imageid in similars)
+                    {
+                        ImageInfo temp = ErzaDB.GetImageWithOutTags(imageid, Erza);
+                        imageListView1.Items.Add(temp, temp.Hash, adaptor);
+                        count++;
+                    }
+                    imageListView1.ResumeLayout();
+                    imageListView1.EnsureVisible(0);
+                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + count.ToString();
                 }
-                imageListView1.SuspendLayout();
-                imageListView1.Items.Clear();
-                foreach (long imageid in similars)
-                {
-                    ImageInfo temp = ErzaDB.GetImageWithOutTags(imageid, Erza);
-                    imageListView1.Items.Add(temp, temp.Hash, adaptor);
-                    count++;
-                }
-                imageListView1.ResumeLayout();
-                imageListView1.EnsureVisible(0);
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + count.ToString();
+                form.Dispose();
             }
         }
     }
