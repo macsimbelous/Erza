@@ -824,12 +824,19 @@ namespace Ange
                         while (reader.Read())
                         {
                             long imageid = (long)reader["image_id"];
-                            byte[] current_phash = (byte[])reader["phash"];
-                            double result = ImagePhash.GetCrossCorrelation(phash, current_phash);
-                            if (result > form.similar)
+                            if (imageid == img.ImageID)
                             {
-                                similars.Add(imageid);
+                                similars.Insert(0, imageid);
+                            }
+                            else
+                            {
+                                byte[] current_phash = (byte[])reader["phash"];
+                                double result = ImagePhash.GetCrossCorrelation(phash, current_phash);
+                                if (result >= form.similar)
+                                {
+                                    similars.Add(imageid);
 
+                                }
                             }
                         }
                         reader.Close();
