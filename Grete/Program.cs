@@ -83,7 +83,7 @@ namespace Grete
             WriterThread.Start();
             while (true)
             {
-                Console.Write($"\rC: {c_count}\\CE: {ce_count}\\W: {w_count}\\WE: {we_count}\\{size_queue}");
+                Console.Write($"\rC: {c_count}\\CE: {ce_count}\\W: {w_count}\\WE: {we_count}\\T: {size_queue}");
                 bool alive = false;
                 foreach (Thread thread in threads)
                 {
