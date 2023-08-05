@@ -33,6 +33,7 @@ using AutocompleteMenuNS;
 using System.Security.Policy;
 using Shipwreck.Phash;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace Ange
 {
@@ -293,7 +294,8 @@ namespace Ange
             if (this.imageListView1.SelectedItems.Count > 0)
             {
                 ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
-                System.Diagnostics.Process.Start(img.FilePath);
+                //System.Diagnostics.Process.Start(img.FilePath);
+                Process.Start(new ProcessStartInfo(img.FilePath) { UseShellExecute = true });
             }
 
         }
@@ -801,7 +803,7 @@ namespace Ange
             if (this.imageListView1.SelectedItems.Count > 0)
             {
                 PHashOptionsForm form = new PHashOptionsForm();
-                if(form.ShowDialog() == DialogResult.OK)
+                if (form.ShowDialog() == DialogResult.OK)
                 {
                     ImageInfo img = (ImageInfo)imageListView1.SelectedItems[0].VirtualItemKey;
                     byte[] phash;
@@ -856,6 +858,21 @@ namespace Ange
                 form.Dispose();
             }
         }
-    }
 
+        private void open_in_explorer_toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                Process PrFolder = new Process();
+                ProcessStartInfo psi = new ProcessStartInfo();
+                psi.CreateNoWindow = true;
+                psi.WindowStyle = ProcessWindowStyle.Normal;
+                psi.FileName = "explorer";
+                psi.Arguments = @"/n, /select, " + img.FilePath;
+                PrFolder.StartInfo = psi;
+                PrFolder.Start();
+            }
+        }
+    }
 }
