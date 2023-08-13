@@ -85,7 +85,7 @@ namespace Shinon
                     Console.WriteLine($"[{i}/{imgs.Count}] Ишем дубликаты для {imgs[i].FilePath}...");
                     try
                     {
-                        string temp = "E:\\previews\\" + imgs[i].Hash[0] + "\\" + imgs[i].Hash[1] + "\\" + imgs[i].Hash + ".jpg";
+                        string temp = "D:\\previews\\" + imgs[i].Hash[0] + "\\" + imgs[i].Hash[1] + "\\" + imgs[i].Hash + ".jpg";
                         imgs[i].Tags = GetTagsFromIqdb2(temp, iqdb_client);
                         //imgs[i].Tags.AddRange(GetTagsFromSauceNao(temp, saucenao_client));
                     }
