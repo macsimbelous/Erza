@@ -42,7 +42,7 @@ namespace Ange
         private const int PreviewWidth = 300;
         private const int PreviewHeight = 225;
         //public static SQLiteConnection Previews;
-        public static string PreviewPath = "E:\\previews";
+        public static string PreviewPath = Properties.Settings.Default.PreviewPath;
         public static SQLiteConnection Erza;
         //SolidBrush brush;
         private CustomAdaptor adaptor;
