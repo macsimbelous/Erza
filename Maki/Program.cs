@@ -32,7 +32,7 @@ namespace Maki
 {
     class Program
     {
-        public static string PreviewPath = "E:\\previews";
+        public static string PreviewPath = "D:\\previews";
         static void Main(string[] args)
         {
             const int PreviewWidth = 300;
