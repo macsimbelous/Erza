@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Erza": {
+      "commandName": "Project",
+      "commandLineArgs": "test"
+    }
+  }
+}
