@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GetGelbooru": {
+      "commandName": "Project",
+      "commandLineArgs": "anastasia_(fate)"
+    }
+  }
+}

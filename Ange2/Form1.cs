@@ -874,5 +874,28 @@ namespace Ange
                 PrFolder.Start();
             }
         }
+
+        private void imageListView1_ItemHover(object sender, ItemHoverEventArgs e)
+        {
+            if (e.Item != null)
+            {
+                string[] tags = e.Item.UserComment.Split(' ');
+                toolTip1.ToolTipTitle = "Тегов " + tags.Length.ToString();
+                StringBuilder tt = new StringBuilder();
+                StringBuilder str = new StringBuilder();
+                foreach (string tag in tags)
+                {
+                    str.Append(tag);
+                    if(str.Length > 75 ) {
+                        tt.Append(str);
+                        tt.AppendLine();
+                        str.Clear();
+                    }
+                }
+                //toolTip1.SetToolTip(imageListView1, e.Item.UserComment.Replace(' ', '\n'));
+                toolTip1.SetToolTip(imageListView1, tt.ToString());
+
+            }
+        }
     }
 }
