@@ -236,15 +236,6 @@ namespace Ange
             LoadImage();
         }
 
-        private void edittagsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            EditTagsForm form = new EditTagsForm();
-            form.Connection = Erza;
-            form.EditImage = this.Result[this.Index];
-            form.ShowDialog();
-            LoadImage();
-        }
-
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
@@ -376,7 +367,9 @@ namespace Ange
             form.Tags = this.Tags_Cache;*/
             if (form.ShowDialog() == DialogResult.OK)
             {
-                ErzaDB.AddTagToImage(Result[this.Index].ImageID, form.NewTag, Erza);
+                Result[this.Index].AddTags(form.NewTags);
+                ErzaDB.LoadImageToErza(Result[this.Index], Erza);
+                //ErzaDB.AddTagToImage(Result[this.Index].ImageID, form.NewTag, Erza);
                 List<TagInfo> temp = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, this.Erza);
                 this.Tags = new BindingList<TagInfo>(temp.OrderBy(tag => tag.Tag).ToList());
                 this.listBox1.DataSource = this.Tags;

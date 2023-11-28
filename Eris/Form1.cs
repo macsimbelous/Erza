@@ -114,7 +114,7 @@ namespace Eris
 
         private void delete_toolStripButton_Click(object sender, EventArgs e)
         {
-            if(dataGridView1.SelectedRows.Count <= 0) { return; }
+            if (dataGridView1.SelectedRows.Count <= 0) { return; }
             foreach (DataGridViewRow row in dataGridView1.SelectedRows)
             {
                 dataGridView1.Rows.Remove(row);
@@ -208,7 +208,7 @@ namespace Eris
 
         private void count_all_toolStripButton_Click(object sender, EventArgs e)
         {
-            if(MessageBox.Show("Произвести подсчёт ссылок на все теги?","Подтверждение",MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("Произвести подсчёт ссылок на все теги?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 CalculateAllLinksForm form = new CalculateAllLinksForm();
                 form.table = table;
@@ -295,6 +295,11 @@ namespace Eris
                         break;
                 }
             }
+        }
+
+        private void search_toolStripTextBox_TextChanged(object sender, EventArgs e)
+        {
+            index_search = 0;
         }
     }
 }

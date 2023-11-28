@@ -161,16 +161,6 @@ namespace Ange
             form.Index = this.imageListView1.SelectedItems[0].Index;
             form.ShowDialog();
         }
-        private void edittagsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (this.imageListView1.SelectedItems.Count > 0)
-            {
-                EditTagsForm form = new EditTagsForm();
-                form.Connection = Erza;
-                form.EditImage = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
-                form.ShowDialog();
-            }
-        }
         private void copytowallToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.imageListView1.SelectedItems.Count > 0)
@@ -374,6 +364,7 @@ namespace Ange
                     //this.imageListView1.Items[form.Index].Selected = true;
                     //this.imageListView1.Items[form.Index].Update();
                     //this.imageListView1.Items.FocusedItem = this.imageListView1.Items[form.Index];
+                    this.imageListView1.SelectedItems[0].Update();
                     this.imageListView1.EnsureVisible(form.Index);
                 }
             }
@@ -886,7 +877,8 @@ namespace Ange
                 foreach (string tag in tags)
                 {
                     str.Append(tag);
-                    if(str.Length > 75 ) {
+                    if (str.Length > 75)
+                    {
                         tt.Append(str);
                         tt.AppendLine();
                         str.Clear();
@@ -894,7 +886,30 @@ namespace Ange
                 }
                 //toolTip1.SetToolTip(imageListView1, e.Item.UserComment.Replace(' ', '\n'));
                 toolTip1.SetToolTip(imageListView1, tt.ToString());
+            }
+        }
 
+        private void add_tag_ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                AddTagForm form = new AddTagForm();
+                form.Erza = Erza;
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    if(form.NewTags.Length > 0)
+                    {
+                        SQLiteTransaction transact = Erza.BeginTransaction();
+                        foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                        {
+                            ImageInfo img = (ImageInfo)item.VirtualItemKey;
+                            img.AddTags(form.NewTags);
+                            ErzaDB.LoadImageToErza(img, Erza);
+                            item.Update();
+                        }
+                        transact.Commit();
+                    }
+                }
             }
         }
     }

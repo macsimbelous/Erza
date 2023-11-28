@@ -85,13 +85,6 @@
             this.viewinfullscreenToolStripMenuItem.Text = "На весь экран";
             this.viewinfullscreenToolStripMenuItem.Click += new System.EventHandler(this.viewinfullscreenToolStripMenuItem_Click);
             // 
-            // edittagsToolStripMenuItem
-            // 
-            this.edittagsToolStripMenuItem.Name = "edittagsToolStripMenuItem";
-            this.edittagsToolStripMenuItem.Size = new System.Drawing.Size(201, 30);
-            this.edittagsToolStripMenuItem.Text = "Изменить теги";
-            this.edittagsToolStripMenuItem.Click += new System.EventHandler(this.edittagsToolStripMenuItem_Click);
-            // 
             // nextToolStripMenuItem
             // 
             this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
