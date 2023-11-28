@@ -364,7 +364,10 @@ namespace Ange
                     //this.imageListView1.Items[form.Index].Selected = true;
                     //this.imageListView1.Items[form.Index].Update();
                     //this.imageListView1.Items.FocusedItem = this.imageListView1.Items[form.Index];
-                    this.imageListView1.SelectedItems[0].Update();
+                    if (this.imageListView1.SelectedItems.Count > 0)
+                    {
+                        this.imageListView1.SelectedItems[0].Update();
+                    }
                     this.imageListView1.EnsureVisible(form.Index);
                 }
             }
