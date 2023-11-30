@@ -900,7 +900,7 @@ namespace Ange
                 form.Erza = Erza;
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    if(form.NewTags.Length > 0)
+                    if (form.NewTags.Length > 0)
                     {
                         SQLiteTransaction transact = Erza.BeginTransaction();
                         foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
@@ -913,6 +913,15 @@ namespace Ange
                         transact.Commit();
                     }
                 }
+            }
+        }
+
+        private void copytagToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                //ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                Clipboard.SetText(this.imageListView1.SelectedItems[0].UserComment);
             }
         }
     }

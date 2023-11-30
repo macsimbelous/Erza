@@ -36,6 +36,7 @@
             openOuterSoftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             open_in_explorer_toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             add_tag_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            copytagToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             copyhashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             find_similar_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,21 +52,25 @@
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             toolTip1 = new System.Windows.Forms.ToolTip(components);
+            search_button = new System.Windows.Forms.Button();
+            slide_show_button = new System.Windows.Forms.Button();
             imageListView1 = new Manina.Windows.Forms.ImageListView();
             folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             autocompleteMenu1 = new AutocompleteMenuNS.AutocompleteMenu();
             tags_textBox = new System.Windows.Forms.TextBox();
             option_comboBox = new System.Windows.Forms.ComboBox();
-            search_button = new System.Windows.Forms.Button();
-            slide_show_button = new System.Windows.Forms.Button();
+            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             contextMenuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
             // 
             // contextMenuStrip1
             // 
             contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { view_in_window_ToolStripMenuItem, view_fullscreen_ToolStripMenuItem, openOuterSoftToolStripMenuItem, open_in_explorer_toolStripMenuItem1, add_tag_ToolStripMenuItem, slideshowToolStripMenuItem, copyhashToolStripMenuItem, find_similar_ToolStripMenuItem, toolStripSeparator2, copytowallToolStripMenuItem, copytodirToolStripMenuItem, copyAllToDirToolStripMenuItem, MoveAllToDirToolStripMenuItem, recreate_preview_ToolStripMenuItem, toolStripSeparator1, deleteToolStripMenuItem });
+            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { view_in_window_ToolStripMenuItem, view_fullscreen_ToolStripMenuItem, openOuterSoftToolStripMenuItem, open_in_explorer_toolStripMenuItem1, add_tag_ToolStripMenuItem, copytagToolStripMenuItem, slideshowToolStripMenuItem, copyhashToolStripMenuItem, find_similar_ToolStripMenuItem, toolStripSeparator2, copytowallToolStripMenuItem, copytodirToolStripMenuItem, copyAllToDirToolStripMenuItem, MoveAllToDirToolStripMenuItem, recreate_preview_ToolStripMenuItem, toolStripSeparator1, deleteToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
             contextMenuStrip1.Size = new System.Drawing.Size(257, 346);
             // 
@@ -103,6 +108,13 @@
             add_tag_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             add_tag_ToolStripMenuItem.Text = "Добавить теги";
             add_tag_ToolStripMenuItem.Click += add_tag_ToolStripMenuItem_Click;
+            // 
+            // copytagToolStripMenuItem
+            // 
+            copytagToolStripMenuItem.Name = "copytagToolStripMenuItem";
+            copytagToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            copytagToolStripMenuItem.Text = "Копировать теги";
+            copytagToolStripMenuItem.Click += copytagToolStripMenuItem_Click;
             // 
             // slideshowToolStripMenuItem
             // 
@@ -200,16 +212,41 @@
             toolStripStatusLabel1.Size = new System.Drawing.Size(136, 17);
             toolStripStatusLabel1.Text = "Изображений найдено:";
             // 
+            // search_button
+            // 
+            search_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            search_button.Image = (System.Drawing.Image)resources.GetObject("search_button.Image");
+            search_button.Location = new System.Drawing.Point(1258, 4);
+            search_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            search_button.Name = "search_button";
+            search_button.Size = new System.Drawing.Size(37, 24);
+            search_button.TabIndex = 10;
+            toolTip1.SetToolTip(search_button, "Поиск");
+            search_button.UseVisualStyleBackColor = true;
+            search_button.Click += search_button_Click;
+            // 
+            // slide_show_button
+            // 
+            slide_show_button.Image = Properties.Resources.images25;
+            slide_show_button.Location = new System.Drawing.Point(1301, 4);
+            slide_show_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            slide_show_button.Name = "slide_show_button";
+            slide_show_button.Size = new System.Drawing.Size(37, 25);
+            slide_show_button.TabIndex = 11;
+            toolTip1.SetToolTip(slide_show_button, "Слайд шоу");
+            slide_show_button.UseVisualStyleBackColor = true;
+            slide_show_button.Click += slide_show_button_Click;
+            // 
             // imageListView1
             // 
-            imageListView1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             imageListView1.ContextMenuStrip = contextMenuStrip1;
-            imageListView1.Location = new System.Drawing.Point(0, 37);
+            imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            imageListView1.Location = new System.Drawing.Point(3, 39);
             imageListView1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             imageListView1.Name = "imageListView1";
             imageListView1.PersistentCacheDirectory = "";
             imageListView1.PersistentCacheSize = 100L;
-            imageListView1.Size = new System.Drawing.Size(1347, 577);
+            imageListView1.Size = new System.Drawing.Size(1341, 572);
             imageListView1.TabIndex = 7;
             imageListView1.ThumbnailSize = new System.Drawing.Size(300, 225);
             imageListView1.UseWIC = true;
@@ -226,63 +263,68 @@
             // 
             // tags_textBox
             // 
-            tags_textBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             autocompleteMenu1.SetAutocompleteMenu(tags_textBox, autocompleteMenu1);
-            tags_textBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold);
-            tags_textBox.Location = new System.Drawing.Point(0, 4);
+            tags_textBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            tags_textBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 204);
+            tags_textBox.Location = new System.Drawing.Point(3, 4);
             tags_textBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             tags_textBox.Name = "tags_textBox";
-            tags_textBox.Size = new System.Drawing.Size(1112, 29);
+            tags_textBox.Size = new System.Drawing.Size(1102, 26);
             tags_textBox.TabIndex = 8;
             tags_textBox.KeyDown += tags_textBox_KeyDown;
             // 
             // option_comboBox
             // 
-            option_comboBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             option_comboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            option_comboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold);
+            option_comboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 204);
             option_comboBox.FormattingEnabled = true;
             option_comboBox.Items.AddRange(new object[] { "Теги", "Теги ИЛИ", "Часть тега", "MD5" });
-            option_comboBox.Location = new System.Drawing.Point(1118, 4);
+            option_comboBox.Location = new System.Drawing.Point(1111, 4);
             option_comboBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             option_comboBox.Name = "option_comboBox";
-            option_comboBox.Size = new System.Drawing.Size(141, 32);
+            option_comboBox.Size = new System.Drawing.Size(141, 28);
             option_comboBox.TabIndex = 9;
             // 
-            // search_button
+            // tableLayoutPanel1
             // 
-            search_button.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            search_button.Image = Properties.Resources.search25;
-            search_button.Location = new System.Drawing.Point(1265, 0);
-            search_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            search_button.Name = "search_button";
-            search_button.Size = new System.Drawing.Size(37, 34);
-            search_button.TabIndex = 10;
-            search_button.UseVisualStyleBackColor = true;
-            search_button.Click += search_button_Click;
+            tableLayoutPanel1.ColumnCount = 1;
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 0, 0);
+            tableLayoutPanel1.Controls.Add(imageListView1, 0, 1);
+            tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 2;
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            tableLayoutPanel1.Size = new System.Drawing.Size(1347, 615);
+            tableLayoutPanel1.TabIndex = 12;
             // 
-            // slide_show_button
+            // tableLayoutPanel2
             // 
-            slide_show_button.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            slide_show_button.Image = Properties.Resources.images25;
-            slide_show_button.Location = new System.Drawing.Point(1306, 0);
-            slide_show_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            slide_show_button.Name = "slide_show_button";
-            slide_show_button.Size = new System.Drawing.Size(37, 34);
-            slide_show_button.TabIndex = 11;
-            slide_show_button.UseVisualStyleBackColor = true;
-            slide_show_button.Click += slide_show_button_Click;
+            tableLayoutPanel2.ColumnCount = 4;
+            tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            tableLayoutPanel2.Controls.Add(tags_textBox, 0, 0);
+            tableLayoutPanel2.Controls.Add(option_comboBox, 1, 0);
+            tableLayoutPanel2.Controls.Add(slide_show_button, 3, 0);
+            tableLayoutPanel2.Controls.Add(search_button, 2, 0);
+            tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 1;
+            tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            tableLayoutPanel2.Size = new System.Drawing.Size(1341, 29);
+            tableLayoutPanel2.TabIndex = 0;
             // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1347, 637);
-            Controls.Add(slide_show_button);
-            Controls.Add(search_button);
-            Controls.Add(option_comboBox);
-            Controls.Add(tags_textBox);
-            Controls.Add(imageListView1);
+            Controls.Add(tableLayoutPanel1);
             Controls.Add(statusStrip1);
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -294,6 +336,9 @@
             contextMenuStrip1.ResumeLayout(false);
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
+            tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel2.ResumeLayout(false);
+            tableLayoutPanel2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -327,6 +372,9 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem open_in_explorer_toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem add_tag_ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copytagToolStripMenuItem;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
     }
 }
 
