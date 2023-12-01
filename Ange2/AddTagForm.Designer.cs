@@ -535,7 +535,8 @@
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             Name = "AddTagForm";
-            Text = "Добавление тега";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "Добавление тегов";
             Load += AddTagForm_Load;
             ResumeLayout(false);
         }

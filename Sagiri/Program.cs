@@ -123,7 +123,7 @@ namespace Sagiri
                         string hash = ComputeMD5(files[i]);
                         string sub_dir = "\\" + hash[0] + "\\" + hash[1];
                         string ext = Path.GetExtension(files[i]);
-                        if (ext.CompareTo(".jpeg") == 0)
+                        if ((ext.CompareTo(".jpeg") == 0) || (ext.CompareTo(".jpe") == 0))
                         {
                             dest_file = dest_path + sub_dir + "\\" + hash + ".jpg";
                         }
