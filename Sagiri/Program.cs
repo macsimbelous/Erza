@@ -182,6 +182,8 @@ namespace Sagiri
                     return true;
                 case ".jpeg":
                     return true;
+                case ".jpe":
+                    return true;
                 case ".png":
                     return true;
                 case ".bmp":
