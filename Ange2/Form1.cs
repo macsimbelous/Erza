@@ -876,6 +876,7 @@ namespace Ange
                 string[] tags = e.Item.UserComment.Split(' ');
                 toolTip1.ToolTipTitle = "Тегов " + tags.Length.ToString();
                 StringBuilder tt = new StringBuilder();
+                //tt.Append("Тегов " + tags.Length.ToString() + "\n");
                 StringBuilder str = new StringBuilder();
                 foreach (string tag in tags)
                 {
@@ -889,6 +890,7 @@ namespace Ange
                 }
                 //toolTip1.SetToolTip(imageListView1, e.Item.UserComment.Replace(' ', '\n'));
                 toolTip1.SetToolTip(imageListView1, tt.ToString());
+                //toolTip1.Show(tt.ToString(), imageListView1);
             }
         }
 
