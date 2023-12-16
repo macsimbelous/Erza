@@ -27,6 +27,7 @@ using System.Data.SQLite;
 using ImageMagick;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
+using WebP.Net;
 
 namespace Maki
 {
@@ -80,13 +81,30 @@ namespace Maki
                     string dest_file = PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg";
 
                     //Directory.CreateDirectory(PreviewPath + "\\" + hash[0] + "\\" + hash[1]);
-                    using (MagickImage img = new MagickImage(files_to_preview[i]))
+                    if (Path.GetExtension(files_to_preview[i]).ToLower() == ".webp")
                     {
-                        img.Resize(p_size);
-                        img.SetCompression(CompressionMethod.JPEG);
-                        img.Quality = 80;
-                        img.Write(dest_file);
+                        using var webp = new WebPObject(File.ReadAllBytes(files_to_preview[i]));
+                        var m = new MagickFactory();
+                        Bitmap bitmap = new Bitmap(webp.GetImage());
+                        MagickImage image = new MagickImage(m.Image.Create(bitmap));
+
+                        image.Resize(p_size);
+                        image.SetCompression(CompressionMethod.JPEG);
+                        image.Quality = 80;
+                        image.Write(dest_file);
+                        
                     }
+                    else
+                    {
+                        using (MagickImage img = new MagickImage(files_to_preview[i]))
+                        {
+                            img.Resize(p_size);
+                            img.SetCompression(CompressionMethod.JPEG);
+                            img.Quality = 80;
+                            img.Write(dest_file);
+                        }
+                    }
+
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Успех!");
                     Console.ResetColor();

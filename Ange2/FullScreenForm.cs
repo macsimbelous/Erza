@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ErzaLib;
 using System.IO;
+using WebP.Net;
 
 namespace Ange
 {
@@ -119,11 +120,19 @@ namespace Ange
                 if (fs != null) { fs.Close(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {
-                    //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-                    fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
-                    this.pictureBox1.Image = Image.FromStream(fs);
-                    //fs.Close();
-                    ImageFormat = GetImageFormat(this.pictureBox1.Image);
+                    if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".webp")
+                    {
+                        using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
+                        pictureBox1.Image = webp.GetImage();
+                        ImageFormat = "WEBP";
+                    }
+                    else
+                    {
+                        fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
+                        this.pictureBox1.Image = Image.FromStream(fs);
+                        //fs.Close();
+                        ImageFormat = GetImageFormat(this.pictureBox1.Image);
+                    }
                     Result[this.Index].Tags = ErzaDB.GetTagsByImageIDToString(Result[this.Index].ImageID, Form1.Erza);
                     StringBuilder tag_string = new StringBuilder();
                     for (int i = 0; i < Result[this.Index].Tags.Count; i++)

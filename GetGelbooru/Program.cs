@@ -581,6 +581,8 @@ namespace GetGelbooru
                     return true;
                 case ".jpeg":
                     return true;
+                case ".jpe":
+                    return true;
                 case ".png":
                     return true;
                 case ".bmp":
@@ -590,6 +592,8 @@ namespace GetGelbooru
                 case ".tif":
                     return true;
                 case ".tiff":
+                    return true;
+                case ".webp":
                     return true;
             }
             return false;

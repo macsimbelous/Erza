@@ -194,6 +194,8 @@ namespace Sagiri
                     return true;
                 case ".tiff":
                     return true;
+                case ".webp":
+                    return true;
             }
             return false;
         }

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ErzaLib;
+using WebP.Net;
 
 namespace Ange
 {
@@ -101,7 +103,16 @@ namespace Ange
         {
             try
             {
-                this.pictureBox1.ImageLocation = path;
+                if (Path.GetExtension(path).ToLower() == ".webp")
+                {
+                    using var webp = new WebPObject(File.ReadAllBytes(path));
+                    this.pictureBox1.Image = webp.GetImage();
+                }
+                else
+                {
+                    this.pictureBox1.ImageLocation = path;
+                }
+                
             }
             catch (Exception e)
             {

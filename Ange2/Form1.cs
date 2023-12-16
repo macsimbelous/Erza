@@ -26,6 +26,7 @@ using System.Drawing.Drawing2D;
 using System.Data.SQLite;
 using System.IO;
 using ErzaLib;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Manina.Windows.Forms;
@@ -34,6 +35,8 @@ using System.Security.Policy;
 using Shipwreck.Phash;
 using System.Reflection;
 using System.Diagnostics;
+using WebP.Net;
+using ImageMagick;
 
 namespace Ange
 {
@@ -410,7 +413,19 @@ namespace Ange
             System.Drawing.Bitmap bmpOut;
             try
             {
-                Bitmap loBMP = new Bitmap(lcFilename);
+                Bitmap loBMP;
+                if (Path.GetExtension(lcFilename).ToLower() == ".webp")
+                {
+                    using var webp = new WebPObject(File.ReadAllBytes(lcFilename));
+                    var m = new MagickFactory();
+                    loBMP = new Bitmap(webp.GetImage());
+
+                }
+                else
+                {
+                    loBMP = new Bitmap(lcFilename);
+                }
+                
                 ImageFormat loFormat = loBMP.RawFormat;
 
                 //decimal lnRatio;
