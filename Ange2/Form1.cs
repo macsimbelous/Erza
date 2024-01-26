@@ -586,6 +586,7 @@ namespace Ange
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < tag_list.Count; i++)
                     {
+                        img.Tags.Add(tag_list[i].Tag);
                         if (i == 0)
                         {
                             sb.Append(tag_list[i].Tag);
@@ -888,12 +889,13 @@ namespace Ange
         {
             if (e.Item != null)
             {
-                string[] tags = e.Item.UserComment.Split(' ');
-                toolTip1.ToolTipTitle = "Тегов " + tags.Length.ToString();
+                ImageInfo img = (ImageInfo)e.Item.VirtualItemKey;
+                //string[] tags = e.Item.UserComment.Split(' ');
+                toolTip1.ToolTipTitle = "Тегов " + img.Tags.Count.ToString();
                 StringBuilder tt = new StringBuilder();
                 //tt.Append("Тегов " + tags.Length.ToString() + "\n");
                 StringBuilder str = new StringBuilder();
-                foreach (string tag in tags)
+                foreach (string tag in img.Tags)
                 {
                     str.Append(tag);
                     if (str.Length > 75)
@@ -904,8 +906,12 @@ namespace Ange
                     }
                 }
                 //toolTip1.SetToolTip(imageListView1, e.Item.UserComment.Replace(' ', '\n'));
-                toolTip1.SetToolTip(imageListView1, tt.ToString());
+                //toolTip1.SetToolTip(imageListView1, tt.ToString());
                 //toolTip1.Show(tt.ToString(), imageListView1);
+                
+                toolStripStatusLabel2.Text = "Тегов: " + img.Tags.Count.ToString();
+                //toolStripStatusLabel2.ToolTipText = tt.ToString();
+                toolTip1.SetToolTip(statusStrip1, tt.ToString());
             }
         }
 
