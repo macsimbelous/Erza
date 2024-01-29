@@ -2,96 +2,76 @@
 using System.Data;
 using ErzaLib;
 using Shipwreck.Phash;
+using System.IO;
+using System.Collections.Concurrent;
+using System.Drawing;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Lora
 {
     internal class Program
     {
+        static double SIMILAR = 0.97;
+        static int LIMIT_THREADS = Environment.ProcessorCount;
+        static Thread[] threads = new Thread[LIMIT_THREADS];
+        static ConcurrentQueue<PhashCacheItem>? img_wo_tags;
+        static ConcurrentQueue<PhashCacheItem> img_finded_tags = new ConcurrentQueue<PhashCacheItem>();
+        static PhashCacheItem[]? phash_cache;
+        static object locker = new object();
+        static object locker3 = new object();
+        static bool abort = false;
+        static int c_count = 0;
+        static int ce_count = 0;
         static void Main(string[] args)
         {
-            double similar = 0.95;
             List<ImgTags> img_tags = new List<ImgTags>();
-            List<PhashCacheItem> phash_cache = new List<PhashCacheItem>();
-            List<long> img_wo_tags = new List<long>();
+
+
             using (SQLiteConnection connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite"))
             {
                 connection.Open();
-                long count_rows;
-                //Определяем число записей
-                using (SQLiteCommand command = new SQLiteCommand())
+                //Считываем записи без тегов
+                img_wo_tags = ReadImgWOTags(connection);
+                int size_queue = img_wo_tags.Count;
+                //Загружаем кэш
+                Console.WriteLine("Загружаем кэш...");
+                phash_cache = LoadCache(connection);
+                Console.WriteLine("Готово");
+                //Сравниваем
+                for (int i = 0; i < LIMIT_THREADS; i++)
                 {
-                    command.CommandText = "SELECT count(*) FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
-                    command.Connection = connection;
-                    count_rows = System.Convert.ToInt64(command.ExecuteScalar());
+                    threads[i] = new Thread(Similaring);
+                    threads[i].Name = "Поток " + i.ToString();
+                    threads[i].Start();
                 }
-                //Считываем записи
-                using (SQLiteCommand command = new SQLiteCommand())
+                while (true)
                 {
-                    command.CommandText = "SELECT images.image_id FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
-                    command.Connection = connection;
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    int count = 0;
-                    while (reader.Read())
+                    Console.Write($"\rC: {c_count}\\CE: {ce_count}\\T: {size_queue}");
+                    bool alive = false;
+                    foreach (Thread thread in threads)
                     {
-                        long id = reader.GetInt64(0);
-                        img_wo_tags.Add(id);
-                        count++;
-                        Console.Write("Считано: {0} из {1}\r", count, count_rows);
+                        if (thread.IsAlive)
+                        {
+                            alive = true;
+                            break;
+                        }
+                    }
+                    if (alive)
+                    {
+                        Thread.Sleep(0);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
-                //Сравниваем
+                /*
                 for (int i = 0; i < img_wo_tags.Count; i++)
                 {
                     long ImageID = img_wo_tags[i];
                     Console.Write($"[{i + 1}/{img_wo_tags.Count}] {ImageID}...");
                     byte[]? phash;
-                    List<long> similars = new List<long>();
-                    using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM phashs WHERE image_id = @image_id", connection))
-                    {
-                        command.Parameters.AddWithValue("image_id", ImageID);
-                        object o = command.ExecuteScalar();
-                        if (o == null)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("Нет Phash");
-                            Console.ResetColor();
-                            continue;
-                        }
-                        else
-                        {
-                            phash = o as byte[];
-                        }
-                    }
-                    if (phash_cache.Count > 0)
-                    {
-                        foreach (PhashCacheItem current_phash in phash_cache)
-                        {
-                            double result = ImagePhash.GetCrossCorrelation(phash, current_phash.Phash);
-                            if (result >= similar)
-                            {
-                                similars.Add(current_phash.ImageID);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from phashs;", connection))
-                        {
-                            SQLiteDataReader reader = command.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                long imageid = (long)reader["image_id"];
-                                byte[] current_phash = (byte[])reader["phash"];
-                                double result = ImagePhash.GetCrossCorrelation(phash, current_phash);
-                                if (result >= similar)
-                                {
-                                    similars.Add(imageid);
-                                }
-                                phash_cache.Add(new PhashCacheItem(imageid, current_phash));
-                            }
-                            reader.Close();
-                        }
-                    }
+
 
                     List<long> tagids = new List<long>();
                     foreach (long imageid in similars)
@@ -105,6 +85,87 @@ namespace Lora
                         img_tags.Add(new ImgTags(ImageID, tagids));
                     }
                     Console.WriteLine($"Найдено тегов {tagids.Count}");
+                }*/
+            }
+        }
+        static ConcurrentQueue<PhashCacheItem> ReadImgWOTags(SQLiteConnection connection)
+        {
+            ConcurrentQueue<PhashCacheItem> imgs = new ConcurrentQueue<PhashCacheItem>();
+            long count_rows;
+            //Определяем число записей
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT count(*) FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id LEFT OUTER JOIN phashs ON images.image_id = phashs.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL AND phashs.phash IS NOT NULL;";
+                command.Connection = connection;
+                count_rows = System.Convert.ToInt64(command.ExecuteScalar());
+            }
+            //Считываем записи
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT images.image_id, phashs.phash FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id LEFT OUTER JOIN phashs ON images.image_id = phashs.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL AND phashs.phash IS NOT NULL;";
+                command.Connection = connection;
+                SQLiteDataReader reader = command.ExecuteReader();
+                int count = 0;
+                while (reader.Read())
+                {
+                    imgs.Enqueue(new PhashCacheItem((long)reader[0], (byte[])reader[1]));
+                    count++;
+                    Console.Write("Считано: {0} из {1}\r", count, count_rows);
+                }
+                Console.WriteLine();
+            }
+            return imgs;
+        }
+        static PhashCacheItem[] LoadCache(SQLiteConnection connection)
+        {
+            List<PhashCacheItem> phash_cache = new List<PhashCacheItem>();
+            using (SQLiteCommand command = new SQLiteCommand("SELECT phashs.image_id, phashs.phash FROM phashs LEFT OUTER JOIN image_tags on phashs.image_id = image_tags.image_id WHERE image_tags.image_id IS NOT NULL GROUP BY phashs.image_id;", connection))
+            {
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    phash_cache.Add(new PhashCacheItem((long)reader[0], (byte[])reader[1]));
+                }
+                reader.Close();
+            }
+            return phash_cache.ToArray();
+        }
+        static void Similaring()
+        {
+            while (!abort)
+            {
+                PhashCacheItem? item = null;
+                if (img_wo_tags.TryDequeue(out item))
+                {
+                    try
+                    {
+                        List<long> similars = new List<long>();
+                        foreach (PhashCacheItem current_phash in phash_cache)
+                        {
+                            double result = ImagePhash.GetCrossCorrelation(item.Phash, current_phash.Phash);
+                            if (result >= SIMILAR)
+                            {
+                                similars.Add(current_phash.ImageID);
+                            }
+                        }
+                        item.Similars = similars;
+                        img_finded_tags.Enqueue(item);
+                    }
+                    catch (Exception)
+                    {
+                        lock (locker3)
+                        {
+                            ce_count++;
+                        }
+                    }
+                    lock (locker)
+                    {
+                        c_count++;
+                    }
+                }
+                else
+                {
+                    break;
                 }
             }
         }
@@ -121,12 +182,13 @@ namespace Lora
     }
     class PhashCacheItem
     {
-        public PhashCacheItem(long ImageID, byte[] Phash)
+        public PhashCacheItem(long ImageID, byte[]? Phash)
         {
             this.Phash = Phash;
             this.ImageID = ImageID;
         }
         public long ImageID;
-        public byte[] Phash;
+        public byte[]? Phash;
+        public List<long>? Similars;
     }
 }
