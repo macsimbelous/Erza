@@ -80,23 +80,26 @@ namespace Ange
                     }
                     break;
                 case Keys.Delete:
-                    if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+                    if (MessageBox.Show("Удалить изображение " + Result[Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
                     {
-                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        if (pictureBox1.Image != null) {
+                            pictureBox1.Enabled = false;
+                            pictureBox1.Image.Dispose(); 
+                        }
                         if (fs != null) { fs.Close(); }
-                        DeleteImage(this.Index);
-                        if (this.Result.Count > 0)
+                        DeleteImage(Index);
+                        if (Result.Count > 0)
                         {
-                            if (this.Index >= this.Result.Count)
+                            if (Index >= Result.Count)
                             {
-                                this.Index = this.Result.Count - 1;
+                                Index = Result.Count - 1;
                             }
                             //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
                             LoadImage();
                         }
                         else
                         {
-                            this.Close();
+                            Close();
                         }
                     }
                     break;
@@ -133,6 +136,7 @@ namespace Ange
                         //fs.Close();
                         ImageFormat = GetImageFormat(this.pictureBox1.Image);
                     }
+                    pictureBox1.Enabled = true;
                     Result[this.Index].Tags = ErzaDB.GetTagsByImageIDToString(Result[this.Index].ImageID, Form1.Erza);
                     StringBuilder tag_string = new StringBuilder();
                     for (int i = 0; i < Result[this.Index].Tags.Count; i++)

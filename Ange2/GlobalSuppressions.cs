@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Ожидание>", Scope = "member", Target = "~M:Ange.Form1.recreate_preview_ToolStripMenuItem_Click(System.Object,System.EventArgs)")]
+[assembly: SuppressMessage("Interoperability", "CA1416:Проверка совместимости платформы", Justification = "<Ожидание>", Scope = "member", Target = "~M:Ange.FullScreenForm.FullScreenForm_KeyDown(System.Object,System.Windows.Forms.KeyEventArgs)")]

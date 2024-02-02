@@ -87,7 +87,7 @@ namespace Ange
                         //fs.Close();
                         ImageFormat = GetImageFormat(this.pictureBox1.Image);
                     }
-                   
+                    pictureBox1.Enabled = true;
                     this.format_label.Text = "Формат: " + ImageFormat;
                     this.resolution_label.Text = String.Format($"Разрешение: {this.pictureBox1.Image.Size.Width} x {this.pictureBox1.Image.Size.Height}");
                     /*if (this.Result[this.Index].Tags.Count == 0)
@@ -204,7 +204,9 @@ namespace Ange
                 case Keys.Delete:
                     if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
                     {
-                        if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                        if (this.pictureBox1.Image != null) {
+                            pictureBox1.Enabled = false;
+                            this.pictureBox1.Image.Dispose(); }
                         if (fs != null) { fs.Close(); }
                         DeleteImage(this.Index);
                         if (this.Result.Count > 0)
@@ -252,7 +254,9 @@ namespace Ange
         {
             if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                if (this.pictureBox1.Image != null) {
+                    pictureBox1.Enabled = false; 
+                    this.pictureBox1.Image.Dispose(); }
                 if (fs != null) { fs.Close(); }
                 DeleteImage(this.Index);
                 if (this.Result.Count > 0)
