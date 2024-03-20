@@ -11,7 +11,7 @@ namespace Lora
 {
     internal class Program
     {
-        static double SIMILAR = 0.97;
+        static double SIMILAR = 0.99;
         static int LIMIT_THREADS = Environment.ProcessorCount;
         static Thread[] threads = new Thread[LIMIT_THREADS];
         static ConcurrentQueue<PhashCacheItem>? img_wo_tags;
