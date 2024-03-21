@@ -22,71 +22,76 @@ namespace Lora
         static bool abort = false;
         static int c_count = 0;
         static int ce_count = 0;
+        static SQLiteConnection connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite");
         static void Main(string[] args)
         {
             List<ImgTags> img_tags = new List<ImgTags>();
-
-
-            using (SQLiteConnection connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite"))
+            connection.Open();
+            //Считываем записи без тегов
+            img_wo_tags = ReadImgWOTags(connection);
+            int size_queue = img_wo_tags.Count;
+            //Загружаем кэш
+            Console.WriteLine("Загружаем кэш...");
+            phash_cache = LoadCache(connection);
+            Console.WriteLine("Готово");
+            //Сравниваем
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
+            for (int i = 0; i < LIMIT_THREADS; i++)
             {
-                connection.Open();
-                //Считываем записи без тегов
-                img_wo_tags = ReadImgWOTags(connection);
-                int size_queue = img_wo_tags.Count;
-                //Загружаем кэш
-                Console.WriteLine("Загружаем кэш...");
-                phash_cache = LoadCache(connection);
-                Console.WriteLine("Готово");
-                //Сравниваем
-                for (int i = 0; i < LIMIT_THREADS; i++)
+                threads[i] = new Thread(Similaring);
+                threads[i].Name = "Поток " + i.ToString();
+                threads[i].Start();
+            }
+            while (true)
+            {
+                Console.Write($"\rC: {c_count}\\CE: {ce_count}\\T: {size_queue}");
+                bool alive = false;
+                foreach (Thread thread in threads)
                 {
-                    threads[i] = new Thread(Similaring);
-                    threads[i].Name = "Поток " + i.ToString();
-                    threads[i].Start();
-                }
-                while (true)
-                {
-                    Console.Write($"\rC: {c_count}\\CE: {ce_count}\\T: {size_queue}");
-                    bool alive = false;
-                    foreach (Thread thread in threads)
+                    if (thread.IsAlive)
                     {
-                        if (thread.IsAlive)
-                        {
-                            alive = true;
-                            break;
-                        }
-                    }
-                    if (alive)
-                    {
-                        Thread.Sleep(0);
-                    }
-                    else
-                    {
+                        alive = true;
                         break;
                     }
                 }
-                /*
-                for (int i = 0; i < img_wo_tags.Count; i++)
+                if (alive)
                 {
-                    long ImageID = img_wo_tags[i];
-                    Console.Write($"[{i + 1}/{img_wo_tags.Count}] {ImageID}...");
-                    byte[]? phash;
-
-
+                    Thread.Sleep(0);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            SQLiteTransaction transaction = connection.BeginTransaction();
+            int index = 1;
+            while (true)
+            {
+                PhashCacheItem? item = null;
+                if (img_finded_tags.TryDequeue(out item))
+                {
+                    index++;
+                    Console.Write($"[{index}] {item.ImageID}...");
                     List<long> tagids = new List<long>();
-                    foreach (long imageid in similars)
+                    foreach (long imageid in item.Similars)
                     {
                         tagids.AddRange(ErzaLib.ErzaDB.GetTagIDsFromImageTags(imageid, connection));
                     }
                     tagids = tagids.Distinct().ToList();
                     if (tagids.Count > 0)
                     {
-                        //ErzaLib.ErzaDB.AddImageTags(ImageID, tagids, connection);
-                        img_tags.Add(new ImgTags(ImageID, tagids));
+                        ErzaLib.ErzaDB.AddImageTags(item.ImageID, tagids, connection);
                     }
                     Console.WriteLine($"Найдено тегов {tagids.Count}");
-                }*/
+                }
+                else
+                {
+                    break;
+                }
             }
+            transaction.Commit();
+            connection.Close();
+
         }
         static ConcurrentQueue<PhashCacheItem> ReadImgWOTags(SQLiteConnection connection)
         {
@@ -168,6 +173,60 @@ namespace Lora
                     break;
                 }
             }
+        }
+        protected static void OnExit(object sender, ConsoleCancelEventArgs args)
+        {
+            abort = true;
+            while (true)
+            {
+                bool alive = false;
+                foreach (Thread thread in threads)
+                {
+                    if (thread.IsAlive)
+                    {
+                        alive = true;
+                        break;
+                    }
+                }
+                if (alive)
+                {
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            SQLiteTransaction transaction = connection.BeginTransaction();
+            int index = 1;
+            while (true)
+            {
+                PhashCacheItem? item = null;
+                if (img_finded_tags.TryDequeue(out item))
+                {
+                    index++;
+                    Console.Write($"[{index}] {item.ImageID}...");
+                    List<long> tagids = new List<long>();
+                    foreach (long imageid in item.Similars)
+                    {
+                        tagids.AddRange(ErzaLib.ErzaDB.GetTagIDsFromImageTags(imageid, connection));
+                    }
+                    tagids = tagids.Distinct().ToList();
+                    if (tagids.Count > 0)
+                    {
+                        ErzaLib.ErzaDB.AddImageTags(item.ImageID, tagids, connection);
+                    }
+                    Console.WriteLine($"Найдено тегов {tagids.Count}");
+                }
+                else
+                {
+                    break;
+                }
+            }
+            transaction.Commit();
+            connection.Close();
+            Console.WriteLine("\nExit");
+            Environment.Exit(0);
         }
     }
     class ImgTags
