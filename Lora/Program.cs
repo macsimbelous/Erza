@@ -20,15 +20,24 @@ namespace Lora
         static object locker = new object();
         static object locker3 = new object();
         static bool abort = false;
+        static bool on_exit_flag = false;
         static int c_count = 0;
         static int ce_count = 0;
         static SQLiteConnection connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite");
         static void Main(string[] args)
         {
-            List<ImgTags> img_tags = new List<ImgTags>();
+            //List<ImgTags> img_tags = new List<ImgTags>();
             connection.Open();
-            //Считываем записи без тегов
-            img_wo_tags = ReadImgWOTags(connection);
+            if (CountItemOnCache() <= 0)
+            {
+                //Считываем записи без тегов
+                img_wo_tags = ReadImgWOTags(connection);
+            }
+            else
+            {
+                img_wo_tags = GetImagesFromCache(connection);
+            }
+
             int size_queue = img_wo_tags.Count;
             //Загружаем кэш
             Console.WriteLine("Загружаем кэш...");
@@ -63,8 +72,13 @@ namespace Lora
                     break;
                 }
             }
+            while (on_exit_flag)
+            {
+                Thread.Sleep(0);
+            }
             SQLiteTransaction transaction = connection.BeginTransaction();
             int index = 1;
+            int count_img_find_tags = 0;
             while (true)
             {
                 PhashCacheItem? item = null;
@@ -81,6 +95,7 @@ namespace Lora
                     if (tagids.Count > 0)
                     {
                         ErzaLib.ErzaDB.AddImageTags(item.ImageID, tagids, connection);
+                        count_img_find_tags++;
                     }
                     Console.WriteLine($"Найдено тегов {tagids.Count}");
                 }
@@ -89,11 +104,29 @@ namespace Lora
                     break;
                 }
             }
+            if (img_wo_tags.Count > 0)
+            {
+                Console.Write("Добавляем в Кэш...");
+                int c = 0;
+                foreach (PhashCacheItem img in img_wo_tags)
+                {
+                    using (SQLiteCommand command = new SQLiteCommand())
+                    {
+                        command.CommandText = "INSERT INTO lora_cache (image_id, phash) VALUES (@image_id, @phash);";
+                        command.Parameters.AddWithValue("image_id", img.ImageID);
+                        command.Parameters.AddWithValue("phash", img.Phash);
+                        command.Connection = connection;
+                        command.ExecuteNonQuery();
+                    }
+                    c++;
+                }
+                Console.WriteLine($"добавлено {c}");
+            }
             transaction.Commit();
             connection.Close();
-
+            Console.WriteLine($"Найдено изображений с тегами: {count_img_find_tags}");
         }
-        static ConcurrentQueue<PhashCacheItem> ReadImgWOTags(SQLiteConnection connection)
+        static ConcurrentQueue<PhashCacheItem> ReadImgWOTags(SQLiteConnection Connection)
         {
             ConcurrentQueue<PhashCacheItem> imgs = new ConcurrentQueue<PhashCacheItem>();
             long count_rows;
@@ -101,14 +134,14 @@ namespace Lora
             using (SQLiteCommand command = new SQLiteCommand())
             {
                 command.CommandText = "SELECT count(*) FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id LEFT OUTER JOIN phashs ON images.image_id = phashs.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL AND phashs.phash IS NOT NULL;";
-                command.Connection = connection;
+                command.Connection = Connection;
                 count_rows = System.Convert.ToInt64(command.ExecuteScalar());
             }
             //Считываем записи
             using (SQLiteCommand command = new SQLiteCommand())
             {
                 command.CommandText = "SELECT images.image_id, phashs.phash FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id LEFT OUTER JOIN phashs ON images.image_id = phashs.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL AND phashs.phash IS NOT NULL;";
-                command.Connection = connection;
+                command.Connection = Connection;
                 SQLiteDataReader reader = command.ExecuteReader();
                 int count = 0;
                 while (reader.Read())
@@ -121,10 +154,10 @@ namespace Lora
             }
             return imgs;
         }
-        static PhashCacheItem[] LoadCache(SQLiteConnection connection)
+        static PhashCacheItem[] LoadCache(SQLiteConnection Connection)
         {
             List<PhashCacheItem> phash_cache = new List<PhashCacheItem>();
-            using (SQLiteCommand command = new SQLiteCommand("SELECT phashs.image_id, phashs.phash FROM phashs LEFT OUTER JOIN image_tags on phashs.image_id = image_tags.image_id WHERE image_tags.image_id IS NOT NULL GROUP BY phashs.image_id;", connection))
+            using (SQLiteCommand command = new SQLiteCommand("SELECT phashs.image_id, phashs.phash FROM phashs LEFT OUTER JOIN image_tags on phashs.image_id = image_tags.image_id WHERE image_tags.image_id IS NOT NULL GROUP BY phashs.image_id;", Connection))
             {
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -176,6 +209,7 @@ namespace Lora
         }
         protected static void OnExit(object sender, ConsoleCancelEventArgs args)
         {
+            on_exit_flag = true;
             abort = true;
             while (true)
             {
@@ -223,10 +257,60 @@ namespace Lora
                     break;
                 }
             }
+
+            Console.Write("Добавляем в Кэш...");
+            int c = 0;
+            foreach (PhashCacheItem img in img_wo_tags)
+            {
+                using (SQLiteCommand command = new SQLiteCommand())
+                {
+                    command.CommandText = "INSERT INTO lora_cache (image_id, phash) VALUES (@image_id, @phash);";
+                    command.Parameters.AddWithValue("image_id", img.ImageID);
+                    command.Parameters.AddWithValue("phash", img.Phash);
+                    command.Connection = connection;
+                    command.ExecuteNonQuery();
+                }
+                c++;
+            }
+            Console.WriteLine($"добавлено {c}");
+
             transaction.Commit();
             connection.Close();
             Console.WriteLine("\nExit");
             Environment.Exit(0);
+        }
+        static int CountItemOnCache()
+        {
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT count(*) FROM lora_cache;";
+                command.Connection = connection;
+                int count = Convert.ToInt32(command.ExecuteScalar());
+                return count;
+            }
+        }
+        static ConcurrentQueue<PhashCacheItem> GetImagesFromCache(SQLiteConnection Connection)
+        {
+            ConcurrentQueue<PhashCacheItem> imgs = new ConcurrentQueue<PhashCacheItem>();
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT image_id, phash FROM lora_cache;";
+                command.Connection = Connection;
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    PhashCacheItem img = new PhashCacheItem((long)reader[0], (byte[])reader[1]);
+                    imgs.Enqueue(img);
+                }
+                reader.Close();
+            }
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "DELETE FROM lora_cache;";
+                command.Connection = Connection;
+                command.ExecuteNonQuery();
+            }
+            return imgs;
         }
     }
     class ImgTags
