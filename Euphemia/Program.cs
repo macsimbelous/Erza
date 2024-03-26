@@ -34,6 +34,7 @@ namespace Euphemia
         static string dir = null;
         static void Main(string[] args)
         {
+            List<ImageInfo> deleted_imgs = new List<ImageInfo>();
             foreach (string option in args)
             {
                 if (option == "-full")
@@ -122,6 +123,7 @@ namespace Euphemia
                         if (temp.IsDeleted)
                         {
                             il[i2].IsDeleted = true;
+                            deleted_imgs.Add(il[i2]);
                             continue;
                         }
                         ErzaDB.SetImagePath(il[i2].Hash, il[i2].FilePath, connection);
@@ -189,6 +191,18 @@ namespace Euphemia
                 transact2.Commit();
                 Console.WriteLine($"Файлов проверено: {img_list.Count} ");
                 Console.WriteLine($"Файлов отсутствует: {count_deleted}");
+                Console.WriteLine($"Присутствуют но помечены удалёнными: {deleted_imgs.Count}");
+                if(deleted_imgs.Count > 0)
+                {
+                    string deleted_path = args[0] + "\\UnSorted\\deleted";
+                    Console.Write($"Перемещаю помеченные удалёнными в {deleted_path}...");
+                    Directory.CreateDirectory(deleted_path);
+                    foreach (ImageInfo img in deleted_imgs)
+                    {
+                        File.Move(img.FilePath, deleted_path + "\\" + Path.GetFileName(img.FilePath));
+                    }
+                    Console.WriteLine("Закончено.");
+                }
             }
         }
         static byte[] CalculateHashFile(string file)
