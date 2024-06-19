@@ -425,7 +425,7 @@ namespace Ange
                 {
                     loBMP = new Bitmap(lcFilename);
                 }
-                
+
                 ImageFormat loFormat = loBMP.RawFormat;
 
                 //decimal lnRatio;
@@ -885,36 +885,6 @@ namespace Ange
             }
         }
 
-        private void imageListView1_ItemHover(object sender, ItemHoverEventArgs e)
-        {
-            if (e.Item != null)
-            {
-                ImageInfo img = (ImageInfo)e.Item.VirtualItemKey;
-                //string[] tags = e.Item.UserComment.Split(' ');
-                toolTip1.ToolTipTitle = "Тегов " + img.Tags.Count.ToString();
-                StringBuilder tt = new StringBuilder();
-                //tt.Append("Тегов " + tags.Length.ToString() + "\n");
-                StringBuilder str = new StringBuilder();
-                foreach (string tag in img.Tags)
-                {
-                    str.Append(tag);
-                    if (str.Length > 75)
-                    {
-                        tt.Append(str);
-                        tt.AppendLine();
-                        str.Clear();
-                    }
-                }
-                //toolTip1.SetToolTip(imageListView1, e.Item.UserComment.Replace(' ', '\n'));
-                //toolTip1.SetToolTip(imageListView1, tt.ToString());
-                //toolTip1.Show(tt.ToString(), imageListView1);
-                
-                toolStripStatusLabel2.Text = "Тегов: " + img.Tags.Count.ToString();
-                //toolStripStatusLabel2.ToolTipText = tt.ToString();
-                toolTip1.SetToolTip(statusStrip1, tt.ToString());
-            }
-        }
-
         private void add_tag_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.imageListView1.SelectedItems.Count > 0)
@@ -945,6 +915,36 @@ namespace Ange
             {
                 //ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
                 Clipboard.SetText(this.imageListView1.SelectedItems[0].UserComment);
+            }
+        }
+
+        private void imageListView1_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.Item != null)
+            {
+                ImageInfo img = (ImageInfo)e.Item.VirtualItemKey;
+                //string[] tags = e.Item.UserComment.Split(' ');
+                toolTip1.ToolTipTitle = "Тегов " + img.Tags.Count.ToString();
+                StringBuilder tt = new StringBuilder();
+                //tt.Append("Тегов " + tags.Length.ToString() + "\n");
+                StringBuilder str = new StringBuilder();
+                foreach (string tag in img.Tags)
+                {
+                    str.Append(tag);
+                    if (str.Length > 75)
+                    {
+                        tt.Append(str);
+                        tt.AppendLine();
+                        str.Clear();
+                    }
+                }
+                //toolTip1.SetToolTip(imageListView1, e.Item.UserComment.Replace(' ', '\n'));
+                //toolTip1.SetToolTip(imageListView1, tt.ToString());
+                //toolTip1.Show(tt.ToString(), imageListView1);
+
+                toolStripStatusLabel2.Text = "Тегов: " + img.Tags.Count.ToString();
+                //toolStripStatusLabel2.ToolTipText = tt.ToString();
+                toolTip1.SetToolTip(statusStrip1, tt.ToString());
             }
         }
     }
