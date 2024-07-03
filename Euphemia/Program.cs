@@ -199,7 +199,7 @@ namespace Euphemia
                     Directory.CreateDirectory(deleted_path);
                     foreach (ImageInfo img in deleted_imgs)
                     {
-                        File.Move(img.FilePath, deleted_path + "\\" + Path.GetFileName(img.FilePath));
+                        File.Move(img.FilePath, deleted_path + "\\" + Path.GetFileName(img.FilePath), true);
                     }
                     Console.WriteLine("Закончено.");
                 }
