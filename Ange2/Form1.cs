@@ -947,5 +947,36 @@ namespace Ange
                 toolTip1.SetToolTip(statusStrip1, tt.ToString());
             }
         }
+
+        private void no_tags_toolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            tags_textBox.Text = String.Empty;
+            imageListView1.SuspendLayout();
+            imageListView1.Items.Clear();
+            List<ImageInfo> Result = new List<ImageInfo>();
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
+                command.Connection = Form1.Erza;
+                SQLiteDataReader reader = command.ExecuteReader();
+                int count = 0;
+                while (reader.Read())
+                {
+                    ImageInfo img = new ImageInfo();
+                    img.Hash = (string)reader["hash"];
+                    img.ImageID = (long)reader["image_id"];
+                    img.FilePath = (string)reader["file_path"];
+                    Result.Add(img);
+                    count++;
+                }
+                reader.Close();
+            }
+            foreach (ImageInfo img in Result)
+            {
+                imageListView1.Items.Add(img, img.Hash, adaptor);
+            }
+            imageListView1.ResumeLayout();
+            imageListView1.EnsureVisible(0);
+        }
     }
 }
