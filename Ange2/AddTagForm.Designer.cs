@@ -69,6 +69,17 @@
             button_intersex = new System.Windows.Forms.Button();
             button_futanari = new System.Windows.Forms.Button();
             button_yuri = new System.Windows.Forms.Button();
+            button_slave = new System.Windows.Forms.Button();
+            button_favorited = new System.Windows.Forms.Button();
+            button_prostitution = new System.Windows.Forms.Button();
+            button_whore = new System.Windows.Forms.Button();
+            button_cum_in_mouth = new System.Windows.Forms.Button();
+            button_cum_on_body = new System.Windows.Forms.Button();
+            button_horseback_riding = new System.Windows.Forms.Button();
+            button_prison = new System.Windows.Forms.Button();
+            button_toilet = new System.Windows.Forms.Button();
+            button_womb_tattoo = new System.Windows.Forms.Button();
+            button_forced_prostitution = new System.Windows.Forms.Button();
             SuspendLayout();
             // 
             // comboBox1
@@ -77,13 +88,13 @@
             comboBox1.Location = new System.Drawing.Point(12, 15);
             comboBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             comboBox1.Name = "comboBox1";
-            comboBox1.Size = new System.Drawing.Size(602, 23);
+            comboBox1.Size = new System.Drawing.Size(652, 23);
             comboBox1.TabIndex = 0;
             comboBox1.TextUpdate += comboBox1_TextUpdate;
             // 
             // OK_button
             // 
-            OK_button.Location = new System.Drawing.Point(434, 219);
+            OK_button.Location = new System.Drawing.Point(484, 219);
             OK_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             OK_button.Name = "OK_button";
             OK_button.Size = new System.Drawing.Size(87, 26);
@@ -95,7 +106,7 @@
             // Cancel_button
             // 
             Cancel_button.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            Cancel_button.Location = new System.Drawing.Point(527, 219);
+            Cancel_button.Location = new System.Drawing.Point(577, 219);
             Cancel_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             Cancel_button.Name = "Cancel_button";
             Cancel_button.Size = new System.Drawing.Size(87, 26);
@@ -106,9 +117,9 @@
             // 
             // button_bondage
             // 
-            button_bondage.Location = new System.Drawing.Point(93, 45);
+            button_bondage.Location = new System.Drawing.Point(67, 45);
             button_bondage.Name = "button_bondage";
-            button_bondage.Size = new System.Drawing.Size(75, 23);
+            button_bondage.Size = new System.Drawing.Size(64, 23);
             button_bondage.TabIndex = 2;
             button_bondage.Text = "bondage";
             button_bondage.UseVisualStyleBackColor = true;
@@ -118,7 +129,7 @@
             // 
             button_bdsm.Location = new System.Drawing.Point(12, 45);
             button_bdsm.Name = "button_bdsm";
-            button_bdsm.Size = new System.Drawing.Size(75, 23);
+            button_bdsm.Size = new System.Drawing.Size(49, 23);
             button_bdsm.TabIndex = 1;
             button_bdsm.Text = "BDSM";
             button_bdsm.UseVisualStyleBackColor = true;
@@ -206,9 +217,9 @@
             // 
             // button_women_livestock
             // 
-            button_women_livestock.Location = new System.Drawing.Point(174, 45);
+            button_women_livestock.Location = new System.Drawing.Point(137, 45);
             button_women_livestock.Name = "button_women_livestock";
-            button_women_livestock.Size = new System.Drawing.Size(114, 23);
+            button_women_livestock.Size = new System.Drawing.Size(112, 23);
             button_women_livestock.TabIndex = 3;
             button_women_livestock.Text = "women_livestock";
             button_women_livestock.UseVisualStyleBackColor = true;
@@ -226,9 +237,9 @@
             // 
             // button_blindfold
             // 
-            button_blindfold.Location = new System.Drawing.Point(294, 45);
+            button_blindfold.Location = new System.Drawing.Point(255, 45);
             button_blindfold.Name = "button_blindfold";
-            button_blindfold.Size = new System.Drawing.Size(75, 23);
+            button_blindfold.Size = new System.Drawing.Size(71, 23);
             button_blindfold.TabIndex = 4;
             button_blindfold.Text = "blindfold";
             button_blindfold.UseVisualStyleBackColor = true;
@@ -236,7 +247,7 @@
             // 
             // button_leash
             // 
-            button_leash.Location = new System.Drawing.Point(375, 45);
+            button_leash.Location = new System.Drawing.Point(332, 45);
             button_leash.Name = "button_leash";
             button_leash.Size = new System.Drawing.Size(47, 23);
             button_leash.TabIndex = 5;
@@ -286,7 +297,7 @@
             // 
             // button_pet_play
             // 
-            button_pet_play.Location = new System.Drawing.Point(428, 45);
+            button_pet_play.Location = new System.Drawing.Point(385, 45);
             button_pet_play.Name = "button_pet_play";
             button_pet_play.Size = new System.Drawing.Size(65, 23);
             button_pet_play.TabIndex = 6;
@@ -296,7 +307,7 @@
             // 
             // button_milking_machine
             // 
-            button_milking_machine.Location = new System.Drawing.Point(499, 45);
+            button_milking_machine.Location = new System.Drawing.Point(456, 45);
             button_milking_machine.Name = "button_milking_machine";
             button_milking_machine.Size = new System.Drawing.Size(112, 23);
             button_milking_machine.TabIndex = 7;
@@ -328,7 +339,7 @@
             // 
             button_sex.Location = new System.Drawing.Point(12, 161);
             button_sex.Name = "button_sex";
-            button_sex.Size = new System.Drawing.Size(41, 23);
+            button_sex.Size = new System.Drawing.Size(38, 23);
             button_sex.TabIndex = 40;
             button_sex.Text = "sex";
             button_sex.UseVisualStyleBackColor = true;
@@ -336,7 +347,7 @@
             // 
             // button_vaginal
             // 
-            button_vaginal.Location = new System.Drawing.Point(59, 161);
+            button_vaginal.Location = new System.Drawing.Point(137, 161);
             button_vaginal.Name = "button_vaginal";
             button_vaginal.Size = new System.Drawing.Size(55, 23);
             button_vaginal.TabIndex = 41;
@@ -346,9 +357,9 @@
             // 
             // button_anal
             // 
-            button_anal.Location = new System.Drawing.Point(120, 161);
+            button_anal.Location = new System.Drawing.Point(198, 161);
             button_anal.Name = "button_anal";
-            button_anal.Size = new System.Drawing.Size(46, 23);
+            button_anal.Size = new System.Drawing.Size(42, 23);
             button_anal.TabIndex = 42;
             button_anal.Text = "anal";
             button_anal.UseVisualStyleBackColor = true;
@@ -356,9 +367,9 @@
             // 
             // button_oral
             // 
-            button_oral.Location = new System.Drawing.Point(172, 161);
+            button_oral.Location = new System.Drawing.Point(246, 161);
             button_oral.Name = "button_oral";
-            button_oral.Size = new System.Drawing.Size(40, 23);
+            button_oral.Size = new System.Drawing.Size(35, 23);
             button_oral.TabIndex = 43;
             button_oral.Text = "oral";
             button_oral.UseVisualStyleBackColor = true;
@@ -366,7 +377,7 @@
             // 
             // button_fellatio
             // 
-            button_fellatio.Location = new System.Drawing.Point(218, 161);
+            button_fellatio.Location = new System.Drawing.Point(287, 161);
             button_fellatio.Name = "button_fellatio";
             button_fellatio.Size = new System.Drawing.Size(52, 23);
             button_fellatio.TabIndex = 44;
@@ -376,7 +387,7 @@
             // 
             // button_group_sex
             // 
-            button_group_sex.Location = new System.Drawing.Point(122, 190);
+            button_group_sex.Location = new System.Drawing.Point(56, 161);
             button_group_sex.Name = "button_group_sex";
             button_group_sex.Size = new System.Drawing.Size(75, 23);
             button_group_sex.TabIndex = 52;
@@ -386,7 +397,7 @@
             // 
             // button_double_penetration
             // 
-            button_double_penetration.Location = new System.Drawing.Point(203, 190);
+            button_double_penetration.Location = new System.Drawing.Point(122, 190);
             button_double_penetration.Name = "button_double_penetration";
             button_double_penetration.Size = new System.Drawing.Size(123, 23);
             button_double_penetration.TabIndex = 53;
@@ -396,7 +407,7 @@
             // 
             // button_triple_penetration
             // 
-            button_triple_penetration.Location = new System.Drawing.Point(332, 190);
+            button_triple_penetration.Location = new System.Drawing.Point(251, 190);
             button_triple_penetration.Name = "button_triple_penetration";
             button_triple_penetration.Size = new System.Drawing.Size(113, 23);
             button_triple_penetration.TabIndex = 54;
@@ -426,9 +437,9 @@
             // 
             // button_nipple_penetration
             // 
-            button_nipple_penetration.Location = new System.Drawing.Point(276, 161);
+            button_nipple_penetration.Location = new System.Drawing.Point(345, 161);
             button_nipple_penetration.Name = "button_nipple_penetration";
-            button_nipple_penetration.Size = new System.Drawing.Size(123, 23);
+            button_nipple_penetration.Size = new System.Drawing.Size(116, 23);
             button_nipple_penetration.TabIndex = 45;
             button_nipple_penetration.Text = "nipple_penetration";
             button_nipple_penetration.UseVisualStyleBackColor = true;
@@ -484,13 +495,134 @@
             button_yuri.UseVisualStyleBackColor = true;
             button_yuri.Click += button_yuri_Click;
             // 
+            // button_slave
+            // 
+            button_slave.Location = new System.Drawing.Point(266, 74);
+            button_slave.Name = "button_slave";
+            button_slave.Size = new System.Drawing.Size(45, 23);
+            button_slave.TabIndex = 201;
+            button_slave.Text = "slave";
+            button_slave.UseVisualStyleBackColor = true;
+            button_slave.Click += button_slave_Click;
+            // 
+            // button_favorited
+            // 
+            button_favorited.Location = new System.Drawing.Point(285, 219);
+            button_favorited.Name = "button_favorited";
+            button_favorited.Size = new System.Drawing.Size(64, 23);
+            button_favorited.TabIndex = 202;
+            button_favorited.Text = "favorited";
+            button_favorited.UseVisualStyleBackColor = true;
+            button_favorited.Click += button_favorited_Click;
+            // 
+            // button_prostitution
+            // 
+            button_prostitution.Location = new System.Drawing.Point(370, 190);
+            button_prostitution.Name = "button_prostitution";
+            button_prostitution.Size = new System.Drawing.Size(75, 23);
+            button_prostitution.TabIndex = 203;
+            button_prostitution.Text = "prostitution";
+            button_prostitution.UseVisualStyleBackColor = true;
+            button_prostitution.Click += button_prostitution_Click;
+            // 
+            // button_whore
+            // 
+            button_whore.Location = new System.Drawing.Point(578, 190);
+            button_whore.Name = "button_whore";
+            button_whore.Size = new System.Drawing.Size(51, 23);
+            button_whore.TabIndex = 204;
+            button_whore.Text = "whore";
+            button_whore.UseVisualStyleBackColor = true;
+            button_whore.Click += button_whore_Click;
+            // 
+            // button_cum_in_mouth
+            // 
+            button_cum_in_mouth.Location = new System.Drawing.Point(467, 161);
+            button_cum_in_mouth.Name = "button_cum_in_mouth";
+            button_cum_in_mouth.Size = new System.Drawing.Size(98, 23);
+            button_cum_in_mouth.TabIndex = 205;
+            button_cum_in_mouth.Text = "cum_in_mouth";
+            button_cum_in_mouth.UseVisualStyleBackColor = true;
+            button_cum_in_mouth.Click += button_cum_in_mouth_Click;
+            // 
+            // button_cum_on_body
+            // 
+            button_cum_on_body.Location = new System.Drawing.Point(571, 161);
+            button_cum_on_body.Name = "button_cum_on_body";
+            button_cum_on_body.Size = new System.Drawing.Size(90, 23);
+            button_cum_on_body.TabIndex = 206;
+            button_cum_on_body.Text = "cum_on_body";
+            button_cum_on_body.UseVisualStyleBackColor = true;
+            button_cum_on_body.Click += button_cum_on_body_Click;
+            // 
+            // button_horseback_riding
+            // 
+            button_horseback_riding.Location = new System.Drawing.Point(428, 74);
+            button_horseback_riding.Name = "button_horseback_riding";
+            button_horseback_riding.Size = new System.Drawing.Size(109, 23);
+            button_horseback_riding.TabIndex = 207;
+            button_horseback_riding.Text = "horseback_riding";
+            button_horseback_riding.UseVisualStyleBackColor = true;
+            button_horseback_riding.Click += button_horseback_riding_Click;
+            // 
+            // button_prison
+            // 
+            button_prison.Location = new System.Drawing.Point(317, 74);
+            button_prison.Name = "button_prison";
+            button_prison.Size = new System.Drawing.Size(52, 23);
+            button_prison.TabIndex = 208;
+            button_prison.Text = "prison";
+            button_prison.UseVisualStyleBackColor = true;
+            button_prison.Click += button_prison_Click;
+            // 
+            // button_toilet
+            // 
+            button_toilet.Location = new System.Drawing.Point(375, 74);
+            button_toilet.Name = "button_toilet";
+            button_toilet.Size = new System.Drawing.Size(47, 23);
+            button_toilet.TabIndex = 209;
+            button_toilet.Text = "toilet";
+            button_toilet.UseVisualStyleBackColor = true;
+            button_toilet.Click += button_toilet_Click;
+            // 
+            // button_womb_tattoo
+            // 
+            button_womb_tattoo.Location = new System.Drawing.Point(574, 45);
+            button_womb_tattoo.Name = "button_womb_tattoo";
+            button_womb_tattoo.Size = new System.Drawing.Size(90, 23);
+            button_womb_tattoo.TabIndex = 210;
+            button_womb_tattoo.Text = "womb_tattoo";
+            button_womb_tattoo.UseVisualStyleBackColor = true;
+            button_womb_tattoo.Click += button_womb_tattoo_Click;
+            // 
+            // button_forced_prostitution
+            // 
+            button_forced_prostitution.Location = new System.Drawing.Point(451, 190);
+            button_forced_prostitution.Name = "button_forced_prostitution";
+            button_forced_prostitution.Size = new System.Drawing.Size(121, 23);
+            button_forced_prostitution.TabIndex = 211;
+            button_forced_prostitution.Text = "forced_prostitution";
+            button_forced_prostitution.UseVisualStyleBackColor = true;
+            button_forced_prostitution.Click += button_forced_prostitution_Click;
+            // 
             // AddTagForm
             // 
             AcceptButton = OK_button;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             CancelButton = Cancel_button;
-            ClientSize = new System.Drawing.Size(626, 258);
+            ClientSize = new System.Drawing.Size(676, 258);
+            Controls.Add(button_forced_prostitution);
+            Controls.Add(button_womb_tattoo);
+            Controls.Add(button_toilet);
+            Controls.Add(button_prison);
+            Controls.Add(button_horseback_riding);
+            Controls.Add(button_cum_on_body);
+            Controls.Add(button_cum_in_mouth);
+            Controls.Add(button_whore);
+            Controls.Add(button_prostitution);
+            Controls.Add(button_favorited);
+            Controls.Add(button_slave);
             Controls.Add(button_yuri);
             Controls.Add(button_futanari);
             Controls.Add(button_intersex);
@@ -584,5 +716,16 @@
         private System.Windows.Forms.Button button_intersex;
         private System.Windows.Forms.Button button_futanari;
         private System.Windows.Forms.Button button_yuri;
+        private System.Windows.Forms.Button button_slave;
+        private System.Windows.Forms.Button button_favorited;
+        private System.Windows.Forms.Button button_prostitution;
+        private System.Windows.Forms.Button button_whore;
+        private System.Windows.Forms.Button button_cum_in_mouth;
+        private System.Windows.Forms.Button button_cum_on_body;
+        private System.Windows.Forms.Button button_horseback_riding;
+        private System.Windows.Forms.Button button_prison;
+        private System.Windows.Forms.Button button_toilet;
+        private System.Windows.Forms.Button button_womb_tattoo;
+        private System.Windows.Forms.Button button_forced_prostitution;
     }
 }

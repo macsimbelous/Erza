@@ -420,5 +420,102 @@ namespace Ange
             }
             this.comboBox1.Text = this.comboBox1.Text + "yuri";
         }
+
+        private void button_slave_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "slave";
+        }
+
+        private void button_favorited_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "favorited";
+        }
+
+        private void button_prostitution_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "prostitution";
+        }
+
+        private void button_whore_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "whore";
+        }
+        private void button_cum_on_body_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "cum_on_body";
+        }
+        private void button_cum_in_mouth_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "cum_in_mouth";
+        }
+
+        private void button_horseback_riding_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "horseback_riding";
+        }
+
+        private void button_prison_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "prison";
+        }
+
+        private void button_toilet_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "toilet";
+        }
+
+        private void button_womb_tattoo_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "womb_tattoo";
+        }
+
+        private void button_forced_prostitution_Click(object sender, EventArgs e)
+        {
+            if (this.comboBox1.Text.Length > 0)
+            {
+                this.comboBox1.Text = this.comboBox1.Text + " ";
+            }
+            this.comboBox1.Text = this.comboBox1.Text + "forced_prostitution";
+        }
     }
 }
