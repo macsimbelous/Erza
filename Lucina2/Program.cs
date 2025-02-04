@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Npgsql;
-using NpgsqlTypes;
 using AngleSharp;
-using AngleSharp.Parser.Html;
+//using AngleSharp.Parser.Html;
 using AngleSharp.Dom;
 using System.Net;
 using System.Threading;
@@ -14,8 +12,9 @@ using System.Xml;
 using System.IO;
 using System.Data.SQLite;
 using System.Xml.Linq;
+using AngleSharp.Html.Parser;
 
-namespace Lucina2
+namespace Lucina
 {
     class Program
     {
@@ -293,7 +292,7 @@ namespace Lucina2
                     }
                     else
                     {
-                        LoadToPostgres(list);
+                        //LoadToPostgres(list);
                         pid++;
                         count = count + list.Count;
                         errors = 0;
@@ -323,7 +322,7 @@ namespace Lucina2
         {
             List<Tag> tags = new List<Tag>();
             var parser = new HtmlParser();
-            var document = parser.Parse(Page);
+            var document = parser.ParseDocument(Page);
             foreach (IElement element in document.QuerySelectorAll("table"))
             {
                 if (element.GetAttribute("class") == "highlightable")
@@ -591,7 +590,7 @@ namespace Lucina2
             try
             {
                 var parser = new HtmlParser();
-                var document = parser.Parse(Page);
+                var document = parser.ParseDocument(Page);
                 foreach (IElement a_element in document.QuerySelectorAll("a"))
                 {
                     if(a_element.InnerHtml == "»")
@@ -610,7 +609,7 @@ namespace Lucina2
         {
             List<Tag> tags = new List<Tag>();
             var parser = new HtmlParser();
-            var document = parser.Parse(Page);
+            var document = parser.ParseDocument(Page);
             foreach (IElement element in document.QuerySelectorAll("table"))
             {
                 //string s222 = element.GetAttribute("class");
@@ -703,107 +702,6 @@ namespace Lucina2
             }
             return sb.ToString();
         }
-        static void LoadToPostgres(List<Tag> TagList)
-        {
-            //строка подключения
-            NpgsqlConnectionStringBuilder csb = new NpgsqlConnectionStringBuilder();
-#if DEBUG
-            csb.Host = "188.166.117.73";
-#else
-            csb.Host = "127.0.0.1";
-#endif
-            csb.Port = 5432;
-            csb.Username = "erza";
-            csb.Password = "48sf54ro";
-            csb.Database = "erza";
-            //csb.SslMode = SslMode.Require;
-            using (NpgsqlConnection conn = new NpgsqlConnection(csb.ConnectionString))
-            {
-                conn.Open();
-                for (int i = 0; i < TagList.Count; i++)
-                {
-                    Program.count_tags++;
-                    Console.Write($"[{Program.count_tags}] {TagList[i].Name}");
-                    //SetTypeTag(TagList[i].Name, TagList[i].Type, connection);
-                    if (ExistTag(TagList[i], conn))
-                    {
-                        using (NpgsqlCommand comm = new NpgsqlCommand("UPDATE public.tags SET type = @type, count = @count, name_type = @name_type, parents = @parents, children = @children, language = @language WHERE tag = @tag AND site = @site", conn))
-                        {
-                            comm.Parameters.AddWithValue("@type", TagList[i].Type);
-                            comm.Parameters.AddWithValue("@count", TagList[i].Count);
-                            comm.Parameters.AddWithValue("@tag", TagList[i].Name);
-                            comm.Parameters.AddWithValue("@site", TagList[i].Site);
-                            if (String.IsNullOrEmpty(TagList[i].Language))
-                            {
-                                comm.Parameters.AddWithValue("@language", DBNull.Value);
-                            }
-                            else
-                            {
-                                comm.Parameters.AddWithValue("@language", TagList[i].Language);
-                            }
-                            comm.Parameters.AddWithValue("@name_type", TagList[i].TypeName);
-                            if (String.IsNullOrEmpty(TagList[i].Parents))
-                            {
-                                comm.Parameters.AddWithValue("@parents", DBNull.Value);
-                            }
-                            else
-                            {
-                                comm.Parameters.AddWithValue("@parents", TagList[i].Parents);
-                            }
-                            if (String.IsNullOrEmpty(TagList[i].Children))
-                            {
-                                comm.Parameters.AddWithValue("@children", DBNull.Value);
-                            }
-                            else
-                            {
-                                comm.Parameters.AddWithValue("@children", TagList[i].Children);
-                            }
-                            comm.ExecuteNonQuery();
-                        }
-                    }
-                    else
-                    {
-                        using (NpgsqlCommand comm = new NpgsqlCommand("INSERT INTO public.tags(type, count, tag, language, name_type, parents, children, site) VALUES (@type, @count, @tag, @language, @name_type, @parents, @children, @site);", conn))
-                        {
-                            comm.Parameters.AddWithValue("@type", TagList[i].Type);
-                            comm.Parameters.AddWithValue("@count", TagList[i].Count);
-                            comm.Parameters.AddWithValue("@tag", TagList[i].Name);
-                            comm.Parameters.AddWithValue("@site", TagList[i].Site);
-                            if (String.IsNullOrEmpty(TagList[i].Language))
-                            {
-                                comm.Parameters.AddWithValue("@language", DBNull.Value);
-                            }
-                            else
-                            {
-                                comm.Parameters.AddWithValue("@language", TagList[i].Language);
-                            }
-                            comm.Parameters.AddWithValue("@name_type", TagList[i].TypeName);
-                            if (String.IsNullOrEmpty(TagList[i].Parents))
-                            {
-                                comm.Parameters.AddWithValue("@parents", DBNull.Value);
-                            }
-                            else
-                            {
-                                comm.Parameters.AddWithValue("@parents", TagList[i].Parents);
-                            }
-                            if (String.IsNullOrEmpty(TagList[i].Children))
-                            {
-                                comm.Parameters.AddWithValue("@children", DBNull.Value);
-                            }
-                            else
-                            {
-                                comm.Parameters.AddWithValue("@children", TagList[i].Children);
-                            }
-                            comm.ExecuteNonQuery();
-                        }
-                    }
-                    Console.WriteLine(" Успех");
-                }
-                //NpgsqlCommand comm = new NpgsqlCommand("UPDATE tags SET type = @type WHERE tag = @tag", conn);
-                //comm.ExecuteNonQuery();
-                conn.Close();
-            }
-        }
         static void LoadToSQLite(List<Tag> TagList)
         {
             for (int i = 0; i < TagList.Count; i++)
@@ -830,23 +728,6 @@ namespace Lucina2
                     }
                 }
                 Console.WriteLine(" Успех");
-            }
-        }
-        static bool ExistTag(Tag TagInfo, NpgsqlConnection Connection)
-        {
-            using (NpgsqlCommand comm = new NpgsqlCommand("SELECT tag_id FROM public.tags WHERE tag = @tag AND site = @site", Connection))
-            {
-                comm.Parameters.AddWithValue("@site", TagInfo.Site);
-                comm.Parameters.AddWithValue("@tag", TagInfo.Name);
-                object o = comm.ExecuteScalar();
-                if (o != null)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
             }
         }
         static bool ExistTagSQLite(Tag TagInfo, SQLiteConnection Connection)

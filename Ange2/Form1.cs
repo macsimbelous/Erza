@@ -37,6 +37,7 @@ using System.Reflection;
 using System.Diagnostics;
 using WebP.Net;
 using ImageMagick;
+using ImageMagick.Factories;
 
 namespace Ange
 {
