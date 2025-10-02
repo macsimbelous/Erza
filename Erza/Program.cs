@@ -409,7 +409,8 @@ namespace Erza
                 {
                     Uri uri = new Uri(strURL);
                     DateTime start = DateTime.Now;
-                    string xml = Client.DownloadString(uri);
+                    //string xml = Client.DownloadString(uri);
+                    string xml = DownloadString(strURL, null);
                     if (xml == null)
                     {
                         if (count_errors < Program.config.LimitError)
@@ -615,8 +616,8 @@ namespace Erza
             try
             {
                 Uri uri = new Uri(url);
-                string xml = Client.DownloadString(uri);
-                //string xml = DownloadStringFromGelbooru(url, "http://gelbooru.com/", gelbooru_cookies);
+                //string xml = Client.DownloadString(uri);
+                string xml = DownloadString(url, null);
                 if (xml == null)
                 {
                     return -1;
@@ -671,6 +672,31 @@ namespace Erza
             downloadRequest.Headers.Add("Accept-Encoding: identity");
             downloadRequest.CookieContainer = new CookieContainer();
             downloadRequest.CookieContainer.Add(cookies);
+            if (referer != null)
+            {
+                downloadRequest.Referer = referer;
+            }
+            string source;
+            using (StreamReader reader = new StreamReader(downloadRequest.GetResponse().GetResponseStream()))
+            {
+                source = reader.ReadToEnd();
+            }
+            return source;
+        }
+        public static string DownloadString(string url, string referer)
+        {
+            HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(url);
+            if (Program.config.UseProxy)
+            {
+                WebProxy myProxy = new WebProxy(Program.config.ProxyAddress, Program.config.ProxyPort);
+                myProxy.Credentials = new NetworkCredential(Program.config.ProxyLogin, Program.config.ProxyPassword);
+                downloadRequest.Proxy = myProxy;
+            }
+            downloadRequest.UserAgent = Program.config.UserAgent;
+            downloadRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+            downloadRequest.Headers.Add("Accept-Encoding: identity");
+            //downloadRequest.CookieContainer = new CookieContainer();
+            //downloadRequest.CookieContainer.Add(cookies);
             if (referer != null)
             {
                 downloadRequest.Referer = referer;

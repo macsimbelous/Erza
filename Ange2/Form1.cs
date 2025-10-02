@@ -37,6 +37,7 @@ using System.Reflection;
 using System.Diagnostics;
 using WebP.Net;
 using ImageMagick;
+using ImageMagick.Factories;
 
 namespace Ange
 {
@@ -977,6 +978,7 @@ namespace Ange
             }
             imageListView1.ResumeLayout();
             imageListView1.EnsureVisible(0);
+            this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
         }
     }
 }

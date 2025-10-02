@@ -77,7 +77,7 @@ namespace Ange
                     if(Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".webp")
                     {
                         using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
-                        this.pictureBox1.Image = webp.GetImage();
+                        this.pictureBox1.Image = webp.GetImage().Clone() as Image;
                         ImageFormat = "WEBP";
                     }
                     else
@@ -402,6 +402,7 @@ namespace Ange
         private void ViewImageForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (fs != null) { fs.Close(); }
+            this.pictureBox1.Image.Dispose();
         }
     }
 }

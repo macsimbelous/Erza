@@ -28,6 +28,7 @@ using ImageMagick;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using WebP.Net;
+using ImageMagick.Factories;
 
 namespace Maki
 {
