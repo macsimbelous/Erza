@@ -433,10 +433,17 @@ namespace ErzaLib2
                 return imgs;
             }
         }
-        public static List<ImageInfo> GetAllImages(SQLiteConnection Connection)
+        public static List<ImageInfo> GetAllImages(bool WithOutFilePath, SQLiteConnection Connection)
         {
             List<ImageInfo> imgs = new List<ImageInfo>();
-            string sql = "select * from images where is_deleted = 0;";
+            string sql;
+            if (WithOutFilePath) {
+                sql = "SELECT image_id, favorited, is_deleted, width, height, hash, phash, file_path FROM images WHERE is_deleted = 0;";
+            }
+            else
+            {
+                sql = "SELECT image_id, favorited, is_deleted, width, height, hash, phash, file_path FROM images WHERE is_deleted = 0 AND file_path IS NOT NULL;";
+            }
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 SQLiteDataReader reader = command.ExecuteReader();
@@ -444,6 +451,7 @@ namespace ErzaLib2
                 {
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
+                    image.IsFavorited = Convert.ToBoolean(reader["favorited"]);
                     image.Hash = (string)reader["hash"];
                     image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
                     image.Width = Convert.ToInt32(reader["width"]);
@@ -452,6 +460,11 @@ namespace ErzaLib2
                     if (o != DBNull.Value)
                     {
                         image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
                     }
                     imgs.Add(image);
                 }
@@ -535,15 +548,17 @@ namespace ErzaLib2
         public static List<string> GetTagsByImageIDToString(long ImageID, SQLiteConnection Connection)
         {
             List<string> tags = new List<string>();
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
+            List<long> tagids = GetTagsByImageIDToTagIDs(ImageID, Connection);
+            foreach (long tagid in tagids)
             {
-                command.CommandText = "select tags.tag from tags inner join image_tags on tags.tag_id = image_tags.tag_id where image_tags.image_id = @image_id";
-                command.Parameters.AddWithValue("image_id", ImageID);
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                using (SQLiteCommand command = new SQLiteCommand(Connection))
                 {
-                    while (reader.Read())
+                    command.CommandText = "SELECT tag FROM tags WHERE tag_id = @tag_id";
+                    command.Parameters.AddWithValue("tag_id", tagid);
+                    object o = command.ExecuteScalar();
+                    if (o != DBNull.Value && o != null)
                     {
-                        tags.Add(reader.GetString(0));
+                        tags.Add((string)o);
                     }
                 }
             }
@@ -552,30 +567,50 @@ namespace ErzaLib2
         public static List<TagInfo> GetTagsByImageID(long ImageID, SQLiteConnection Connection)
         {
             List<TagInfo> tags = new List<TagInfo>();
+            List<long> tagids = GetTagsByImageIDToTagIDs(ImageID, Connection);
+            foreach (long tagid in tagids)
+            {
+                using (SQLiteCommand command = new SQLiteCommand(Connection))
+                {
+                    command.CommandText = "SELECT tag_id, count, type, tag, localization, description FROM tags WHERE tag_id = @tag_id";
+                    command.Parameters.AddWithValue("tag_id", tagid);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            TagInfo tag = new TagInfo();
+                            tag.Tag = (string)reader["tag"];
+                            tag.TagID = (long)reader["tag_id"];
+                            tag.Count = (long)reader["count"];
+                            object o2 = reader["localization"];
+                            if (o2 != DBNull.Value)
+                            {
+                                tag.Localization = (string)o2;
+                            }
+                            o2 = reader["description"];
+                            if (o2 != DBNull.Value)
+                            {
+                                tag.Description = (string)o2;
+                            }
+                            tag.Type = (TagType)reader["type"];
+                            tags.Add(tag);
+                        }
+                    }
+                }
+            }
+            return tags;
+        }
+        public static List<long> GetTagsByImageIDToTagIDs(long ImageID, SQLiteConnection Connection)
+        {
+            List<long> tags = new List<long>();
             using (SQLiteCommand command = new SQLiteCommand(Connection))
             {
-                command.CommandText = "select tags.tag, tags.count, tags.type, tags.localization, tags.description from tags inner join image_tags on tags.tag_id = image_tags.tag_id where image_tags.image_id = @image_id";
+                command.CommandText = "select tags from images where image_id = @image_id";
                 command.Parameters.AddWithValue("image_id", ImageID);
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                object o = command.ExecuteScalar();
+                if (o != DBNull.Value && o != null)
                 {
-                    while (reader.Read())
-                    {
-                        TagInfo tag = new TagInfo();
-                        tag.Tag = (string)reader["tag"];
-                        tag.Count = (long)reader["count"];
-                        object o = reader["localization"];
-                        if (o != DBNull.Value)
-                        {
-                            tag.TagRus = (string)o;
-                        }
-                        o = reader["description"];
-                        if (o != DBNull.Value)
-                        {
-                            tag.Description = (string)o;
-                        }
-                        tag.Type = (TagType)reader["type"];
-                        tags.Add(tag);
-                    }
+                    tags = ParseStringOfTagIDs((string)o);
                 }
             }
             return tags;
@@ -600,7 +635,7 @@ namespace ErzaLib2
         {
             using (SQLiteCommand command = new SQLiteCommand(Connection))
             {
-                command.CommandText = "DELETE FROM image_tags WHERE image_id = @image_id AND tag_id = @tag_id";
+                command.CommandText = "UPDATE images SET tags = REPLACE(tags, '#' || @tag_id || '#', '#') WHERE image_id = @image_id;";
                 command.Parameters.AddWithValue("tag_id", TagID);
                 command.Parameters.AddWithValue("image_id", ImageID);
                 command.ExecuteNonQuery();
@@ -609,13 +644,7 @@ namespace ErzaLib2
         public static void DeleteTagFromImage(string Tag, long ImageID, SQLiteConnection Connection)
         {
             long tagid = GetTagID(Tag, Connection);
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
-            {
-                command.CommandText = "DELETE FROM image_tags WHERE image_id = @image_id AND tag_id = @tag_id";
-                command.Parameters.AddWithValue("tag_id", tagid);
-                command.Parameters.AddWithValue("image_id", ImageID);
-                command.ExecuteNonQuery();
-            }
+            DeleteTagFromImage(tagid, ImageID, Connection);
         }
         public static List<string> SearchTags(string Query, bool First, bool Sort, SQLiteConnection Connection)
         {
@@ -652,13 +681,13 @@ namespace ErzaLib2
         {
             using (SQLiteCommand command = new SQLiteCommand())
             {
-                command.CommandText = "SELECT count(*) FROM image_tags WHERE image_tags.tag_id = @tag_id;";
-                command.Parameters.AddWithValue("tag_id", Tag);
+                command.CommandText = "SELECT count(*) FROM images WHERE tags LIKE '%#' || (SELECT tag_id FROM tags WHERE tag = @tag) || '#%';";
+                command.Parameters.AddWithValue("tag", Tag);
                 command.Connection = Connection;
                 object o = command.ExecuteScalar();
-                if (o == null)
+                if (o == null || o == DBNull.Value)
                 {
-                    return -1;
+                    return 0;
                 }
                 else
                 {
@@ -670,14 +699,14 @@ namespace ErzaLib2
         {
             List<TagInfo> tags = new List<TagInfo>();
             StringBuilder sql = new StringBuilder();
-            sql.Append("select count(tags.tag), tags.tag, tags.type, tags.localization, tags.description from tags inner join image_tags on tags.tag_id = image_tags.tag_id where tags.tag in (");
+            sql.Append("SELECT tag, tag_id, type, localization, description, (SELECT COUNT(*) FROM images WHERE tags LIKE '%#' || tag_id || '#%') AS count_tag FROM tags WHERE tag IN (");
             for (int i = 0; i < Tags.Count; i++)
             {
                 if (i > 0) sql.Append(", ");
                 //sql.Append("'" + Tags[i].Tag + "'");
                 sql.Append("@tag" + i.ToString());
             }
-            sql.Append(") GROUP BY tags.tag;");
+            sql.Append(")");
             using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
             {
                 for (int i = 0; i < Tags.Count; i++)
@@ -689,12 +718,14 @@ namespace ErzaLib2
                     while (reader.Read())
                     {
                         TagInfo tag = new TagInfo();
-                        tag.Tag = (string)reader[1];
-                        tag.Count = (long)reader[0];
+                        tag.Tag = (string)reader[0];
+                        tag.TagID = (long)reader[1];
+                        tag.Type = (TagType)reader[2];
+                        tag.Count = (long)reader[5];
                         object o = reader[3];
                         if (o != DBNull.Value)
                         {
-                            tag.TagRus = (string)o;
+                            tag.Localization = (string)o;
                         }
                         o = reader[4];
                         if (o != DBNull.Value)

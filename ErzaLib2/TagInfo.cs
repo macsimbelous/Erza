@@ -23,24 +23,17 @@ namespace ErzaLib2
 {
     public class TagInfo
     {
-        public string Tag;
-        public string TagRus;
-        public string TagJpn;
-        public TagType Type;
+        public long TagID;
         public long Count;
-        public string Description;
+        public TagType Type;
+        public string? Tag;
+        public string? Localization;
+        public string? Description;
         public TagInfo()
         {
-            Tag = null;
-            TagRus = null;
-            TagJpn = null;
-            Type = TagType.General;
+            TagID = -1;
             Count = 0;
-            Description = null;
-        }
-        override public string ToString()
-        {
-            return this.Tag;
+            Type = TagType.General;
         }
     }
     public enum TagType: long

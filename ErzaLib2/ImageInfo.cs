@@ -29,6 +29,7 @@ namespace ErzaLib2
         public string? FilePath = null;
         public int Width = 0;
         public int Height = 0;
+        public byte[]? PHash;
         public List<string> Tags = new List<string>();
         public string GetStringOfTags()
         {
