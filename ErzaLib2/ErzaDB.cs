@@ -16,6 +16,7 @@
 
 using System.Data.SQLite;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ErzaLib2
 {
@@ -28,7 +29,7 @@ namespace ErzaLib2
             ImageInfo temp_image = GetImageWithOutTags(Image.Hash, Connection);
             if (temp_image == null)
             {
-                AddImage(Image.Hash, Image.IsDeleted, Image.FilePath, Image.Width, Image.Height, Connection);
+                AddImage(Image, Connection);
                 image_id = GetImageID(Image.Hash, Connection);
             }
             else
@@ -64,66 +65,66 @@ namespace ErzaLib2
                 AddImageTags(image_id, tag_ids, Connection);
             }
         }
-        public static void AddImage(string Hash, bool IsDeleted, string FilePath, int Width, int Height, SQLiteConnection Connection)
+        public static void AddImage(ImageInfo Image, SQLiteConnection Connection)
         {
             using (SQLiteCommand insert_command = new SQLiteCommand(Connection))
             {
-                insert_command.CommandText = "insert into images (hash, is_deleted, file_path, width, height) values (@hash, @is_deleted, @file_path, @width, @height)";
-                insert_command.Parameters.AddWithValue("hash", Hash);
-                insert_command.Parameters.AddWithValue("is_deleted", IsDeleted);
-                insert_command.Parameters.AddWithValue("width", Width);
-                insert_command.Parameters.AddWithValue("height", Height);
-                if (FilePath == null)
+                insert_command.CommandText = "insert into images (hash, phash, favorited, is_deleted, file_path, width, height) values (@hash, @phash, @favorited, @is_deleted, @file_path, @width, @height)";
+                insert_command.Parameters.AddWithValue("hash", Image.Hash);
+                insert_command.Parameters.AddWithValue("is_deleted", Image.IsDeleted);
+                insert_command.Parameters.AddWithValue("favorited", Image.IsFavorited);
+                insert_command.Parameters.AddWithValue("width", Image.Width);
+                insert_command.Parameters.AddWithValue("height", Image.Height);
+                if (Image.FilePath == null)
                 {
                     insert_command.Parameters.AddWithValue("file_path", DBNull.Value);
                 }
                 else
                 {
-                    insert_command.Parameters.AddWithValue("file_path", FilePath);
+                    insert_command.Parameters.AddWithValue("file_path", Image.FilePath);
+                }
+                if (Image.PHash == null)
+                {
+                    insert_command.Parameters.AddWithValue("phash", DBNull.Value);
+                }
+                else
+                {
+                    insert_command.Parameters.AddWithValue("phash", Image.PHash);
                 }
                 insert_command.ExecuteNonQuery();
             }
         }
-        public static void AddTagToImage(string Hash, string Tag, SQLiteConnection Connection)
+        public static void AddTagToImage(long ImageID, long TagID, SQLiteConnection Connection)
         {
-            string sql = "SELECT images.image_id FROM images inner join image_tags on images.image_id = image_tags.image_id inner join tags on image_tags.tag_id = tags.tag_id WHERE images.hash = @hash AND tags.tag = @tag";
-            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            List<long> tagids = new List<long>();
+            tagids.Add(TagID);
+            using (SQLiteCommand command = new SQLiteCommand("SELECT tags FROM images WHERE image_id = @image_id", Connection))
             {
-                command.Parameters.AddWithValue("hash", Hash);
-                command.Parameters.AddWithValue("tag", Tag);
+                command.Parameters.AddWithValue("image_id", ImageID);
                 object o = command.ExecuteScalar();
-                if (o == null)
+                if (o != null)
                 {
-                    long t = GetTagID(Tag, Connection);
-                    if (t < 0)
-                    {
-                        AddTag(Tag, Connection);
-                        t = GetTagID(Tag, Connection);
-                    }
-                    long i = GetImageID(Hash, Connection);
-                    AddImageTags(i, t, Connection);
+                    tagids.AddRange(ParseStringOfTagIDs((string)o));
                 }
             }
+            tagids = tagids.Distinct().ToList();
+            using (SQLiteCommand command = new SQLiteCommand("UPDATE images SET tags = @tags WHERE image_id = @image_id", Connection))
+            {
+                command.Parameters.AddWithValue("tags", GetStringOfTagIDs(tagids));
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void AddTagToImage(string Hash, string Tag, SQLiteConnection Connection)
+        {
+            long imageid = GetImageID(Hash, Connection);
+            long tagid = GetTagID(Tag, Connection);
+            AddTagToImage(imageid, tagid, Connection);
         }
         public static void AddTagToImage(long ImageID, string Tag, SQLiteConnection Connection)
         {
-            string sql = "SELECT image_tags.image_id FROM image_tags inner join tags on image_tags.tag_id = tags.tag_id WHERE image_tags.image_id = @image_id AND tags.tag = @tag";
-            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
-            {
-                command.Parameters.AddWithValue("image_id", ImageID);
-                command.Parameters.AddWithValue("tag", Tag);
-                object o = command.ExecuteScalar();
-                if (o == null)
-                {
-                    long t = GetTagID(Tag, Connection);
-                    if (t < 0)
-                    {
-                        AddTag(Tag, Connection);
-                        t = GetTagID(Tag, Connection);
-                    }
-                    AddImageTags(ImageID, t, Connection);
-                }
-            }
+            long tagid = GetTagID(Tag, Connection);
+            AddTagToImage(ImageID, tagid, Connection);
         }
         public static long GetImageID(string Hash, SQLiteConnection Connection)
         {
@@ -142,9 +143,9 @@ namespace ErzaLib2
                 }
             }
         }
-        public static ImageInfo GetImageWithOutTags(string Hash, SQLiteConnection Connection)
+        public static ImageInfo? GetImageWithOutTags(string Hash, SQLiteConnection Connection)
         {
-            string sql = "SELECT image_id, hash, is_deleted, file_path, width, height FROM images WHERE hash = @hash";
+            string sql = "SELECT image_id, hash, is_deleted, file_path, width, height, favorited, phash FROM images WHERE hash = @hash";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("hash", Hash);
@@ -154,13 +155,19 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
-                    image.Width = Convert.ToInt32(reader["width"]);
-                    image.Height = Convert.ToInt32(reader["height"]);
+                    image.IsDeleted = (bool)reader["is_deleted"];
+                    image.IsFavorited = (bool)reader["favorited"];
+                    image.Width = (int)reader["width"];
+                    image.Height = (int)reader["height"];
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
                         image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
                     }
                     reader.Close();
                     return image;
@@ -172,9 +179,9 @@ namespace ErzaLib2
                 }
             }
         }
-        public static ImageInfo GetImageWithOutTags(long ImageID, SQLiteConnection Connection)
+        public static ImageInfo? GetImageWithOutTags(long ImageID, SQLiteConnection Connection)
         {
-            string sql = "SELECT image_id, hash, is_deleted, file_path, width, height FROM images WHERE image_id = @image_id";
+            string sql = "SELECT image_id, hash, is_deleted, file_path, width, height, favorited, phash FROM images WHERE image_id = @image_id";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("image_id", ImageID);
@@ -184,13 +191,19 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
-                    image.Width = Convert.ToInt32(reader["width"]);
-                    image.Height = Convert.ToInt32(reader["height"]);
+                    image.IsDeleted = (bool)reader["is_deleted"];
+                    image.IsFavorited = (bool)reader["favorited"];
+                    image.Width = (int)reader["width"];
+                    image.Height = (int)reader["height"];
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
                         image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
                     }
                     reader.Close();
                     return image;
@@ -206,12 +219,24 @@ namespace ErzaLib2
         {
             using (SQLiteCommand update_command = new SQLiteCommand(Connection))
             {
-                update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path WHERE hash = @hash";
+                update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path, favorited = @favorited WHERE hash = @hash";
                 update_command.Parameters.AddWithValue("hash", Image.Hash);
                 update_command.Parameters.AddWithValue("width", Image.Width);
                 update_command.Parameters.AddWithValue("height", Image.Height);
                 update_command.Parameters.AddWithValue("file_path", Image.FilePath);
                 update_command.Parameters.AddWithValue("is_deleted", Image.IsDeleted);
+                update_command.Parameters.AddWithValue("favorited", Image.IsFavorited);
+                update_command.ExecuteNonQuery();
+            }
+        }
+        public static void SetImageResolution(long ImageID, int Width, int Height, SQLiteConnection Connection)
+        {
+            using (SQLiteCommand update_command = new SQLiteCommand(Connection))
+            {
+                update_command.CommandText = "UPDATE images SET width = @width, height = @height WHERE image_id = @image_id";
+                update_command.Parameters.AddWithValue("image_id", ImageID);
+                update_command.Parameters.AddWithValue("width", Width);
+                update_command.Parameters.AddWithValue("height", Height);
                 update_command.ExecuteNonQuery();
             }
         }
@@ -226,6 +251,16 @@ namespace ErzaLib2
                 update_command.ExecuteNonQuery();
             }
         }
+        public static void SetImagePath(long ImageID, string FilePath, SQLiteConnection Connection)
+        {
+            using (SQLiteCommand update_command = new SQLiteCommand(Connection))
+            {
+                update_command.CommandText = "UPDATE images SET file_path = @file_path WHERE image_id = @image_id";
+                update_command.Parameters.AddWithValue("image_id", ImageID);
+                update_command.Parameters.AddWithValue("file_path", FilePath);
+                update_command.ExecuteNonQuery();
+            }
+        }
         public static void SetImagePath(string Hash, string FilePath, SQLiteConnection Connection)
         {
             using (SQLiteCommand update_command = new SQLiteCommand(Connection))
@@ -233,6 +268,23 @@ namespace ErzaLib2
                 update_command.CommandText = "UPDATE images SET file_path = @file_path WHERE hash = @hash";
                 update_command.Parameters.AddWithValue("hash", Hash);
                 update_command.Parameters.AddWithValue("file_path", FilePath);
+                update_command.ExecuteNonQuery();
+            }
+        }
+        public static void DeleteImage(long ImageID, SQLiteConnection Connection)
+        {
+            RemoveImageTags(ImageID, Connection);
+            using (SQLiteCommand update_command = new SQLiteCommand(Connection))
+            {
+                update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path, favorited = @favorited, phash = @phash, tags = @tags WHERE image_id = @image_id";
+                update_command.Parameters.AddWithValue("image_id", ImageID);
+                update_command.Parameters.AddWithValue("width", 0);
+                update_command.Parameters.AddWithValue("height", 0);
+                update_command.Parameters.AddWithValue("file_path", null);
+                update_command.Parameters.AddWithValue("is_deleted", true);
+                update_command.Parameters.AddWithValue("favorited", false);
+                update_command.Parameters.AddWithValue("phash", null);
+                update_command.Parameters.AddWithValue("tags", null);
                 update_command.ExecuteNonQuery();
             }
         }
@@ -246,50 +298,6 @@ namespace ErzaLib2
             else
             {
                 DeleteImage(id, Connection);
-                /*RemoveImageTags(id, Connection);
-                using (SQLiteCommand update_command = new SQLiteCommand(Connection))
-                {
-                    update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path WHERE hash = @hash";
-                    update_command.Parameters.AddWithValue("hash", Hash);
-                    update_command.Parameters.AddWithValue("width", 0);
-                    update_command.Parameters.AddWithValue("height", 0);
-                    update_command.Parameters.AddWithValue("file_path", null);
-                    update_command.Parameters.AddWithValue("is_deleted", true);
-                    update_command.ExecuteNonQuery();
-                }*/
-            }
-        }
-        public static void DeleteImage(long ImageID, SQLiteConnection Connection)
-        {
-            RemoveImageTags(ImageID, Connection);
-            using (SQLiteCommand update_command = new SQLiteCommand(Connection))
-            {
-                update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path WHERE image_id = @image_id";
-                update_command.Parameters.AddWithValue("image_id", ImageID);
-                update_command.Parameters.AddWithValue("width", 0);
-                update_command.Parameters.AddWithValue("height", 0);
-                update_command.Parameters.AddWithValue("file_path", null);
-                update_command.Parameters.AddWithValue("is_deleted", true);
-                update_command.ExecuteNonQuery();
-            }
-        }
-        public static void VipeImage(string Hash, SQLiteConnection Connection)
-        {
-            long id = GetImageID(Hash, Connection);
-            if (id < 0)
-            {
-                return;
-            }
-            else
-            {
-                VipeImage(id, Connection);
-                /*RemoveImageTags(id, Connection);
-                using (SQLiteCommand command = new SQLiteCommand(Connection))
-                {
-                    command.CommandText = "DELETE FROM images WHERE hash = @hash";
-                    command.Parameters.AddWithValue("hash", Hash);
-                    command.ExecuteNonQuery();
-                }*/
             }
         }
         public static void VipeImage(long ImageID, SQLiteConnection Connection)
@@ -302,12 +310,34 @@ namespace ErzaLib2
                 command.ExecuteNonQuery();
             }
         }
+        public static void VipeImage(string Hash, SQLiteConnection Connection)
+        {
+            long id = GetImageID(Hash, Connection);
+            if (id < 0)
+            {
+                return;
+            }
+            else
+            {
+                VipeImage(id, Connection);
+            }
+        }
         public static void AddTag(string Tag, SQLiteConnection Connection)
         {
             string sql = "INSERT INTO tags (tag) VALUES (@tag);";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("tag", Tag);
+                command.ExecuteNonQuery();
+            }
+        }
+        public static void AddTag(string Tag, TagType Type, SQLiteConnection Connection)
+        {
+            string sql = "INSERT INTO tags (tag, type) VALUES (@tag, @type);";
+            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            {
+                command.Parameters.AddWithValue("tag", Tag);
+                command.Parameters.AddWithValue("type", Type);
                 command.ExecuteNonQuery();
             }
         }
@@ -327,57 +357,6 @@ namespace ErzaLib2
                     return System.Convert.ToInt64(o);
                 }
             }
-        }
-        public static void AddImageTags(long ImageID, List<long> TagIDs, SQLiteConnection Connection)
-        {
-            StringBuilder sql = new StringBuilder();
-            sql.Append("INSERT INTO image_tags (image_id, tag_id) VALUES ");
-            for (int i = 0; i < TagIDs.Count; i++)
-            {
-                if (i > 0) sql.Append(", ");
-                sql.Append("(" + ImageID.ToString() + ", " + TagIDs[i].ToString() + ")");
-            }
-            sql.Append(";");
-            using (SQLiteCommand ins_command = new SQLiteCommand(sql.ToString(), Connection))
-            {
-                ins_command.ExecuteNonQuery();
-            }
-        }
-        public static void AddImageTags(long ImageID, long TagID, SQLiteConnection Connection)
-        {
-            using (SQLiteCommand ins_command = new SQLiteCommand(Connection))
-            {
-                ins_command.CommandText = "INSERT INTO image_tags (image_id, tag_id) VALUES (@image_id, @tag_id)";
-                ins_command.Parameters.AddWithValue("image_id", ImageID);
-                ins_command.Parameters.AddWithValue("tag_id", TagID);
-                ins_command.ExecuteNonQuery();
-            }
-        }
-        public static void RemoveImageTags(long ImageID, SQLiteConnection Connection)
-        {
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
-            {
-                command.CommandText = "DELETE FROM image_tags WHERE image_id = @image_id";
-                command.Parameters.AddWithValue("image_id", ImageID);
-                command.ExecuteNonQuery();
-            }
-        }
-        public static List<long> GetTagIDsFromImageTags(long ImageID, SQLiteConnection Connection)
-        {
-            List<long> ids = new List<long>();
-            using (SQLiteCommand command = new SQLiteCommand(Connection))
-            {
-                command.CommandText = "SELECT tag_id FROM image_tags WHERE image_id = @image_id";
-                command.Parameters.AddWithValue("image_id", ImageID);
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        ids.Add((long)reader[0]);
-                    }
-                }
-            }
-            return ids;
         }
         public static List<ImageInfo> GetImagesByTag(string Tag, SQLiteConnection Connection)
         {
