@@ -22,8 +22,8 @@ namespace ErzaLib2
 {
     public class ImageInfo
     {
-        public bool IsDeleted = false;
-        public bool IsFavorited = false;
+        public bool Deleted = false;
+        public bool Favorited = false;
         public long ImageID = -1;
         public string? Hash = null;
         public string? FilePath = null;

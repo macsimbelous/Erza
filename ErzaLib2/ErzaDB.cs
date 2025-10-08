@@ -15,6 +15,7 @@
     along with Foobar.  If not, see <https://www.gnu.org/licenses/>.*/
 
 using System.Data.SQLite;
+using System.IO;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -24,55 +25,45 @@ namespace ErzaLib2
     {
         public static void LoadImageToErza(ImageInfo Image, SQLiteConnection Connection)
         {
-            long image_id;
             List<long> tag_ids = new List<long>();
-            ImageInfo temp_image = GetImageWithOutTags(Image.Hash, Connection);
+            ImageInfo? temp_image = GetImageWithOutTags(Image.Hash, Connection);
             if (temp_image == null)
             {
                 AddImage(Image, Connection);
-                image_id = GetImageID(Image.Hash, Connection);
             }
             else
             {
-                if (temp_image.IsDeleted == true)
+                if (temp_image.Deleted != true)
                 {
-                    return;
+                    foreach (string tag in Image.Tags)
+                    {
+                        long t = GetTagID(tag, Connection);
+                        if (t >= 0)
+                        {
+                            tag_ids.Add(t);
+                        }
+                        else
+                        {
+                            AddTag(tag, Connection);
+                            tag_ids.Add(GetTagID(tag, Connection));
+                        }
+                    }
+                    tag_ids = tag_ids.Except(GetTagsByImageIDToTagIDs(temp_image.ImageID, Connection)).ToList();
+                    if (tag_ids.Count > 0)
+                    {
+                        AddTagsToImage(temp_image.ImageID, tag_ids, Connection);
+                    }
                 }
-                else
-                {
-                    image_id = temp_image.ImageID;
-                }
-            }
-            foreach (string tag in Image.Tags)
-            {
-                long t = GetTagID(tag, Connection);
-                if (t >= 0)
-                {
-                    tag_ids.Add(t);
-                }
-                else
-                {
-                    AddTag(tag, Connection);
-                    tag_ids.Add(GetTagID(tag, Connection));
-                }
-            }
-            tag_ids = tag_ids.Except(GetTagIDsFromImageTags(image_id, Connection)).ToList();
-            /*tag_ids.AddRange(GetTagIDsFromImageTags(image_id, Connection));
-            tag_ids = tag_ids.Distinct().ToList();
-            RemoveImageTags(image_id, Connection);*/
-            if (tag_ids.Count > 0)
-            {
-                AddImageTags(image_id, tag_ids, Connection);
             }
         }
         public static void AddImage(ImageInfo Image, SQLiteConnection Connection)
         {
             using (SQLiteCommand insert_command = new SQLiteCommand(Connection))
             {
-                insert_command.CommandText = "insert into images (hash, phash, favorited, is_deleted, file_path, width, height) values (@hash, @phash, @favorited, @is_deleted, @file_path, @width, @height)";
+                insert_command.CommandText = "insert into images (hash, phash, favorited, deleted, file_path, width, height, tags) values (@hash, @phash, @favorited, @deleted, @file_path, @width, @height, @tags)";
                 insert_command.Parameters.AddWithValue("hash", Image.Hash);
-                insert_command.Parameters.AddWithValue("is_deleted", Image.IsDeleted);
-                insert_command.Parameters.AddWithValue("favorited", Image.IsFavorited);
+                insert_command.Parameters.AddWithValue("deleted", Image.Deleted);
+                insert_command.Parameters.AddWithValue("favorited", Image.Favorited);
                 insert_command.Parameters.AddWithValue("width", Image.Width);
                 insert_command.Parameters.AddWithValue("height", Image.Height);
                 if (Image.FilePath == null)
@@ -90,6 +81,28 @@ namespace ErzaLib2
                 else
                 {
                     insert_command.Parameters.AddWithValue("phash", Image.PHash);
+                }
+                if (Image.Tags != null && Image.Tags.Count > 0)
+                {
+                    List<long> tagids = new List<long>();
+                    foreach (string tag in Image.Tags)
+                    {
+                        long t = GetTagID(tag, Connection);
+                        if (t >= 0)
+                        {
+                            tagids.Add(t);
+                        }
+                        else
+                        {
+                            AddTag(tag, Connection);
+                            tagids.Add(GetTagID(tag, Connection));
+                        }
+                    }
+                    insert_command.Parameters.AddWithValue("tags", GetStringOfTagIDs(tagids));
+                }
+                else
+                {
+                    insert_command.Parameters.AddWithValue("tags", DBNull.Value);
                 }
                 insert_command.ExecuteNonQuery();
             }
@@ -115,18 +128,30 @@ namespace ErzaLib2
                 command.ExecuteNonQuery();
             }
         }
-        public static void AddTagToImage(string Hash, string Tag, SQLiteConnection Connection)
+        public static void AddTagsToImage(long ImageID, IEnumerable<long> TagIDs, SQLiteConnection Connection)
         {
-            long imageid = GetImageID(Hash, Connection);
-            long tagid = GetTagID(Tag, Connection);
-            AddTagToImage(imageid, tagid, Connection);
+            List<long> tagids = new List<long>();
+            foreach (long TagID in TagIDs) {
+                tagids.Add(TagID);
+            }
+            using (SQLiteCommand command = new SQLiteCommand("SELECT tags FROM images WHERE image_id = @image_id", Connection))
+            {
+                command.Parameters.AddWithValue("image_id", ImageID);
+                object o = command.ExecuteScalar();
+                if (o != null)
+                {
+                    tagids.AddRange(ParseStringOfTagIDs((string)o));
+                }
+            }
+            tagids = tagids.Distinct().ToList();
+            using (SQLiteCommand command = new SQLiteCommand("UPDATE images SET tags = @tags WHERE image_id = @image_id", Connection))
+            {
+                command.Parameters.AddWithValue("tags", GetStringOfTagIDs(tagids));
+                command.Parameters.AddWithValue("image_id", ImageID);
+                command.ExecuteNonQuery();
+            }
         }
-        public static void AddTagToImage(long ImageID, string Tag, SQLiteConnection Connection)
-        {
-            long tagid = GetTagID(Tag, Connection);
-            AddTagToImage(ImageID, tagid, Connection);
-        }
-        public static long GetImageID(string Hash, SQLiteConnection Connection)
+        public static long GetImageID(string? Hash, SQLiteConnection Connection)
         {
             string sql = "SELECT image_id FROM images WHERE hash = @hash";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
@@ -143,9 +168,9 @@ namespace ErzaLib2
                 }
             }
         }
-        public static ImageInfo? GetImageWithOutTags(string Hash, SQLiteConnection Connection)
+        public static ImageInfo? GetImageWithOutTags(string? Hash, SQLiteConnection Connection)
         {
-            string sql = "SELECT image_id, hash, is_deleted, file_path, width, height, favorited, phash FROM images WHERE hash = @hash";
+            string sql = "SELECT image_id, hash, deleted, file_path, width, height, favorited, phash FROM images WHERE hash = @hash";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("hash", Hash);
@@ -155,8 +180,8 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.IsDeleted = (bool)reader["is_deleted"];
-                    image.IsFavorited = (bool)reader["favorited"];
+                    image.Deleted = (bool)reader["deleted"];
+                    image.Favorited = (bool)reader["favorited"];
                     image.Width = (int)reader["width"];
                     image.Height = (int)reader["height"];
                     object o = reader["file_path"];
@@ -181,7 +206,7 @@ namespace ErzaLib2
         }
         public static ImageInfo? GetImageWithOutTags(long ImageID, SQLiteConnection Connection)
         {
-            string sql = "SELECT image_id, hash, is_deleted, file_path, width, height, favorited, phash FROM images WHERE image_id = @image_id";
+            string sql = "SELECT image_id, hash, deleted, file_path, width, height, favorited, phash FROM images WHERE image_id = @image_id";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("image_id", ImageID);
@@ -191,8 +216,8 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.IsDeleted = (bool)reader["is_deleted"];
-                    image.IsFavorited = (bool)reader["favorited"];
+                    image.Deleted = (bool)reader["deleted"];
+                    image.Favorited = (bool)reader["favorited"];
                     image.Width = (int)reader["width"];
                     image.Height = (int)reader["height"];
                     object o = reader["file_path"];
@@ -219,13 +244,13 @@ namespace ErzaLib2
         {
             using (SQLiteCommand update_command = new SQLiteCommand(Connection))
             {
-                update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path, favorited = @favorited WHERE hash = @hash";
+                update_command.CommandText = "UPDATE images SET deleted = @deleted, width = @width, height = @height, file_path = @file_path, favorited = @favorited WHERE hash = @hash";
                 update_command.Parameters.AddWithValue("hash", Image.Hash);
                 update_command.Parameters.AddWithValue("width", Image.Width);
                 update_command.Parameters.AddWithValue("height", Image.Height);
                 update_command.Parameters.AddWithValue("file_path", Image.FilePath);
-                update_command.Parameters.AddWithValue("is_deleted", Image.IsDeleted);
-                update_command.Parameters.AddWithValue("favorited", Image.IsFavorited);
+                update_command.Parameters.AddWithValue("deleted", Image.Deleted);
+                update_command.Parameters.AddWithValue("favorited", Image.Favorited);
                 update_command.ExecuteNonQuery();
             }
         }
@@ -271,17 +296,26 @@ namespace ErzaLib2
                 update_command.ExecuteNonQuery();
             }
         }
-        public static void DeleteImage(long ImageID, SQLiteConnection Connection)
+        public static void SetImagePhash(long ImageID, byte[] Phash, SQLiteConnection Connection)
         {
-            RemoveImageTags(ImageID, Connection);
             using (SQLiteCommand update_command = new SQLiteCommand(Connection))
             {
-                update_command.CommandText = "UPDATE images SET is_deleted = @is_deleted, width = @width, height = @height, file_path = @file_path, favorited = @favorited, phash = @phash, tags = @tags WHERE image_id = @image_id";
+                update_command.CommandText = "UPDATE images SET phash = @phash WHERE image_id = @image_id";
+                update_command.Parameters.AddWithValue("image_id", ImageID);
+                update_command.Parameters.AddWithValue("phash", Phash);
+                update_command.ExecuteNonQuery();
+            }
+        }
+        public static void DeleteImage(long ImageID, SQLiteConnection Connection)
+        {
+            using (SQLiteCommand update_command = new SQLiteCommand(Connection))
+            {
+                update_command.CommandText = "UPDATE images SET deleted = @deleted, width = @width, height = @height, file_path = @file_path, favorited = @favorited, phash = @phash, tags = @tags WHERE image_id = @image_id";
                 update_command.Parameters.AddWithValue("image_id", ImageID);
                 update_command.Parameters.AddWithValue("width", 0);
                 update_command.Parameters.AddWithValue("height", 0);
                 update_command.Parameters.AddWithValue("file_path", null);
-                update_command.Parameters.AddWithValue("is_deleted", true);
+                update_command.Parameters.AddWithValue("deleted", true);
                 update_command.Parameters.AddWithValue("favorited", false);
                 update_command.Parameters.AddWithValue("phash", null);
                 update_command.Parameters.AddWithValue("tags", null);
@@ -302,7 +336,6 @@ namespace ErzaLib2
         }
         public static void VipeImage(long ImageID, SQLiteConnection Connection)
         {
-            RemoveImageTags(ImageID, Connection);
             using (SQLiteCommand command = new SQLiteCommand(Connection))
             {
                 command.CommandText = "DELETE FROM images WHERE image_id = @image_id";
@@ -361,7 +394,7 @@ namespace ErzaLib2
         public static List<ImageInfo> GetImagesByTag(string Tag, SQLiteConnection Connection)
         {
             List<ImageInfo> imgs = new List<ImageInfo>();
-            string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag = @tag AND images.is_deleted = 0;";
+            string sql = "SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL AND tags LIKE '%#' || (SELECT tag_id FROM tags WHERE tag = @tag) || '#%'";
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
                 command.Parameters.AddWithValue("tag", Tag);
@@ -371,13 +404,19 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
-                    image.Width = Convert.ToInt32(reader["width"]);
-                    image.Height = Convert.ToInt32(reader["height"]);
+                    image.Favorited = (bool)reader["favorited"];
+                    image.Deleted = (bool)reader["deleted"];
+                    image.Width = (int)reader["width"];
+                    image.Height = (int)reader["height"];
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
                         image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
                     }
                     imgs.Add(image);
                 }
@@ -387,24 +426,47 @@ namespace ErzaLib2
         }
         public static List<ImageInfo> GetImagesByPartTag(string PartTag, SQLiteConnection Connection)
         {
-            List<ImageInfo> imgs = new List<ImageInfo>();
-            string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag like @tag AND images.is_deleted = 0 GROUP BY images.image_id";
-            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            List<long> tagids = new List<long>();
+            using (SQLiteCommand command = new SQLiteCommand("SELECT tag_id FROM tags WHERE tag LIKE '%' || @tag || '%'", Connection))
             {
-                command.Parameters.AddWithValue("tag", '%' + PartTag + '%');
+                command.Parameters.AddWithValue("tag", PartTag);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    tagids.Add(reader.GetInt64(0));
+                }
+                reader.Close();
+            }
+            List<ImageInfo> imgs = new List<ImageInfo>();
+            StringBuilder sql = new StringBuilder();
+            sql.Append("SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL AND (");
+            for(int i = 0; i < tagids.Count; i++)
+            {
+                if (i > 0) sql.Append(" OR ");
+                sql.Append("tags LIKE '%#" + tagids[i].ToString() + "#%'");
+            }
+            sql.Append(')');
+            using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
+            {
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
-                    image.Width = Convert.ToInt32(reader["width"]);
-                    image.Height = Convert.ToInt32(reader["height"]);
+                    image.Favorited = (bool)reader["favorited"];
+                    image.Deleted = (bool)reader["deleted"];
+                    image.Width = (int)reader["width"];
+                    image.Height = (int)reader["height"];
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
                         image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
                     }
                     imgs.Add(image);
                 }
@@ -417,11 +479,11 @@ namespace ErzaLib2
             List<ImageInfo> imgs = new List<ImageInfo>();
             string sql;
             if (WithOutFilePath) {
-                sql = "SELECT image_id, favorited, is_deleted, width, height, hash, phash, file_path FROM images WHERE is_deleted = 0;";
+                sql = "SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0;";
             }
             else
             {
-                sql = "SELECT image_id, favorited, is_deleted, width, height, hash, phash, file_path FROM images WHERE is_deleted = 0 AND file_path IS NOT NULL;";
+                sql = "SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL;";
             }
             using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
             {
@@ -430,9 +492,9 @@ namespace ErzaLib2
                 {
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
-                    image.IsFavorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
                     image.Hash = (string)reader["hash"];
-                    image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
                     image.Width = Convert.ToInt32(reader["width"]);
                     image.Height = Convert.ToInt32(reader["height"]);
                     object o = reader["file_path"];
@@ -453,34 +515,60 @@ namespace ErzaLib2
         }
         public static List<ImageInfo> GetImagesByTags(List<string> Tags, bool Or, SQLiteConnection Connection)
         {
+            List<long> tagids = new List<long>();
+            StringBuilder sb = new StringBuilder();
+            sb.Append("SELECT tag_id FROM tags WHERE tag IN (");
+            for (int i = 0; i < Tags.Count; i++)
+            {
+                if (i > 0) sb.Append(", ");
+                sb.Append("@tag" + i.ToString());
+            }
+            using (SQLiteCommand command = new SQLiteCommand(sb.ToString(), Connection))
+            {
+                for (int i = 0; i < Tags.Count; i++)
+                {
+                    command.Parameters.AddWithValue("tag" + i.ToString(), Tags[i]);
+                }
+                
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    tagids.Add(reader.GetInt64(0));
+                }
+                reader.Close();
+            }
             List<ImageInfo> imgs = new List<ImageInfo>();
             if (Or)
             {
                 StringBuilder sql = new StringBuilder();
-                sql.Append("select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in (");
-                for (int i = 0; i < Tags.Count; i++)
+                sql.Append("SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL AND (");
+                for (int i = 0; i < tagids.Count; i++)
                 {
-                    if (i > 0) sql.Append(", ");
-                    sql.Append("'" + Tags[i] + "'");
+                    if (i > 0) sql.Append(" OR ");
+                    sql.Append("tags LIKE '%#" + tagids[i].ToString() + "#%'");
                 }
-                sql.Append(") AND images.is_deleted = 0 group by images.image_id;");
-                //string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path, Count(images.image_id) as CountName from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in ('bdsm', 'oral') group by images.image_id Having CountName=2;";
+                sql.Append(')');
                 using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
                 {
-                    //command.Parameters.AddWithValue("tag", Tag);
                     SQLiteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         ImageInfo image = new ImageInfo();
                         image.ImageID = (long)reader["image_id"];
                         image.Hash = (string)reader["hash"];
-                        image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
-                        image.Width = Convert.ToInt32(reader["width"]);
-                        image.Height = Convert.ToInt32(reader["height"]);
+                        image.Favorited = (bool)reader["favorited"];
+                        image.Deleted = (bool)reader["deleted"];
+                        image.Width = (int)reader["width"];
+                        image.Height = (int)reader["height"];
                         object o = reader["file_path"];
                         if (o != DBNull.Value)
                         {
                             image.FilePath = (string)o;
+                        }
+                        o = reader["phash"];
+                        if (o != DBNull.Value)
+                        {
+                            image.PHash = (byte[])o;
                         }
                         imgs.Add(image);
                     }
@@ -490,32 +578,34 @@ namespace ErzaLib2
             else
             {
                 StringBuilder sql = new StringBuilder();
-                sql.Append("select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path, Count(images.image_id) as CountName from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in (");
-                for (int i = 0; i < Tags.Count; i++)
+                sql.Append("SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL AND (");
+                for (int i = 0; i < tagids.Count; i++)
                 {
-                    if (i > 0) sql.Append(", ");
-                    sql.Append("'" + Tags[i] + "'");
+                    if (i > 0) sql.Append(" AND ");
+                    sql.Append("tags LIKE '%#" + tagids[i].ToString() + "#%'");
                 }
-                sql.Append(") group by images.image_id Having CountName=");
-                sql.Append(Tags.Count);
-                sql.Append(';');
-                //string sql = "select images.image_id, images.hash, images.is_deleted, images.width, images.height, images.file_path, Count(images.image_id) as CountName from tags inner join image_tags on tags.tag_id = image_tags.tag_id inner join images on images.image_id = image_tags.image_id where tags.tag in ('bdsm', 'oral') group by images.image_id Having CountName=2;";
+                sql.Append(')');
                 using (SQLiteCommand command = new SQLiteCommand(sql.ToString(), Connection))
                 {
-                    //command.Parameters.AddWithValue("tag", Tag);
                     SQLiteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         ImageInfo image = new ImageInfo();
                         image.ImageID = (long)reader["image_id"];
                         image.Hash = (string)reader["hash"];
-                        image.IsDeleted = Convert.ToBoolean(reader["is_deleted"]);
-                        image.Width = Convert.ToInt32(reader["width"]);
-                        image.Height = Convert.ToInt32(reader["height"]);
+                        image.Favorited = (bool)reader["favorited"];
+                        image.Deleted = (bool)reader["deleted"];
+                        image.Width = (int)reader["width"];
+                        image.Height = (int)reader["height"];
                         object o = reader["file_path"];
                         if (o != DBNull.Value)
                         {
                             image.FilePath = (string)o;
+                        }
+                        o = reader["phash"];
+                        if (o != DBNull.Value)
+                        {
+                            image.PHash = (byte[])o;
                         }
                         imgs.Add(image);
                     }
@@ -535,7 +625,7 @@ namespace ErzaLib2
                     command.CommandText = "SELECT tag FROM tags WHERE tag_id = @tag_id";
                     command.Parameters.AddWithValue("tag_id", tagid);
                     object o = command.ExecuteScalar();
-                    if (o != DBNull.Value && o != null)
+                    if (o != null)
                     {
                         tags.Add((string)o);
                     }
@@ -587,7 +677,7 @@ namespace ErzaLib2
                 command.CommandText = "select tags from images where image_id = @image_id";
                 command.Parameters.AddWithValue("image_id", ImageID);
                 object o = command.ExecuteScalar();
-                if (o != DBNull.Value && o != null)
+                if (o != null)
                 {
                     tags = ParseStringOfTagIDs((string)o);
                 }
