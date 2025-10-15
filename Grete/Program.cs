@@ -1,6 +1,6 @@
 ﻿using System.Data.SQLite;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using ErzaLib;
+using ErzaLib2;
 using Shipwreck.Phash;
 using System.Drawing;
 using Shipwreck.Phash.Bitmaps;
@@ -37,7 +37,7 @@ namespace Grete
             connection.Open();
             using (SQLiteCommand command = new SQLiteCommand(connection))
             {
-                command.CommandText = "SELECT images.image_id, images.file_path FROM images LEFT OUTER JOIN phashs on images.image_id = phashs.image_id WHERE phashs.phash IS NULL AND images.file_path IS NOT NULL;";
+                command.CommandText = "SELECT image_id, file_path FROM images WHERE phash IS NULL AND file_path IS NOT NULL;";
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -55,20 +55,6 @@ namespace Grete
                 }
             }
             Console.WriteLine($"Не хэшированых изображений: {image_queue.Count}");
-            //for (int i = 0; i < imgs.Count; i++)
-            //{
-            //    //PHash
-            //    var bitmap = (Bitmap)Image.FromFile(imgs[i].FilePath);
-            //    var phash = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage());
-            //    using (SQLiteCommand insert_command = new SQLiteCommand(connection))
-            //    {
-            //        insert_command.CommandText = "insert into phashs (image_id, phash) values (@image_id, @phash)";
-            //        insert_command.Parameters.AddWithValue("image_id", imgs[i].ImageID);
-            //        insert_command.Parameters.AddWithValue("phash", phash.Coefficients);
-            //        insert_command.ExecuteNonQuery();
-            //    }
-            //    Console.WriteLine($"[{i+1}\\{imgs.Count}] ID: {imgs[i].ImageID}");
-            //}
             size_queue = image_queue.Count;
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
             //threads = new Thread[LIMIT_THREADS];
@@ -106,29 +92,6 @@ namespace Grete
             {
                 Thread.Sleep(0);
             }
-            List<long> ids = new List<long>();
-            using (SQLiteCommand command = new SQLiteCommand(connection))
-            {
-                command.CommandText = "SELECT phashs.image_id FROM phashs LEFT OUTER JOIN images on phashs.image_id = images.image_id WHERE images.file_path IS NULL;";
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        ids.Add(reader.GetInt64(0));
-                    }
-                }
-            }
-            SQLiteTransaction transaction = connection.BeginTransaction();
-            foreach (long id in ids)
-            {
-                using (SQLiteCommand command = new SQLiteCommand(connection))
-                {
-                    command.CommandText = "DELETE FROM phashs WHERE image_id = @image_id";
-                    command.Parameters.AddWithValue("image_id", id);
-                    command.ExecuteNonQuery();
-                }
-            }
-            transaction.Commit();
             connection.Close();
         }
         public static void Calculate()
@@ -198,7 +161,7 @@ namespace Grete
                         {
                             using (SQLiteCommand insert_command = new SQLiteCommand(connection))
                             {
-                                insert_command.CommandText = "insert into phashs (image_id, phash) values (@image_id, @phash)";
+                                insert_command.CommandText = "UPDATE images SET phash = @phash WHERE image_id = @image_id";
                                 insert_command.Parameters.AddWithValue("image_id", temp.ImageID);
                                 insert_command.Parameters.AddWithValue("phash", temp.pHash);
                                 insert_command.ExecuteNonQuery();

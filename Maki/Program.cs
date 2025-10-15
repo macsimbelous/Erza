@@ -20,7 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
-using ErzaLib;
+using ErzaLib2;
 using System.IO;
 using System.Data;
 using System.Data.SQLite;
@@ -84,9 +84,10 @@ namespace Maki
                     //Directory.CreateDirectory(PreviewPath + "\\" + hash[0] + "\\" + hash[1]);
                     if (Path.GetExtension(files_to_preview[i]).ToLower() == ".webp")
                     {
-                        using var webp = new WebPObject(File.ReadAllBytes(files_to_preview[i]));
+                        Bitmap bitmap = WebPDecoder.Decode(File.ReadAllBytes(files_to_preview[i]));
+                        //using var webp = new WebPObject(File.ReadAllBytes(files_to_preview[i]));
                         var m = new MagickFactory();
-                        Bitmap bitmap = new Bitmap(webp.GetImage());
+                        //Bitmap bitmap = new Bitmap(webp.GetImage());
                         MagickImage image = new MagickImage(m.Image.Create(bitmap));
 
                         image.Resize(p_size);
@@ -161,7 +162,7 @@ namespace Maki
                     ImageInfo img = ErzaDB.GetImageWithOutTags(hash, erza_conn);
                     if (img != null)
                     {
-                        if (img.IsDeleted)
+                        if (img.Deleted)
                         {
                             //RomovePreviewFromDB(hash, conn);
                             File.Delete(dest_file);

@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ErzaLib;
+using ErzaLib2;
 using System.IO;
 using WebP.Net;
 
@@ -125,8 +125,9 @@ namespace Ange
                 {
                     if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".webp")
                     {
-                        using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
-                        pictureBox1.Image = webp.GetImage();
+                        //using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
+                        //pictureBox1.Image = webp.GetImage();
+                        pictureBox1.Image = WebPDecoder.Decode(File.ReadAllBytes(Result[this.Index].FilePath));
                         ImageFormat = "WEBP";
                     }
                     else

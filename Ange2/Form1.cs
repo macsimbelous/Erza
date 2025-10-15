@@ -25,7 +25,7 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Data.SQLite;
 using System.IO;
-using ErzaLib;
+using ErzaLib2;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -417,9 +417,10 @@ namespace Ange
                 Bitmap loBMP;
                 if (Path.GetExtension(lcFilename).ToLower() == ".webp")
                 {
-                    using var webp = new WebPObject(File.ReadAllBytes(lcFilename));
+                    //using var webp = new WebPObject(File.ReadAllBytes(lcFilename));
                     var m = new MagickFactory();
-                    loBMP = new Bitmap(webp.GetImage());
+                    //loBMP = new Bitmap(webp.GetImage());
+                    loBMP = WebPDecoder.Decode(File.ReadAllBytes(lcFilename));
 
                 }
                 else
@@ -641,7 +642,7 @@ namespace Ange
             {
                 imageListView1.SuspendLayout();
                 imageListView1.Items.Clear();
-                List<ImageInfo> Result = ErzaDB.GetAllImages(Form1.Erza);
+                List<ImageInfo> Result = ErzaDB.GetAllImages(false, Form1.Erza);
                 foreach (ImageInfo img in Result)
                 {
                     imageListView1.Items.Add(img, img.Hash, adaptor);
@@ -685,7 +686,7 @@ namespace Ange
                     }
                     else
                     {
-                        Result = ErzaDB.GetAllImages(Form1.Erza);
+                        Result = ErzaDB.GetAllImages(false, Form1.Erza);
                     }
                     foreach (ImageInfo img in Result)
                     {
@@ -735,7 +736,7 @@ namespace Ange
                     }
                     else
                     {
-                        Result = ErzaDB.GetAllImages(Form1.Erza);
+                        Result = ErzaDB.GetAllImages(false, Form1.Erza);
                     }
                     foreach (ImageInfo img in Result)
                     {
@@ -820,7 +821,7 @@ namespace Ange
                     byte[] phash;
                     List<long> similars = new List<long>();
                     long count = 0;
-                    using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM phashs WHERE image_id = @image_id", Erza))
+                    using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM images WHERE image_id = @image_id", Erza))
                     {
                         command.Parameters.AddWithValue("image_id", img.ImageID);
                         object o = command.ExecuteScalar();
@@ -831,7 +832,7 @@ namespace Ange
                         }
                         phash = o as byte[];
                     }
-                    using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from phashs;", Erza))
+                    using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from images", Erza))
                     {
                         SQLiteDataReader reader = command.ExecuteReader();
                         while (reader.Read())
@@ -957,7 +958,7 @@ namespace Ange
             List<ImageInfo> Result = new List<ImageInfo>();
             using (SQLiteCommand command = new SQLiteCommand())
             {
-                command.CommandText = "SELECT images.image_id, images.hash, images.file_path FROM images LEFT OUTER JOIN image_tags on images.image_id = image_tags.image_id WHERE images.is_deleted = 0 AND image_tags.image_id IS NULL;";
+                command.CommandText = "SELECT image_id, hash, file_path FROM images WHERE deleted = 0 AND tags IS NULL;";
                 command.Connection = Form1.Erza;
                 SQLiteDataReader reader = command.ExecuteReader();
                 int count = 0;
@@ -979,6 +980,30 @@ namespace Ange
             imageListView1.ResumeLayout();
             imageListView1.EnsureVisible(0);
             this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+        }
+
+        private void add_to_favorited_ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                {
+                    ImageInfo img = (ImageInfo)item.VirtualItemKey;
+                    ErzaDB.SetImageFavorit(img.ImageID, true, Erza);
+                }
+            }
+        }
+
+        private void remove_from_favorited_ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.imageListView1.SelectedItems.Count > 0)
+            {
+                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                {
+                    ImageInfo img = (ImageInfo)item.VirtualItemKey;
+                    ErzaDB.SetImageFavorit(img.ImageID, false, Erza);
+                }
+            }
         }
     }
 }

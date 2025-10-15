@@ -1,6 +1,6 @@
 ﻿using System.Data.SQLite;
 using System.Data;
-using ErzaLib;
+using ErzaLib2;
 using Shipwreck.Phash;
 using System.IO;
 using System.Collections.Concurrent;
@@ -89,12 +89,12 @@ namespace Lora
                     List<long> tagids = new List<long>();
                     foreach (long imageid in item.Similars)
                     {
-                        tagids.AddRange(ErzaLib.ErzaDB.GetTagIDsFromImageTags(imageid, connection));
+                        tagids.AddRange(ErzaDB.GetTagsByImageIDToTagIDs(imageid, connection));
                     }
                     tagids = tagids.Distinct().ToList();
                     if (tagids.Count > 0)
                     {
-                        ErzaLib.ErzaDB.AddImageTags(item.ImageID, tagids, connection);
+                        ErzaDB.AddTagsToImage(item.ImageID, tagids, connection);
                         count_img_find_tags++;
                     }
                     Console.WriteLine($"Найдено тегов {tagids.Count}");
@@ -243,12 +243,12 @@ namespace Lora
                     List<long> tagids = new List<long>();
                     foreach (long imageid in item.Similars)
                     {
-                        tagids.AddRange(ErzaLib.ErzaDB.GetTagIDsFromImageTags(imageid, connection));
+                        tagids.AddRange(ErzaDB.GetTagsByImageIDToTagIDs(imageid, connection));
                     }
                     tagids = tagids.Distinct().ToList();
                     if (tagids.Count > 0)
                     {
-                        ErzaLib.ErzaDB.AddImageTags(item.ImageID, tagids, connection);
+                        ErzaLib2.ErzaDB.AddTagsToImage(item.ImageID, tagids, connection);
                     }
                     Console.WriteLine($"Найдено тегов {tagids.Count}");
                 }

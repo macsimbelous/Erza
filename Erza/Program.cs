@@ -31,7 +31,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
-using ErzaLib;
+using ErzaLib2;
 
 namespace Erza
 {
@@ -102,7 +102,7 @@ namespace Erza
                     SQLiteTransaction transact = connection.BeginTransaction();
                     for (int i = 0; i < il.Count; i++)
                     {
-                        ErzaLib.ErzaDB.LoadImageToErza(il[i], connection);
+                        ErzaLib2.ErzaDB.LoadImageToErza(il[i], connection);
                         Console.Write("Обрабатываю хэш {0} ({1}/{2})\r", il[i].Hash, i, il.Count);
                     }
                     transact.Commit();
@@ -1047,10 +1047,10 @@ namespace Erza
                 Console.WriteLine("\n###### {0}/{1} ######", (i+1), list.Count);
                 if (Program.config.UseDB)
                 {
-                    ImageInfo img = ErzaLib.ErzaDB.GetImageWithOutTags(list[i].Hash, connection);
+                    ImageInfo img = ErzaLib2.ErzaDB.GetImageWithOutTags(list[i].Hash, connection);
                     if (img != null)
                     {
-                        if (img.IsDeleted)
+                        if (img.Deleted)
                         {
                             Console.WriteLine("Этот фаил уже был ранее удалён.");
                             count_deleted++;
@@ -1234,7 +1234,7 @@ namespace Erza
         }
         #endregion
     }
-    class ImageInfo2 : ErzaLib.ImageInfo
+    class ImageInfo2 : ErzaLib2.ImageInfo
     {
         public List<string> urls = new List<string>();
         public int sankaku_post_id = 0;

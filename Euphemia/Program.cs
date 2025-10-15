@@ -22,7 +22,7 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Data;
 using System.Data.SQLite;
-using ErzaLib;
+using ErzaLib2;
 
 namespace Euphemia
 {
@@ -120,9 +120,9 @@ namespace Euphemia
                     ImageInfo temp = ErzaDB.GetImageWithOutTags(il[i2].Hash, connection);
                     if (temp != null)
                     {
-                        if (temp.IsDeleted)
+                        if (temp.Deleted)
                         {
-                            il[i2].IsDeleted = true;
+                            il[i2].Deleted = true;
                             deleted_imgs.Add(il[i2]);
                             continue;
                         }
@@ -130,7 +130,7 @@ namespace Euphemia
                     }
                     else
                     {
-                        ErzaDB.AddImage(il[i2].Hash, false, il[i2].FilePath, 0, 0, connection);
+                        ErzaDB.AddImage(il[i2], connection);
                     }
                 }
                 transact.Commit();

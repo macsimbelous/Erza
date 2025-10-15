@@ -30,7 +30,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
-using ErzaLib;
+using ErzaLib2;
 
 namespace GetDanbooru
 {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ErzaLib;
+using ErzaLib2;
 using System.Data.SQLite;
 
 namespace Ange

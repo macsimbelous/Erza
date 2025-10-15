@@ -28,223 +28,227 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewImageForm));
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.viewinfullscreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.edittagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.prevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.tags_count_label = new System.Windows.Forms.Label();
-            this.size_label = new System.Windows.Forms.Label();
-            this.resolution_label = new System.Windows.Forms.Label();
-            this.format_label = new System.Windows.Forms.Label();
-            this.AddTag_button = new System.Windows.Forms.Button();
-            this.RemoveTag_button = new System.Windows.Forms.Button();
-            this.Search_button = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.contextMenuStrip1.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.SuspendLayout();
+            pictureBox1 = new System.Windows.Forms.PictureBox();
+            contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(components);
+            viewinfullscreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            edittagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            prevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            listBox1 = new System.Windows.Forms.ListBox();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            tags_count_label = new System.Windows.Forms.Label();
+            size_label = new System.Windows.Forms.Label();
+            resolution_label = new System.Windows.Forms.Label();
+            format_label = new System.Windows.Forms.Label();
+            AddTag_button = new System.Windows.Forms.Button();
+            RemoveTag_button = new System.Windows.Forms.Button();
+            Search_button = new System.Windows.Forms.Button();
+            add_to_favorited_button = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            contextMenuStrip1.SuspendLayout();
+            groupBox1.SuspendLayout();
+            SuspendLayout();
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.ContextMenuStrip = this.contextMenuStrip1;
-            this.pictureBox1.Location = new System.Drawing.Point(430, 18);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1230, 885);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+            pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            pictureBox1.ContextMenuStrip = contextMenuStrip1;
+            pictureBox1.Location = new System.Drawing.Point(334, 14);
+            pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new System.Drawing.Size(957, 664);
+            pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
+            pictureBox1.DoubleClick += pictureBox1_DoubleClick;
             // 
             // contextMenuStrip1
             // 
-            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewinfullscreenToolStripMenuItem,
-            this.edittagsToolStripMenuItem,
-            this.nextToolStripMenuItem,
-            this.prevToolStripMenuItem,
-            this.deleteToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(202, 154);
+            contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
+            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { viewinfullscreenToolStripMenuItem, edittagsToolStripMenuItem, nextToolStripMenuItem, prevToolStripMenuItem, deleteToolStripMenuItem });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new System.Drawing.Size(152, 114);
             // 
             // viewinfullscreenToolStripMenuItem
             // 
-            this.viewinfullscreenToolStripMenuItem.Name = "viewinfullscreenToolStripMenuItem";
-            this.viewinfullscreenToolStripMenuItem.Size = new System.Drawing.Size(201, 30);
-            this.viewinfullscreenToolStripMenuItem.Text = "На весь экран";
-            this.viewinfullscreenToolStripMenuItem.Click += new System.EventHandler(this.viewinfullscreenToolStripMenuItem_Click);
+            viewinfullscreenToolStripMenuItem.Name = "viewinfullscreenToolStripMenuItem";
+            viewinfullscreenToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            viewinfullscreenToolStripMenuItem.Text = "На весь экран";
+            viewinfullscreenToolStripMenuItem.Click += viewinfullscreenToolStripMenuItem_Click;
+            // 
+            // edittagsToolStripMenuItem
+            // 
+            edittagsToolStripMenuItem.Name = "edittagsToolStripMenuItem";
+            edittagsToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             // 
             // nextToolStripMenuItem
             // 
-            this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
-            this.nextToolStripMenuItem.Size = new System.Drawing.Size(201, 30);
-            this.nextToolStripMenuItem.Text = "Следуюшее";
-            this.nextToolStripMenuItem.Click += new System.EventHandler(this.nextToolStripMenuItem_Click);
+            nextToolStripMenuItem.Name = "nextToolStripMenuItem";
+            nextToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            nextToolStripMenuItem.Text = "Следуюшее";
+            nextToolStripMenuItem.Click += nextToolStripMenuItem_Click;
             // 
             // prevToolStripMenuItem
             // 
-            this.prevToolStripMenuItem.Name = "prevToolStripMenuItem";
-            this.prevToolStripMenuItem.Size = new System.Drawing.Size(201, 30);
-            this.prevToolStripMenuItem.Text = "Предыдушее";
-            this.prevToolStripMenuItem.Click += new System.EventHandler(this.prevToolStripMenuItem_Click);
+            prevToolStripMenuItem.Name = "prevToolStripMenuItem";
+            prevToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            prevToolStripMenuItem.Text = "Предыдушее";
+            prevToolStripMenuItem.Click += prevToolStripMenuItem_Click;
             // 
             // deleteToolStripMenuItem
             // 
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(201, 30);
-            this.deleteToolStripMenuItem.Text = "Удалить";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            deleteToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            deleteToolStripMenuItem.Text = "Удалить";
+            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
             // listBox1
             // 
-            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 29;
-            this.listBox1.Location = new System.Drawing.Point(18, 18);
-            this.listBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listBox1.Size = new System.Drawing.Size(402, 671);
-            this.listBox1.TabIndex = 1;
-            this.listBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox1_DrawItem);
-            this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
+            listBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 204);
+            listBox1.FormattingEnabled = true;
+            listBox1.Location = new System.Drawing.Point(14, 14);
+            listBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            listBox1.Name = "listBox1";
+            listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            listBox1.Size = new System.Drawing.Size(314, 504);
+            listBox1.TabIndex = 1;
+            listBox1.DrawItem += listBox1_DrawItem;
+            listBox1.DoubleClick += listBox1_DoubleClick;
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox1.Controls.Add(this.tags_count_label);
-            this.groupBox1.Controls.Add(this.size_label);
-            this.groupBox1.Controls.Add(this.resolution_label);
-            this.groupBox1.Controls.Add(this.format_label);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.groupBox1.Location = new System.Drawing.Point(18, 768);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(404, 135);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Свойства";
+            groupBox1.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            groupBox1.Controls.Add(tags_count_label);
+            groupBox1.Controls.Add(size_label);
+            groupBox1.Controls.Add(resolution_label);
+            groupBox1.Controls.Add(format_label);
+            groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            groupBox1.Location = new System.Drawing.Point(14, 576);
+            groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            groupBox1.Size = new System.Drawing.Size(314, 101);
+            groupBox1.TabIndex = 2;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Свойства";
             // 
             // tags_count_label
             // 
-            this.tags_count_label.AutoSize = true;
-            this.tags_count_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.tags_count_label.Location = new System.Drawing.Point(9, 98);
-            this.tags_count_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.tags_count_label.Name = "tags_count_label";
-            this.tags_count_label.Size = new System.Drawing.Size(64, 25);
-            this.tags_count_label.TabIndex = 3;
-            this.tags_count_label.Text = "label3";
+            tags_count_label.AutoSize = true;
+            tags_count_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            tags_count_label.Location = new System.Drawing.Point(7, 74);
+            tags_count_label.Name = "tags_count_label";
+            tags_count_label.Size = new System.Drawing.Size(44, 16);
+            tags_count_label.TabIndex = 3;
+            tags_count_label.Text = "label3";
             // 
             // size_label
             // 
-            this.size_label.AutoSize = true;
-            this.size_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.size_label.Location = new System.Drawing.Point(9, 74);
-            this.size_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.size_label.Name = "size_label";
-            this.size_label.Size = new System.Drawing.Size(64, 25);
-            this.size_label.TabIndex = 2;
-            this.size_label.Text = "label3";
+            size_label.AutoSize = true;
+            size_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            size_label.Location = new System.Drawing.Point(7, 56);
+            size_label.Name = "size_label";
+            size_label.Size = new System.Drawing.Size(44, 16);
+            size_label.TabIndex = 2;
+            size_label.Text = "label3";
             // 
             // resolution_label
             // 
-            this.resolution_label.AutoSize = true;
-            this.resolution_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.resolution_label.Location = new System.Drawing.Point(9, 49);
-            this.resolution_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.resolution_label.Name = "resolution_label";
-            this.resolution_label.Size = new System.Drawing.Size(64, 25);
-            this.resolution_label.TabIndex = 1;
-            this.resolution_label.Text = "label2";
+            resolution_label.AutoSize = true;
+            resolution_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            resolution_label.Location = new System.Drawing.Point(7, 37);
+            resolution_label.Name = "resolution_label";
+            resolution_label.Size = new System.Drawing.Size(44, 16);
+            resolution_label.TabIndex = 1;
+            resolution_label.Text = "label2";
             // 
             // format_label
             // 
-            this.format_label.AutoSize = true;
-            this.format_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.format_label.Location = new System.Drawing.Point(9, 25);
-            this.format_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.format_label.Name = "format_label";
-            this.format_label.Size = new System.Drawing.Size(64, 25);
-            this.format_label.TabIndex = 0;
-            this.format_label.Text = "label1";
+            format_label.AutoSize = true;
+            format_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            format_label.Location = new System.Drawing.Point(7, 19);
+            format_label.Name = "format_label";
+            format_label.Size = new System.Drawing.Size(44, 16);
+            format_label.TabIndex = 0;
+            format_label.Text = "label1";
             // 
             // AddTag_button
             // 
-            this.AddTag_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.AddTag_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.AddTag_button.Location = new System.Drawing.Point(18, 715);
-            this.AddTag_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.AddTag_button.Name = "AddTag_button";
-            this.AddTag_button.Size = new System.Drawing.Size(142, 43);
-            this.AddTag_button.TabIndex = 3;
-            this.AddTag_button.Text = "Добавить тег";
-            this.AddTag_button.UseVisualStyleBackColor = true;
-            this.AddTag_button.Click += new System.EventHandler(this.AddTag_button_Click);
+            AddTag_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            AddTag_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            AddTag_button.Location = new System.Drawing.Point(14, 536);
+            AddTag_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            AddTag_button.Name = "AddTag_button";
+            AddTag_button.Size = new System.Drawing.Size(100, 32);
+            AddTag_button.TabIndex = 3;
+            AddTag_button.Text = "Добавить тег";
+            AddTag_button.UseVisualStyleBackColor = true;
+            AddTag_button.Click += AddTag_button_Click;
             // 
             // RemoveTag_button
             // 
-            this.RemoveTag_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.RemoveTag_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.RemoveTag_button.Location = new System.Drawing.Point(170, 715);
-            this.RemoveTag_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.RemoveTag_button.Name = "RemoveTag_button";
-            this.RemoveTag_button.Size = new System.Drawing.Size(130, 43);
-            this.RemoveTag_button.TabIndex = 4;
-            this.RemoveTag_button.Text = "Удалить тег";
-            this.RemoveTag_button.UseVisualStyleBackColor = true;
-            this.RemoveTag_button.Click += new System.EventHandler(this.RemoveTag_button_Click);
+            RemoveTag_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            RemoveTag_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            RemoveTag_button.Location = new System.Drawing.Point(123, 536);
+            RemoveTag_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            RemoveTag_button.Name = "RemoveTag_button";
+            RemoveTag_button.Size = new System.Drawing.Size(90, 32);
+            RemoveTag_button.TabIndex = 4;
+            RemoveTag_button.Text = "Удалить тег";
+            RemoveTag_button.UseVisualStyleBackColor = true;
+            RemoveTag_button.Click += RemoveTag_button_Click;
             // 
             // Search_button
             // 
-            this.Search_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Search_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Search_button.Location = new System.Drawing.Point(310, 715);
-            this.Search_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Search_button.Name = "Search_button";
-            this.Search_button.Size = new System.Drawing.Size(112, 43);
-            this.Search_button.TabIndex = 5;
-            this.Search_button.Text = "Найти";
-            this.Search_button.UseVisualStyleBackColor = true;
-            this.Search_button.Click += new System.EventHandler(this.Search_button_Click);
+            Search_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            Search_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
+            Search_button.Location = new System.Drawing.Point(222, 536);
+            Search_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            Search_button.Name = "Search_button";
+            Search_button.Size = new System.Drawing.Size(60, 32);
+            Search_button.TabIndex = 5;
+            Search_button.Text = "Найти";
+            Search_button.UseVisualStyleBackColor = true;
+            Search_button.Click += Search_button_Click;
+            // 
+            // add_to_favorited_button
+            // 
+            add_to_favorited_button.Image = Properties.Resources.free_icon_favourites_1040230__2_;
+            add_to_favorited_button.Location = new System.Drawing.Point(290, 536);
+            add_to_favorited_button.Name = "add_to_favorited_button";
+            add_to_favorited_button.Size = new System.Drawing.Size(35, 32);
+            add_to_favorited_button.TabIndex = 6;
+            add_to_favorited_button.UseVisualStyleBackColor = true;
+            add_to_favorited_button.Click += add_to_favorited_button_Click;
             // 
             // ViewImageForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1678, 922);
-            this.Controls.Add(this.Search_button);
-            this.Controls.Add(this.RemoveTag_button);
-            this.Controls.Add(this.AddTag_button);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.listBox1);
-            this.Controls.Add(this.pictureBox1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Name = "ViewImageForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Просмотр";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ViewImageForm_FormClosed);
-            this.Load += new System.EventHandler(this.ViewImageForm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.contextMenuStrip1.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(1305, 692);
+            Controls.Add(add_to_favorited_button);
+            Controls.Add(Search_button);
+            Controls.Add(RemoveTag_button);
+            Controls.Add(AddTag_button);
+            Controls.Add(groupBox1);
+            Controls.Add(listBox1);
+            Controls.Add(pictureBox1);
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            Name = "ViewImageForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            Text = "Просмотр";
+            FormClosed += ViewImageForm_FormClosed;
+            Load += ViewImageForm_Load;
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            contextMenuStrip1.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ResumeLayout(false);
 
         }
 
@@ -266,5 +270,6 @@
         private System.Windows.Forms.Button AddTag_button;
         private System.Windows.Forms.Button RemoveTag_button;
         private System.Windows.Forms.Button Search_button;
+        private System.Windows.Forms.Button add_to_favorited_button;
     }
 }

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ErzaLib;
+using ErzaLib2;
 using WebP.Net;
 
 namespace Ange
@@ -105,8 +105,9 @@ namespace Ange
             {
                 if (Path.GetExtension(path).ToLower() == ".webp")
                 {
-                    using var webp = new WebPObject(File.ReadAllBytes(path));
-                    this.pictureBox1.Image = webp.GetImage();
+                    //using var webp = new WebPObject(File.ReadAllBytes(path));
+                    //this.pictureBox1.Image = webp.GetImage();
+                    pictureBox1.Image = WebPDecoder.Decode(File.ReadAllBytes(path));
                 }
                 else
                 {

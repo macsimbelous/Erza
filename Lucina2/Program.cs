@@ -28,7 +28,6 @@ namespace Lucina
             Console.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
 #if DEBUG
             proxy = new WebProxy("127.0.0.1", 8888);
-            //proxy.Credentials = new NetworkCredential("maksim", "48sf54ro");
 #else
             proxy = new WebProxy("77.73.71.83", 8888);
 #endif

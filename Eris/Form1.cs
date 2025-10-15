@@ -196,7 +196,7 @@ namespace Eris
                 DataGridViewRow row = this.dataGridView1.SelectedRows[0];
                 using (SQLiteCommand command = new SQLiteCommand())
                 {
-                    command.CommandText = "SELECT count(*) FROM image_tags WHERE image_tags.tag_id = @tag_id;";
+                    command.CommandText = "SELECT COUNT(*) FROM images WHERE tags LIKE '%#' || @tag_id || '#%';";
                     command.Parameters.AddWithValue("tag_id", row.Cells["tag_id"].Value);
                     command.Connection = connection;
                     count_rows = System.Convert.ToInt64(command.ExecuteScalar());

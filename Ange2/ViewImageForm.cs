@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ErzaLib;
+using ErzaLib2;
 using System.Data.SQLite;
 using System.IO;
 using WebP.Net;
@@ -69,15 +69,16 @@ namespace Ange
             try
             {
                 if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
-                if(fs != null) { fs.Close(); }
+                if (fs != null) { fs.Close(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {
                     //this.pictureBox1.Image = Image.FromFile(this.Result[this.Index].FilePath);
-                    
-                    if(Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".webp")
+
+                    if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".webp")
                     {
-                        using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
-                        this.pictureBox1.Image = webp.GetImage().Clone() as Image;
+                        //using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
+                        //this.pictureBox1.Image = webp.GetImage().Clone() as Image;
+                        pictureBox1.Image = WebPDecoder.Decode(File.ReadAllBytes(Result[this.Index].FilePath));
                         ImageFormat = "WEBP";
                     }
                     else
@@ -204,9 +205,11 @@ namespace Ange
                 case Keys.Delete:
                     if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
                     {
-                        if (this.pictureBox1.Image != null) {
+                        if (this.pictureBox1.Image != null)
+                        {
                             pictureBox1.Enabled = false;
-                            this.pictureBox1.Image.Dispose(); }
+                            this.pictureBox1.Image.Dispose();
+                        }
                         if (fs != null) { fs.Close(); }
                         DeleteImage(this.Index);
                         if (this.Result.Count > 0)
@@ -254,9 +257,11 @@ namespace Ange
         {
             if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
-                if (this.pictureBox1.Image != null) {
-                    pictureBox1.Enabled = false; 
-                    this.pictureBox1.Image.Dispose(); }
+                if (this.pictureBox1.Image != null)
+                {
+                    pictureBox1.Enabled = false;
+                    this.pictureBox1.Image.Dispose();
+                }
                 if (fs != null) { fs.Close(); }
                 DeleteImage(this.Index);
                 if (this.Result.Count > 0)
@@ -403,6 +408,18 @@ namespace Ange
         {
             if (fs != null) { fs.Close(); }
             this.pictureBox1.Image.Dispose();
+        }
+
+        private void add_to_favorited_button_Click(object sender, EventArgs e)
+        {
+            if (Result[Index].Favorited)
+            {
+                ErzaDB.SetImageFavorit(Result[Index].ImageID, false, Form1.Erza);
+            }
+            else
+            {
+                ErzaDB.SetImageFavorit(Result[Index].ImageID, true, Form1.Erza);
+            }
         }
     }
 }

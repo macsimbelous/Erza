@@ -306,6 +306,16 @@ namespace ErzaLib2
                 update_command.ExecuteNonQuery();
             }
         }
+        public static void SetImageFavorit(long ImageID, bool Favorited, SQLiteConnection Connection)
+        {
+            using (SQLiteCommand update_command = new SQLiteCommand(Connection))
+            {
+                update_command.CommandText = "UPDATE images SET favorited = @favorited WHERE image_id = @image_id";
+                update_command.Parameters.AddWithValue("image_id", ImageID);
+                update_command.Parameters.AddWithValue("favorited", Favorited);
+                update_command.ExecuteNonQuery();
+            }
+        }
         public static void DeleteImage(long ImageID, SQLiteConnection Connection)
         {
             using (SQLiteCommand update_command = new SQLiteCommand(Connection))

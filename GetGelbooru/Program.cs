@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ErzaLib;
+using ErzaLib2;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
@@ -354,7 +354,7 @@ namespace GetGelbooru
                 ImageInfo img = new ImageInfo();
                 img.Hash = Md5;
                 img.Tags.AddRange(tags);
-                img.IsDeleted = false;
+                img.Deleted = false;
                 SQLiteTransaction transact = Program.connection.BeginTransaction();
                 ErzaDB.LoadImageToErza(img, Program.connection);
                 transact.Commit();
@@ -434,7 +434,7 @@ namespace GetGelbooru
         {
             ImageInfo inf = ErzaDB.GetImageWithOutTags(hash_string, connection);
             if (inf == null) { return false; }
-            if (inf.IsDeleted)
+            if (inf.Deleted)
             {
                 count_deleted++;
                 Console.WriteLine("Скачан ранее: Удалён!");

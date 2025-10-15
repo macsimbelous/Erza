@@ -16,9 +16,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ErzaLib\ErzaLib.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup>

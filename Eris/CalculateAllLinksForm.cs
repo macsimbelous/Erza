@@ -29,7 +29,7 @@ namespace Eris
             List<TagsCount> it = new List<TagsCount>();
             using (SQLiteCommand command = new SQLiteCommand(connection))
             {
-                command.CommandText = "SELECT count(tag_id), tag_id FROM image_tags GROUP BY tag_id";
+                command.CommandText = "SELECT count, tag_id FROM tags";
                 using(SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -49,12 +49,23 @@ namespace Eris
                         synchronizationContext.Post(EndProgress, false);
                         return;
                     }
-                    using (SQLiteCommand command = new SQLiteCommand(connection))
+                    long tcount = 0;
+                    using (SQLiteCommand command = new SQLiteCommand())
                     {
-                        command.CommandText = "UPDATE tags SET count = @count WHERE tag_id = @tag_id;";
-                        command.Parameters.AddWithValue("count", it[i].Count);
+                        command.CommandText = "SELECT COUNT(*) FROM images WHERE tags LIKE '%#' || @tag_id || '#%';";
                         command.Parameters.AddWithValue("tag_id", it[i].TagID);
-                        command.ExecuteNonQuery();
+                        command.Connection = connection;
+                        tcount = System.Convert.ToInt64(command.ExecuteScalar());
+                    }
+                    if(tcount != it[i].Count)
+                    {
+                        using (SQLiteCommand command = new SQLiteCommand(connection))
+                        {
+                            command.CommandText = "UPDATE tags SET count = @count WHERE tag_id = @tag_id;";
+                            command.Parameters.AddWithValue("count", it[i].Count);
+                            command.Parameters.AddWithValue("tag_id", it[i].TagID);
+                            command.ExecuteNonQuery();
+                        }
                     }
                     synchronizationContext.Post(RefreshProgress, i + 1);
                 }
