@@ -217,7 +217,7 @@
             // 
             // add_to_favorited_button
             // 
-            add_to_favorited_button.Image = Properties.Resources.free_icon_favourites_1040230__2_;
+            add_to_favorited_button.Image = (System.Drawing.Image)resources.GetObject("add_to_favorited_button.Image");
             add_to_favorited_button.Location = new System.Drawing.Point(290, 536);
             add_to_favorited_button.Name = "add_to_favorited_button";
             add_to_favorited_button.Size = new System.Drawing.Size(35, 32);

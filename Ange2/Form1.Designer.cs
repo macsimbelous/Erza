@@ -41,6 +41,7 @@
             copyhashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             find_similar_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             add_to_favorited_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            remove_from_favorited_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             no_tags_toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -64,7 +65,7 @@
             option_comboBox = new System.Windows.Forms.ComboBox();
             tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            remove_from_favorited_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            imageListView2 = new Manina.Windows.Forms.ImageListView();
             contextMenuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -76,7 +77,7 @@
             contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { view_in_window_ToolStripMenuItem, view_fullscreen_ToolStripMenuItem, openOuterSoftToolStripMenuItem, open_in_explorer_toolStripMenuItem1, add_tag_ToolStripMenuItem, copytagToolStripMenuItem, slideshowToolStripMenuItem, copyhashToolStripMenuItem, find_similar_ToolStripMenuItem, add_to_favorited_ToolStripMenuItem, remove_from_favorited_ToolStripMenuItem, toolStripSeparator3, no_tags_toolStripMenuItem, toolStripSeparator2, copytowallToolStripMenuItem, copytodirToolStripMenuItem, copyAllToDirToolStripMenuItem, MoveAllToDirToolStripMenuItem, recreate_preview_ToolStripMenuItem, toolStripSeparator1, deleteToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new System.Drawing.Size(257, 440);
+            contextMenuStrip1.Size = new System.Drawing.Size(257, 418);
             // 
             // view_in_window_ToolStripMenuItem
             // 
@@ -147,6 +148,13 @@
             add_to_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             add_to_favorited_ToolStripMenuItem.Text = "Добавить в избранное";
             add_to_favorited_ToolStripMenuItem.Click += add_to_favorited_ToolStripMenuItem_Click;
+            // 
+            // remove_from_favorited_ToolStripMenuItem
+            // 
+            remove_from_favorited_ToolStripMenuItem.Name = "remove_from_favorited_ToolStripMenuItem";
+            remove_from_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            remove_from_favorited_ToolStripMenuItem.Text = "Удалить из избраннова";
+            remove_from_favorited_ToolStripMenuItem.Click += remove_from_favorited_ToolStripMenuItem_Click;
             // 
             // toolStripSeparator3
             // 
@@ -305,6 +313,7 @@
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 0, 0);
+            tableLayoutPanel1.Controls.Add(imageListView2, 0, 1);
             tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -333,12 +342,20 @@
             tableLayoutPanel2.Size = new System.Drawing.Size(1341, 29);
             tableLayoutPanel2.TabIndex = 0;
             // 
-            // remove_from_favorited_ToolStripMenuItem
+            // imageListView2
             // 
-            remove_from_favorited_ToolStripMenuItem.Name = "remove_from_favorited_ToolStripMenuItem";
-            remove_from_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
-            remove_from_favorited_ToolStripMenuItem.Text = "Удалить из избраннова";
-            remove_from_favorited_ToolStripMenuItem.Click += remove_from_favorited_ToolStripMenuItem_Click;
+            imageListView2.ContextMenuStrip = contextMenuStrip1;
+            imageListView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            imageListView2.Location = new System.Drawing.Point(3, 38);
+            imageListView2.Name = "imageListView2";
+            imageListView2.PersistentCacheDirectory = "";
+            imageListView2.PersistentCacheSize = 100L;
+            imageListView2.Size = new System.Drawing.Size(1341, 574);
+            imageListView2.TabIndex = 1;
+            imageListView2.ThumbnailSize = new System.Drawing.Size(300, 225);
+            imageListView2.UseWIC = true;
+            imageListView2.ItemClick += imageListView2_ItemClick;
+            imageListView2.ItemDoubleClick += imageListView2_ItemDoubleClick;
             // 
             // Form1
             // 
@@ -382,7 +399,6 @@
         private System.Windows.Forms.ToolStripMenuItem MoveAllToDirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem view_in_window_ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem recreate_preview_ToolStripMenuItem;
-        private Manina.Windows.Forms.ImageListView imageListView1;
         private AutocompleteMenuNS.AutocompleteMenu autocompleteMenu1;
         private System.Windows.Forms.TextBox tags_textBox;
         private System.Windows.Forms.ComboBox option_comboBox;
@@ -401,6 +417,7 @@
         private System.Windows.Forms.ToolStripMenuItem add_to_favorited_ToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem remove_from_favorited_ToolStripMenuItem;
+        private Manina.Windows.Forms.ImageListView imageListView2;
     }
 }
 

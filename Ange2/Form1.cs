@@ -66,7 +66,7 @@ namespace Ange
             //Form1.Previews.Open();
             //this.brush = new SolidBrush(Color.Orange);
             adaptor = new CustomAdaptor();
-            //this.imageListView1.ThumbnailSize = new Size(300, 225);
+            //this.imageListView2.ThumbnailSize = new Size(300, 225);
             //Загружвем список тегов
             autocompleteMenu1.MaximumSize = new System.Drawing.Size(350, 200);
             var columnWidth = new int[] { 250, 100 };
@@ -129,13 +129,13 @@ namespace Ange
         }
         private void view_fullscreen_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                imageListView1.SuspendLayout();
-                int index = this.imageListView1.SelectedItems[0].Index;
+                imageListView2.SuspendLayout();
+                int index = this.imageListView2.SelectedItems[0].Index;
                 FullScreenForm form = new FullScreenForm();
                 form.Result = new List<ImageInfo>();
-                foreach (ImageListViewItem item in this.imageListView1.Items)
+                foreach (ImageListViewItem item in this.imageListView2.Items)
                 {
                     form.Result.Add((ImageInfo)item.VirtualItemKey);
                 }
@@ -143,33 +143,33 @@ namespace Ange
                 form.ShowDialog();
                 if (form.ResultChanged)
                 {
-                    imageListView1.Items.Clear();
+                    imageListView2.Items.Clear();
                     foreach (ImageInfo img in form.Result)
                     {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                        imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
                 }
-                //this.imageListView1.Items[form.Index].Selected = true;
-                imageListView1.ResumeLayout();
-                this.imageListView1.EnsureVisible(form.Index);
+                //this.imageListView2.Items[form.Index].Selected = true;
+                imageListView2.ResumeLayout();
+                this.imageListView2.EnsureVisible(form.Index);
             }
         }
         private void slideshowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SlideShowForm form = new SlideShowForm();
             form.Result = new List<ImageInfo>();
-            foreach (ImageListViewItem item in this.imageListView1.Items)
+            foreach (ImageListViewItem item in this.imageListView2.Items)
             {
                 form.Result.Add((ImageInfo)item.VirtualItemKey);
             }
-            form.Index = this.imageListView1.SelectedItems[0].Index;
+            form.Index = this.imageListView2.SelectedItems[0].Index;
             form.ShowDialog();
         }
         private void copytowallToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                foreach (ImageListViewItem item in this.imageListView2.SelectedItems)
                 {
                     ImageInfo img = (ImageInfo)item.VirtualItemKey;
                     string dest_path = "E:\\Wallpapers\\" + Path.GetFileName(img.FilePath);
@@ -199,7 +199,7 @@ namespace Ange
         {
             DeleteImage();
         }
-        private void imageListView1_KeyDown(object sender, KeyEventArgs e)
+        private void imageListView2_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
@@ -207,27 +207,27 @@ namespace Ange
                     ViewImageInWindow();
                     break;
                 case Keys.Home:
-                    this.imageListView1.EnsureVisible(0);
+                    this.imageListView2.EnsureVisible(0);
                     break;
                 case Keys.End:
-                    this.imageListView1.EnsureVisible(this.imageListView1.Items.Count);
+                    this.imageListView2.EnsureVisible(this.imageListView2.Items.Count);
                     break;
             }
         }
         private void copyhashToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                Clipboard.SetText(((ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey).Hash);
+                Clipboard.SetText(((ImageInfo)this.imageListView2.SelectedItems[0].VirtualItemKey).Hash);
             }
         }
         private void copytodirToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
                 if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
                 {
-                    foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                    foreach (ImageListViewItem item in this.imageListView2.SelectedItems)
                     {
                         ImageInfo img = (ImageInfo)item.VirtualItemKey;
                         string dest_path = this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath);
@@ -256,9 +256,9 @@ namespace Ange
         }
         private void DeleteImage()
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                if (MessageBox.Show("Удалить выбранные(" + this.imageListView1.SelectedItems.Count.ToString() + ") изображения?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                if (MessageBox.Show("Удалить выбранные(" + this.imageListView2.SelectedItems.Count.ToString() + ") изображения?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     RemoveImages();
                 }
@@ -266,9 +266,9 @@ namespace Ange
         }
         private void RemoveImages()
         {
-            imageListView1.SuspendLayout();
+            imageListView2.SuspendLayout();
             List<ImageListViewItem> selitems = new List<ImageListViewItem>();
-            foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+            foreach (ImageListViewItem item in this.imageListView2.SelectedItems)
             {
                 selitems.Add(item);
                 ImageInfo img = (ImageInfo)item.VirtualItemKey;
@@ -277,17 +277,17 @@ namespace Ange
             }
             foreach (ImageListViewItem item in selitems)
             {
-                this.imageListView1.Items.Remove(item);
+                this.imageListView2.Items.Remove(item);
             }
-            this.imageListView1.ClearSelection();
-            imageListView1.ResumeLayout();
-            //this.imageListView1.Refresh();
+            this.imageListView2.ClearSelection();
+            imageListView2.ResumeLayout();
+            //this.imageListView2.Refresh();
         }
         private void openOuterSoftToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                ImageInfo img = (ImageInfo)this.imageListView2.SelectedItems[0].VirtualItemKey;
                 //System.Diagnostics.Process.Start(img.FilePath);
                 Process.Start(new ProcessStartInfo(img.FilePath) { UseShellExecute = true });
             }
@@ -297,7 +297,7 @@ namespace Ange
         {
             if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                foreach (ImageListViewItem item in this.imageListView1.Items)
+                foreach (ImageListViewItem item in this.imageListView2.Items)
                 {
                     ImageInfo img = (ImageInfo)item.VirtualItemKey;
                     File.Move(img.FilePath, this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath));
@@ -308,7 +308,7 @@ namespace Ange
         {
             if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
-                foreach (ImageListViewItem item in this.imageListView1.Items)
+                foreach (ImageListViewItem item in this.imageListView2.Items)
                 {
                     ImageInfo img = (ImageInfo)item.VirtualItemKey;
                     File.Copy(img.FilePath, this.folderBrowserDialog1.SelectedPath + "\\" + Path.GetFileName(img.FilePath));
@@ -321,12 +321,12 @@ namespace Ange
         }
         private void ViewImageInWindow()
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                int index = this.imageListView1.SelectedItems[0].Index;
+                int index = this.imageListView2.SelectedItems[0].Index;
                 ViewImageForm form = new ViewImageForm();
                 form.Result = new List<ImageInfo>();
-                foreach (ImageListViewItem item in this.imageListView1.Items)
+                foreach (ImageListViewItem item in this.imageListView2.Items)
                 {
                     form.Result.Add((ImageInfo)item.VirtualItemKey);
                 }
@@ -356,35 +356,35 @@ namespace Ange
                 {
                     if (form.ResultChanged)
                     {
-                        imageListView1.SuspendLayout();
-                        imageListView1.Items.Clear();
+                        imageListView2.SuspendLayout();
+                        imageListView2.Items.Clear();
                         foreach (ImageInfo img in form.Result)
                         {
-                            imageListView1.Items.Add(img, img.Hash, adaptor);
+                            imageListView2.Items.Add(img, img.Hash, adaptor);
                         }
-                        imageListView1.ResumeLayout();
-                        this.imageListView1.Refresh();
+                        imageListView2.ResumeLayout();
+                        this.imageListView2.Refresh();
                     }
-                    //this.imageListView1.Items[form.Index].Selected = true;
-                    //this.imageListView1.Items[form.Index].Update();
-                    //this.imageListView1.Items.FocusedItem = this.imageListView1.Items[form.Index];
-                    if (this.imageListView1.SelectedItems.Count > 0)
+                    //this.imageListView2.Items[form.Index].Selected = true;
+                    //this.imageListView2.Items[form.Index].Update();
+                    //this.imageListView2.Items.FocusedItem = this.imageListView2.Items[form.Index];
+                    if (this.imageListView2.SelectedItems.Count > 0)
                     {
-                        this.imageListView1.SelectedItems[0].Update();
+                        this.imageListView2.SelectedItems[0].Update();
                     }
-                    this.imageListView1.EnsureVisible(form.Index);
+                    this.imageListView2.EnsureVisible(form.Index);
                 }
             }
         }
         private void recreate_preview_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
                 ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                 EncoderParameters myEncoderParameters = new EncoderParameters(1);
                 EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
                 myEncoderParameters.Param[0] = myEncoderParameter;
-                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                foreach (ImageListViewItem item in this.imageListView2.SelectedItems)
                 {
                     ImageInfo img = (ImageInfo)item.VirtualItemKey;
                     using (Bitmap preview = CreateThumbnail(img.FilePath, PreviewWidth, PreviewHeight))
@@ -613,7 +613,7 @@ namespace Ange
             }
         }
         #endregion
-        private void imageListView1_ItemDoubleClick(object sender, ItemClickEventArgs e)
+        private void imageListView2_ItemDoubleClick(object sender, ItemClickEventArgs e)
         {
             ViewImageInWindow();
         }
@@ -621,7 +621,7 @@ namespace Ange
         {
             SlideShowForm form = new SlideShowForm();
             form.Result = new List<ImageInfo>();
-            foreach (ImageListViewItem item in this.imageListView1.Items)
+            foreach (ImageListViewItem item in this.imageListView2.Items)
             {
                 form.Result.Add((ImageInfo)item.VirtualItemKey);
             }
@@ -640,15 +640,15 @@ namespace Ange
         {
             if (this.tags_textBox.Text.Length == 0)
             {
-                imageListView1.SuspendLayout();
-                imageListView1.Items.Clear();
+                imageListView2.SuspendLayout();
+                imageListView2.Items.Clear();
                 List<ImageInfo> Result = ErzaDB.GetAllImages(false, Form1.Erza);
                 foreach (ImageInfo img in Result)
                 {
-                    imageListView1.Items.Add(img, img.Hash, adaptor);
+                    imageListView2.Items.Add(img, img.Hash, adaptor);
                 }
-                imageListView1.ResumeLayout();
-                imageListView1.EnsureVisible(0);
+                imageListView2.ResumeLayout();
+                imageListView2.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + Result.Count.ToString();
                 return;
             }
@@ -665,20 +665,20 @@ namespace Ange
                 }
                 if (tags.Count > 1)
                 {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
+                    imageListView2.SuspendLayout();
+                    imageListView2.Items.Clear();
                     List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, Form1.Erza);
                     foreach (ImageInfo img in Result)
                     {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                        imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
+                    imageListView2.ResumeLayout();
+                    imageListView2.EnsureVisible(0);
                 }
                 else
                 {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
+                    imageListView2.SuspendLayout();
+                    imageListView2.Items.Clear();
                     List<ImageInfo> Result;
                     if (tags.Count == 1)
                     {
@@ -690,16 +690,16 @@ namespace Ange
                     }
                     foreach (ImageInfo img in Result)
                     {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                        imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
+                    imageListView2.ResumeLayout();
+                    imageListView2.EnsureVisible(0);
                 }
-                if (imageListView1.Items.Count > 0)
+                if (imageListView2.Items.Count > 0)
                 {
-                    imageListView1.EnsureVisible(0);
+                    imageListView2.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 return;
             }
             if (SelectIsTagsOr())
@@ -715,20 +715,20 @@ namespace Ange
                 }
                 if (tags.Count > 1)
                 {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
+                    imageListView2.SuspendLayout();
+                    imageListView2.Items.Clear();
                     List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, Form1.Erza);
                     foreach (ImageInfo img in Result)
                     {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                        imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
+                    imageListView2.ResumeLayout();
+                    imageListView2.EnsureVisible(0);
                 }
                 else
                 {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
+                    imageListView2.SuspendLayout();
+                    imageListView2.Items.Clear();
                     List<ImageInfo> Result;
                     if (tags.Count == 1)
                     {
@@ -740,34 +740,34 @@ namespace Ange
                     }
                     foreach (ImageInfo img in Result)
                     {
-                        imageListView1.Items.Add(img, img.Hash, adaptor);
+                        imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
+                    imageListView2.ResumeLayout();
+                    imageListView2.EnsureVisible(0);
                 }
-                if (imageListView1.Items.Count > 0)
+                if (imageListView2.Items.Count > 0)
                 {
-                    this.imageListView1.EnsureVisible(0);
+                    this.imageListView2.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 return;
             }
             if (SelectIsPartTag())
             {
-                imageListView1.SuspendLayout();
-                imageListView1.Items.Clear();
+                imageListView2.SuspendLayout();
+                imageListView2.Items.Clear();
                 List<ImageInfo> Result = ErzaDB.GetImagesByPartTag(this.tags_textBox.Text, Form1.Erza);
                 foreach (ImageInfo img in Result)
                 {
-                    imageListView1.Items.Add(img, img.Hash, adaptor);
+                    imageListView2.Items.Add(img, img.Hash, adaptor);
                 }
-                imageListView1.ResumeLayout();
-                imageListView1.EnsureVisible(0);
-                if (imageListView1.Items.Count > 0)
+                imageListView2.ResumeLayout();
+                imageListView2.EnsureVisible(0);
+                if (imageListView2.Items.Count > 0)
                 {
-                    this.imageListView1.EnsureVisible(0);
+                    this.imageListView2.EnsureVisible(0);
                 }
-                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 return;
             }
             if (SelectIsMD5())
@@ -775,22 +775,22 @@ namespace Ange
                 ImageInfo img = ErzaDB.GetImageWithOutTags(this.tags_textBox.Text, Form1.Erza);
                 if (img != null)
                 {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    imageListView1.Items.Add(img, img.Hash, adaptor);
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
-                    if (imageListView1.Items.Count > 0)
+                    imageListView2.SuspendLayout();
+                    imageListView2.Items.Clear();
+                    imageListView2.Items.Add(img, img.Hash, adaptor);
+                    imageListView2.ResumeLayout();
+                    imageListView2.EnsureVisible(0);
+                    if (imageListView2.Items.Count > 0)
                     {
-                        this.imageListView1.EnsureVisible(0);
+                        this.imageListView2.EnsureVisible(0);
                     }
-                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 }
                 else
                 {
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
-                    imageListView1.ResumeLayout();
+                    imageListView2.SuspendLayout();
+                    imageListView2.Items.Clear();
+                    imageListView2.ResumeLayout();
                 }
                 return;
             }
@@ -812,12 +812,12 @@ namespace Ange
 
         private void find_similar_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
                 PHashOptionsForm form = new PHashOptionsForm();
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    ImageInfo img = (ImageInfo)imageListView1.SelectedItems[0].VirtualItemKey;
+                    ImageInfo img = (ImageInfo)imageListView2.SelectedItems[0].VirtualItemKey;
                     byte[] phash;
                     List<long> similars = new List<long>();
                     long count = 0;
@@ -855,16 +855,16 @@ namespace Ange
                         }
                         reader.Close();
                     }
-                    imageListView1.SuspendLayout();
-                    imageListView1.Items.Clear();
+                    imageListView2.SuspendLayout();
+                    imageListView2.Items.Clear();
                     foreach (long imageid in similars)
                     {
                         ImageInfo temp = ErzaDB.GetImageWithOutTags(imageid, Erza);
-                        imageListView1.Items.Add(temp, temp.Hash, adaptor);
+                        imageListView2.Items.Add(temp, temp.Hash, adaptor);
                         count++;
                     }
-                    imageListView1.ResumeLayout();
-                    imageListView1.EnsureVisible(0);
+                    imageListView2.ResumeLayout();
+                    imageListView2.EnsureVisible(0);
                     this.toolStripStatusLabel1.Text = "Изображений найдено: " + count.ToString();
                 }
                 form.Dispose();
@@ -873,9 +873,9 @@ namespace Ange
 
         private void open_in_explorer_toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
+                ImageInfo img = (ImageInfo)this.imageListView2.SelectedItems[0].VirtualItemKey;
                 Process PrFolder = new Process();
                 ProcessStartInfo psi = new ProcessStartInfo();
                 psi.CreateNoWindow = true;
@@ -889,7 +889,7 @@ namespace Ange
 
         private void add_tag_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
                 AddTagForm form = new AddTagForm();
                 form.Erza = Erza;
@@ -898,7 +898,7 @@ namespace Ange
                     if (form.NewTags.Length > 0)
                     {
                         SQLiteTransaction transact = Erza.BeginTransaction();
-                        foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                        foreach (ImageListViewItem item in this.imageListView2.SelectedItems)
                         {
                             ImageInfo img = (ImageInfo)item.VirtualItemKey;
                             img.AddTags(form.NewTags);
@@ -913,14 +913,14 @@ namespace Ange
 
         private void copytagToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                //ImageInfo img = (ImageInfo)this.imageListView1.SelectedItems[0].VirtualItemKey;
-                Clipboard.SetText(this.imageListView1.SelectedItems[0].UserComment);
+                //ImageInfo img = (ImageInfo)this.imageListView2.SelectedItems[0].VirtualItemKey;
+                Clipboard.SetText(this.imageListView2.SelectedItems[0].UserComment);
             }
         }
 
-        private void imageListView1_ItemClick(object sender, ItemClickEventArgs e)
+        private void imageListView2_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (e.Item != null)
             {
@@ -940,9 +940,9 @@ namespace Ange
                         str.Clear();
                     }
                 }
-                //toolTip1.SetToolTip(imageListView1, e.Item.UserComment.Replace(' ', '\n'));
-                //toolTip1.SetToolTip(imageListView1, tt.ToString());
-                //toolTip1.Show(tt.ToString(), imageListView1);
+                //toolTip1.SetToolTip(imageListView2, e.Item.UserComment.Replace(' ', '\n'));
+                //toolTip1.SetToolTip(imageListView2, tt.ToString());
+                //toolTip1.Show(tt.ToString(), imageListView2);
 
                 toolStripStatusLabel2.Text = "Тегов: " + img.Tags.Count.ToString();
                 //toolStripStatusLabel2.ToolTipText = tt.ToString();
@@ -953,8 +953,8 @@ namespace Ange
         private void no_tags_toolStripMenuItem_Click(object sender, EventArgs e)
         {
             tags_textBox.Text = String.Empty;
-            imageListView1.SuspendLayout();
-            imageListView1.Items.Clear();
+            imageListView2.SuspendLayout();
+            imageListView2.Items.Clear();
             List<ImageInfo> Result = new List<ImageInfo>();
             using (SQLiteCommand command = new SQLiteCommand())
             {
@@ -975,18 +975,18 @@ namespace Ange
             }
             foreach (ImageInfo img in Result)
             {
-                imageListView1.Items.Add(img, img.Hash, adaptor);
+                imageListView2.Items.Add(img, img.Hash, adaptor);
             }
-            imageListView1.ResumeLayout();
-            imageListView1.EnsureVisible(0);
-            this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView1.Items.Count.ToString();
+            imageListView2.ResumeLayout();
+            imageListView2.EnsureVisible(0);
+            this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
         }
 
         private void add_to_favorited_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                foreach (ImageListViewItem item in this.imageListView2.SelectedItems)
                 {
                     ImageInfo img = (ImageInfo)item.VirtualItemKey;
                     ErzaDB.SetImageFavorit(img.ImageID, true, Erza);
@@ -996,9 +996,9 @@ namespace Ange
 
         private void remove_from_favorited_ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.imageListView1.SelectedItems.Count > 0)
+            if (this.imageListView2.SelectedItems.Count > 0)
             {
-                foreach (ImageListViewItem item in this.imageListView1.SelectedItems)
+                foreach (ImageListViewItem item in this.imageListView2.SelectedItems)
                 {
                     ImageInfo img = (ImageInfo)item.VirtualItemKey;
                     ErzaDB.SetImageFavorit(img.ImageID, false, Erza);

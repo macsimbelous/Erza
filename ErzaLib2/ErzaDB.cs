@@ -180,10 +180,10 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.Deleted = (bool)reader["deleted"];
-                    image.Favorited = (bool)reader["favorited"];
-                    image.Width = (int)reader["width"];
-                    image.Height = (int)reader["height"];
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
@@ -216,10 +216,10 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.Deleted = (bool)reader["deleted"];
-                    image.Favorited = (bool)reader["favorited"];
-                    image.Width = (int)reader["width"];
-                    image.Height = (int)reader["height"];
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
@@ -414,10 +414,10 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.Favorited = (bool)reader["favorited"];
-                    image.Deleted = (bool)reader["deleted"];
-                    image.Width = (int)reader["width"];
-                    image.Height = (int)reader["height"];
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
@@ -464,10 +464,10 @@ namespace ErzaLib2
                     ImageInfo image = new ImageInfo();
                     image.ImageID = (long)reader["image_id"];
                     image.Hash = (string)reader["hash"];
-                    image.Favorited = (bool)reader["favorited"];
-                    image.Deleted = (bool)reader["deleted"];
-                    image.Width = (int)reader["width"];
-                    image.Height = (int)reader["height"];
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
                     object o = reader["file_path"];
                     if (o != DBNull.Value)
                     {
@@ -533,6 +533,7 @@ namespace ErzaLib2
                 if (i > 0) sb.Append(", ");
                 sb.Append("@tag" + i.ToString());
             }
+            sb.Append(")");
             using (SQLiteCommand command = new SQLiteCommand(sb.ToString(), Connection))
             {
                 for (int i = 0; i < Tags.Count; i++)
@@ -566,10 +567,10 @@ namespace ErzaLib2
                         ImageInfo image = new ImageInfo();
                         image.ImageID = (long)reader["image_id"];
                         image.Hash = (string)reader["hash"];
-                        image.Favorited = (bool)reader["favorited"];
-                        image.Deleted = (bool)reader["deleted"];
-                        image.Width = (int)reader["width"];
-                        image.Height = (int)reader["height"];
+                        image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                        image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                        image.Width = Convert.ToInt32(reader["width"]);
+                        image.Height = Convert.ToInt32(reader["height"]);
                         object o = reader["file_path"];
                         if (o != DBNull.Value)
                         {
@@ -603,10 +604,10 @@ namespace ErzaLib2
                         ImageInfo image = new ImageInfo();
                         image.ImageID = (long)reader["image_id"];
                         image.Hash = (string)reader["hash"];
-                        image.Favorited = (bool)reader["favorited"];
-                        image.Deleted = (bool)reader["deleted"];
-                        image.Width = (int)reader["width"];
-                        image.Height = (int)reader["height"];
+                        image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                        image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                        image.Width = Convert.ToInt32(reader["width"]);
+                        image.Height = Convert.ToInt32(reader["height"]);
                         object o = reader["file_path"];
                         if (o != DBNull.Value)
                         {

@@ -74,7 +74,6 @@
   <ItemGroup>
     <Content Include="angelise_result.ico" />
     <Content Include="License.txt" />
-    <None Include="Resources\search32.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -90,7 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoCompleteMenu-ScintillaNET" Version="2.1.1" />
-    <PackageReference Include="ImageListView" Version="13.8.2" />
+    <PackageReference Include="ImageListViewCore" Version="0.0.3" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.8.2" />
     <PackageReference Include="Magick.NET.Core" Version="14.8.2" />
     <PackageReference Include="Magick.NET.SystemDrawing" Version="8.0.10" />
