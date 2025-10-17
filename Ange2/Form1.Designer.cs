@@ -1,4 +1,6 @@
-﻿namespace Ange
+﻿using Ange.Properties;
+
+namespace Ange
 {
     partial class Form1
     {
@@ -43,6 +45,7 @@
             add_to_favorited_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             remove_from_favorited_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            view_favorited_ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             no_tags_toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             copytowallToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,148 +78,156 @@
             // contextMenuStrip1
             // 
             contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { view_in_window_ToolStripMenuItem, view_fullscreen_ToolStripMenuItem, openOuterSoftToolStripMenuItem, open_in_explorer_toolStripMenuItem1, add_tag_ToolStripMenuItem, copytagToolStripMenuItem, slideshowToolStripMenuItem, copyhashToolStripMenuItem, find_similar_ToolStripMenuItem, add_to_favorited_ToolStripMenuItem, remove_from_favorited_ToolStripMenuItem, toolStripSeparator3, no_tags_toolStripMenuItem, toolStripSeparator2, copytowallToolStripMenuItem, copytodirToolStripMenuItem, copyAllToDirToolStripMenuItem, MoveAllToDirToolStripMenuItem, recreate_preview_ToolStripMenuItem, toolStripSeparator1, deleteToolStripMenuItem });
+            contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { view_in_window_ToolStripMenuItem, view_fullscreen_ToolStripMenuItem, openOuterSoftToolStripMenuItem, open_in_explorer_toolStripMenuItem1, add_tag_ToolStripMenuItem, copytagToolStripMenuItem, slideshowToolStripMenuItem, copyhashToolStripMenuItem, find_similar_ToolStripMenuItem, add_to_favorited_ToolStripMenuItem, remove_from_favorited_ToolStripMenuItem, toolStripSeparator3, view_favorited_ToolStripMenuItem, no_tags_toolStripMenuItem, toolStripSeparator2, copytowallToolStripMenuItem, copytodirToolStripMenuItem, copyAllToDirToolStripMenuItem, MoveAllToDirToolStripMenuItem, recreate_preview_ToolStripMenuItem, toolStripSeparator1, deleteToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new System.Drawing.Size(257, 418);
+            contextMenuStrip1.Size = new System.Drawing.Size(265, 592);
             // 
             // view_in_window_ToolStripMenuItem
             // 
             view_in_window_ToolStripMenuItem.Name = "view_in_window_ToolStripMenuItem";
-            view_in_window_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            view_in_window_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             view_in_window_ToolStripMenuItem.Text = "Просмотр в окне";
             view_in_window_ToolStripMenuItem.Click += view_in_window_ToolStripMenuItem_Click;
             // 
             // view_fullscreen_ToolStripMenuItem
             // 
             view_fullscreen_ToolStripMenuItem.Name = "view_fullscreen_ToolStripMenuItem";
-            view_fullscreen_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            view_fullscreen_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             view_fullscreen_ToolStripMenuItem.Text = "Просморт на полный экран";
             view_fullscreen_ToolStripMenuItem.Click += view_fullscreen_ToolStripMenuItem_Click;
             // 
             // openOuterSoftToolStripMenuItem
             // 
             openOuterSoftToolStripMenuItem.Name = "openOuterSoftToolStripMenuItem";
-            openOuterSoftToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            openOuterSoftToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             openOuterSoftToolStripMenuItem.Text = "Открыть во внешней программе";
             openOuterSoftToolStripMenuItem.Click += openOuterSoftToolStripMenuItem_Click;
             // 
             // open_in_explorer_toolStripMenuItem1
             // 
             open_in_explorer_toolStripMenuItem1.Name = "open_in_explorer_toolStripMenuItem1";
-            open_in_explorer_toolStripMenuItem1.Size = new System.Drawing.Size(256, 22);
+            open_in_explorer_toolStripMenuItem1.Size = new System.Drawing.Size(264, 30);
             open_in_explorer_toolStripMenuItem1.Text = "Открыть в проводнике";
             open_in_explorer_toolStripMenuItem1.Click += open_in_explorer_toolStripMenuItem1_Click;
             // 
             // add_tag_ToolStripMenuItem
             // 
             add_tag_ToolStripMenuItem.Name = "add_tag_ToolStripMenuItem";
-            add_tag_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            add_tag_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             add_tag_ToolStripMenuItem.Text = "Добавить теги";
             add_tag_ToolStripMenuItem.Click += add_tag_ToolStripMenuItem_Click;
             // 
             // copytagToolStripMenuItem
             // 
             copytagToolStripMenuItem.Name = "copytagToolStripMenuItem";
-            copytagToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            copytagToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             copytagToolStripMenuItem.Text = "Копировать теги";
             copytagToolStripMenuItem.Click += copytagToolStripMenuItem_Click;
             // 
             // slideshowToolStripMenuItem
             // 
             slideshowToolStripMenuItem.Name = "slideshowToolStripMenuItem";
-            slideshowToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            slideshowToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             slideshowToolStripMenuItem.Text = "Слайдшоу";
             slideshowToolStripMenuItem.Click += slideshowToolStripMenuItem_Click;
             // 
             // copyhashToolStripMenuItem
             // 
             copyhashToolStripMenuItem.Name = "copyhashToolStripMenuItem";
-            copyhashToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            copyhashToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             copyhashToolStripMenuItem.Text = "Копировать хэш";
             copyhashToolStripMenuItem.Click += copyhashToolStripMenuItem_Click;
             // 
             // find_similar_ToolStripMenuItem
             // 
             find_similar_ToolStripMenuItem.Name = "find_similar_ToolStripMenuItem";
-            find_similar_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            find_similar_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             find_similar_ToolStripMenuItem.Text = "Найти похожие";
             find_similar_ToolStripMenuItem.Click += find_similar_ToolStripMenuItem_Click;
             // 
             // add_to_favorited_ToolStripMenuItem
             // 
             add_to_favorited_ToolStripMenuItem.Name = "add_to_favorited_ToolStripMenuItem";
-            add_to_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            add_to_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             add_to_favorited_ToolStripMenuItem.Text = "Добавить в избранное";
             add_to_favorited_ToolStripMenuItem.Click += add_to_favorited_ToolStripMenuItem_Click;
             // 
             // remove_from_favorited_ToolStripMenuItem
             // 
             remove_from_favorited_ToolStripMenuItem.Name = "remove_from_favorited_ToolStripMenuItem";
-            remove_from_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            remove_from_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             remove_from_favorited_ToolStripMenuItem.Text = "Удалить из избраннова";
             remove_from_favorited_ToolStripMenuItem.Click += remove_from_favorited_ToolStripMenuItem_Click;
             // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new System.Drawing.Size(253, 6);
+            toolStripSeparator3.Size = new System.Drawing.Size(261, 6);
+            // 
+            // view_favorited_ToolStripMenuItem
+            // 
+            view_favorited_ToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("view_favorited_ToolStripMenuItem.Image");
+            view_favorited_ToolStripMenuItem.Name = "view_favorited_ToolStripMenuItem";
+            view_favorited_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
+            view_favorited_ToolStripMenuItem.Text = "Избранное";
+            view_favorited_ToolStripMenuItem.Click += view_favorited_ToolStripMenuItem_Click;
             // 
             // no_tags_toolStripMenuItem
             // 
             no_tags_toolStripMenuItem.Name = "no_tags_toolStripMenuItem";
-            no_tags_toolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            no_tags_toolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             no_tags_toolStripMenuItem.Text = "Без тегов";
             no_tags_toolStripMenuItem.Click += no_tags_toolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(253, 6);
+            toolStripSeparator2.Size = new System.Drawing.Size(261, 6);
             // 
             // copytowallToolStripMenuItem
             // 
             copytowallToolStripMenuItem.Name = "copytowallToolStripMenuItem";
-            copytowallToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            copytowallToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             copytowallToolStripMenuItem.Text = "Копировать в обои";
             copytowallToolStripMenuItem.Click += copytowallToolStripMenuItem_Click;
             // 
             // copytodirToolStripMenuItem
             // 
             copytodirToolStripMenuItem.Name = "copytodirToolStripMenuItem";
-            copytodirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            copytodirToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             copytodirToolStripMenuItem.Text = "Копировать в каталог";
             copytodirToolStripMenuItem.Click += copytodirToolStripMenuItem_Click;
             // 
             // copyAllToDirToolStripMenuItem
             // 
             copyAllToDirToolStripMenuItem.Name = "copyAllToDirToolStripMenuItem";
-            copyAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            copyAllToDirToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             copyAllToDirToolStripMenuItem.Text = "Копировать всё в каталог";
             copyAllToDirToolStripMenuItem.Click += copyAllToDirToolStripMenuItem_Click;
             // 
             // MoveAllToDirToolStripMenuItem
             // 
             MoveAllToDirToolStripMenuItem.Name = "MoveAllToDirToolStripMenuItem";
-            MoveAllToDirToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            MoveAllToDirToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             MoveAllToDirToolStripMenuItem.Text = "Переместить всё в каталог";
             MoveAllToDirToolStripMenuItem.Click += MoveAllToDirToolStripMenuItem_Click;
             // 
             // recreate_preview_ToolStripMenuItem
             // 
             recreate_preview_ToolStripMenuItem.Name = "recreate_preview_ToolStripMenuItem";
-            recreate_preview_ToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            recreate_preview_ToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             recreate_preview_ToolStripMenuItem.Text = "Пересоздать эскиз";
             recreate_preview_ToolStripMenuItem.Click += recreate_preview_ToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(253, 6);
+            toolStripSeparator1.Size = new System.Drawing.Size(261, 6);
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            deleteToolStripMenuItem.Size = new System.Drawing.Size(264, 30);
             deleteToolStripMenuItem.Text = "Удалить";
             deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
@@ -267,7 +278,7 @@
             // 
             // slide_show_button
             // 
-            slide_show_button.Image = Properties.Resources.images25;
+            slide_show_button.Image = Resources.images25;
             slide_show_button.Location = new System.Drawing.Point(1301, 4);
             slide_show_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             slide_show_button.Name = "slide_show_button";
@@ -418,6 +429,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem remove_from_favorited_ToolStripMenuItem;
         private Manina.Windows.Forms.ImageListView imageListView2;
+        private System.Windows.Forms.ToolStripMenuItem view_favorited_ToolStripMenuItem;
     }
 }
 

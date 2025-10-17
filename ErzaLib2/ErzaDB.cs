@@ -115,7 +115,7 @@ namespace ErzaLib2
             {
                 command.Parameters.AddWithValue("image_id", ImageID);
                 object o = command.ExecuteScalar();
-                if (o != null)
+                if (o != null && o != DBNull.Value)
                 {
                     tagids.AddRange(ParseStringOfTagIDs((string)o));
                 }
@@ -138,7 +138,7 @@ namespace ErzaLib2
             {
                 command.Parameters.AddWithValue("image_id", ImageID);
                 object o = command.ExecuteScalar();
-                if (o != null)
+                if (o != null && o != DBNull.Value)
                 {
                     tagids.AddRange(ParseStringOfTagIDs((string)o));
                 }
@@ -158,7 +158,7 @@ namespace ErzaLib2
             {
                 command.Parameters.AddWithValue("hash", Hash);
                 object o = command.ExecuteScalar();
-                if (o == null)
+                if (o == null || o == DBNull.Value)
                 {
                     return -1;
                 }
@@ -391,7 +391,7 @@ namespace ErzaLib2
             {
                 command.Parameters.AddWithValue("tag", Tag);
                 object o = command.ExecuteScalar();
-                if (o == null)
+                if (o == null || o == DBNull.Value)
                 {
                     return -1;
                 }
@@ -636,7 +636,7 @@ namespace ErzaLib2
                     command.CommandText = "SELECT tag FROM tags WHERE tag_id = @tag_id";
                     command.Parameters.AddWithValue("tag_id", tagid);
                     object o = command.ExecuteScalar();
-                    if (o != null)
+                    if (o != null && o != DBNull.Value)
                     {
                         tags.Add((string)o);
                     }
@@ -688,7 +688,7 @@ namespace ErzaLib2
                 command.CommandText = "select tags from images where image_id = @image_id";
                 command.Parameters.AddWithValue("image_id", ImageID);
                 object o = command.ExecuteScalar();
-                if (o != null)
+                if (o != null && o != DBNull.Value)
                 {
                     tags = ParseStringOfTagIDs((string)o);
                 }

@@ -217,6 +217,7 @@
             // 
             // add_to_favorited_button
             // 
+            add_to_favorited_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             add_to_favorited_button.Image = (System.Drawing.Image)resources.GetObject("add_to_favorited_button.Image");
             add_to_favorited_button.Location = new System.Drawing.Point(290, 536);
             add_to_favorited_button.Name = "add_to_favorited_button";

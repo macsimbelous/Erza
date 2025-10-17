@@ -13,18 +13,19 @@
 
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <https://www.gnu.org/licenses/>.*/
+using Ange.Properties;
+using ErzaLib2;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SQLite;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ErzaLib2;
-using System.Data.SQLite;
-using System.IO;
 using WebP.Net;
 
 namespace Ange
@@ -61,6 +62,14 @@ namespace Ange
         {
             LoadImage();
             listBox1.DrawMode = DrawMode.OwnerDrawVariable;
+            if (Result[this.Index].Favorited) 
+            {
+                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("favourite");
+            }
+            else 
+            {
+                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("not_favorited");
+            }
         }
         private void LoadImage()
         {
@@ -415,10 +424,12 @@ namespace Ange
             if (Result[Index].Favorited)
             {
                 ErzaDB.SetImageFavorit(Result[Index].ImageID, false, Form1.Erza);
+                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("not_favorited");
             }
             else
             {
                 ErzaDB.SetImageFavorit(Result[Index].ImageID, true, Form1.Erza);
+                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("favourite");
             }
         }
     }

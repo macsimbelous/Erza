@@ -818,10 +818,13 @@ namespace Ange
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     ImageInfo img = (ImageInfo)imageListView2.SelectedItems[0].VirtualItemKey;
-                    byte[] phash;
                     List<long> similars = new List<long>();
-                    long count = 0;
-                    using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM images WHERE image_id = @image_id", Erza))
+                    if (img.PHash == null)
+                    {
+                        MessageBox.Show("Нет Phash");
+                        return;
+                    }
+                    /*using (SQLiteCommand command = new SQLiteCommand("SELECT phash FROM images WHERE image_id = @image_id", Erza))
                     {
                         command.Parameters.AddWithValue("image_id", img.ImageID);
                         object o = command.ExecuteScalar();
@@ -831,8 +834,8 @@ namespace Ange
                             return;
                         }
                         phash = o as byte[];
-                    }
-                    using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from images", Erza))
+                    }*/
+                    using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from images WHERE phash IS NOT NULL", Erza))
                     {
                         SQLiteDataReader reader = command.ExecuteReader();
                         while (reader.Read())
@@ -845,7 +848,7 @@ namespace Ange
                             else
                             {
                                 byte[] current_phash = (byte[])reader["phash"];
-                                double result = ImagePhash.GetCrossCorrelation(phash, current_phash);
+                                double result = ImagePhash.GetCrossCorrelation(img.PHash, current_phash);
                                 if (result >= form.similar)
                                 {
                                     similars.Add(imageid);
@@ -861,11 +864,10 @@ namespace Ange
                     {
                         ImageInfo temp = ErzaDB.GetImageWithOutTags(imageid, Erza);
                         imageListView2.Items.Add(temp, temp.Hash, adaptor);
-                        count++;
                     }
                     imageListView2.ResumeLayout();
                     imageListView2.EnsureVisible(0);
-                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + count.ToString();
+                    this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 }
                 form.Dispose();
             }
@@ -958,18 +960,29 @@ namespace Ange
             List<ImageInfo> Result = new List<ImageInfo>();
             using (SQLiteCommand command = new SQLiteCommand())
             {
-                command.CommandText = "SELECT image_id, hash, file_path FROM images WHERE deleted = 0 AND tags IS NULL;";
+                command.CommandText = "SELECT image_id, hash, deleted, file_path, width, height, favorited, phash FROM images WHERE deleted = 0 AND tags IS NULL;";
                 command.Connection = Form1.Erza;
                 SQLiteDataReader reader = command.ExecuteReader();
-                int count = 0;
                 while (reader.Read())
                 {
-                    ImageInfo img = new ImageInfo();
-                    img.Hash = (string)reader["hash"];
-                    img.ImageID = (long)reader["image_id"];
-                    img.FilePath = (string)reader["file_path"];
-                    Result.Add(img);
-                    count++;
+                    ImageInfo image = new ImageInfo();
+                    image.ImageID = (long)reader["image_id"];
+                    image.Hash = (string)reader["hash"];
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
+                    object o = reader["file_path"];
+                    if (o != DBNull.Value)
+                    {
+                        image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
+                    }
+                    Result.Add(image);
                 }
                 reader.Close();
             }
@@ -1004,6 +1017,49 @@ namespace Ange
                     ErzaDB.SetImageFavorit(img.ImageID, false, Erza);
                 }
             }
+        }
+
+        private void view_favorited_ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            tags_textBox.Text = String.Empty;
+            imageListView2.SuspendLayout();
+            imageListView2.Items.Clear();
+            List<ImageInfo> Result = new List<ImageInfo>();
+            using (SQLiteCommand command = new SQLiteCommand())
+            {
+                command.CommandText = "SELECT image_id, hash, deleted, file_path, width, height, favorited, phash FROM images WHERE deleted = 0 AND favorited = 1";
+                command.Connection = Form1.Erza;
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    ImageInfo image = new ImageInfo();
+                    image.ImageID = (long)reader["image_id"];
+                    image.Hash = (string)reader["hash"];
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
+                    object o = reader["file_path"];
+                    if (o != DBNull.Value)
+                    {
+                        image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
+                    }
+                    Result.Add(image);
+                }
+                reader.Close();
+            }
+            foreach (ImageInfo img in Result)
+            {
+                imageListView2.Items.Add(img, img.Hash, adaptor);
+            }
+            imageListView2.ResumeLayout();
+            imageListView2.EnsureVisible(0);
+            this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
         }
     }
 }
