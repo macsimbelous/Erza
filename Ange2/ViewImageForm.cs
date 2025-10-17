@@ -62,17 +62,17 @@ namespace Ange
         {
             LoadImage();
             listBox1.DrawMode = DrawMode.OwnerDrawVariable;
-            if (Result[this.Index].Favorited) 
-            {
-                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("favourite");
-            }
-            else 
-            {
-                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("not_favorited");
-            }
         }
         private void LoadImage()
         {
+            if (Result[this.Index].Favorited)
+            {
+                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("favourite");
+            }
+            else
+            {
+                add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("not_favorited");
+            }
             string ImageFormat;
             long FileSize;
             try
@@ -425,11 +425,13 @@ namespace Ange
             {
                 ErzaDB.SetImageFavorit(Result[Index].ImageID, false, Form1.Erza);
                 add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("not_favorited");
+                Result[Index].Favorited = false;
             }
             else
             {
                 ErzaDB.SetImageFavorit(Result[Index].ImageID, true, Form1.Erza);
                 add_to_favorited_button.Image = (System.Drawing.Image)Resources.ResourceManager.GetObject("favourite");
+                Result[Index].Favorited =true;
             }
         }
     }
