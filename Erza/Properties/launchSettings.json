@@ -2,7 +2,8 @@
   "profiles": {
     "Erza": {
       "commandName": "Project",
-      "commandLineArgs": "reus_(cetta)"
+      "commandLineArgs": "nikketa_(girls'_frontline_2)",
+      "workingDirectory": "E:\\Downloads"
     }
   }
 }

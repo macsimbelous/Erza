@@ -416,7 +416,11 @@ namespace Ange
         private void ViewImageForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (fs != null) { fs.Close(); }
-            this.pictureBox1.Image.Dispose();
+            try
+            {
+                this.pictureBox1.Image.Dispose();
+            }
+            catch { }
         }
 
         private void add_to_favorited_button_Click(object sender, EventArgs e)
