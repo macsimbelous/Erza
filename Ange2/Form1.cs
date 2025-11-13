@@ -35,9 +35,9 @@ using System.Security.Policy;
 using Shipwreck.Phash;
 using System.Reflection;
 using System.Diagnostics;
-using WebP.Net;
 using ImageMagick;
 using ImageMagick.Factories;
+using WebpWrapper;
 
 namespace Ange
 {
@@ -420,7 +420,11 @@ namespace Ange
                     //using var webp = new WebPObject(File.ReadAllBytes(lcFilename));
                     var m = new MagickFactory();
                     //loBMP = new Bitmap(webp.GetImage());
-                    loBMP = WebPDecoder.Decode(File.ReadAllBytes(lcFilename));
+                    //loBMP = WebPDecoder.Decode(File.ReadAllBytes(lcFilename));
+                    using (WebP webp = new WebP())
+                    {
+                        loBMP = webp.Load(lcFilename);
+                    }
 
                 }
                 else

@@ -100,7 +100,7 @@
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="WebP_Net" Version="2.0.3" />
+    <PackageReference Include="Webp-Wrapper-for-NET-Win-x64" Version="1.6.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErzaLib2\ErzaLib2.csproj" />

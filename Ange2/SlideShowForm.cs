@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ErzaLib2;
-using WebP.Net;
+using WebpWrapper;
 
 namespace Ange
 {
@@ -107,7 +107,11 @@ namespace Ange
                 {
                     //using var webp = new WebPObject(File.ReadAllBytes(path));
                     //this.pictureBox1.Image = webp.GetImage();
-                    pictureBox1.Image = WebPDecoder.Decode(File.ReadAllBytes(path));
+                    //pictureBox1.Image = WebPDecoder.Decode(File.ReadAllBytes(path));
+                    using (WebP webp = new WebP())
+                    {
+                        pictureBox1.Image = webp.Load(path);
+                    }
                 }
                 else
                 {

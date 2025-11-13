@@ -26,7 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WebP.Net;
+using WebpWrapper;
 
 namespace Ange
 {
@@ -87,7 +87,10 @@ namespace Ange
                     {
                         //using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
                         //this.pictureBox1.Image = webp.GetImage().Clone() as Image;
-                        pictureBox1.Image = WebPDecoder.Decode(File.ReadAllBytes(Result[this.Index].FilePath));
+                        using (WebP webp = new WebP())
+                        {
+                            pictureBox1.Image = webp.Load(Result[this.Index].FilePath);
+                        }
                         ImageFormat = "WEBP";
                     }
                     else
