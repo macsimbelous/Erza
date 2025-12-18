@@ -312,7 +312,7 @@ namespace Ange
             option_comboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             option_comboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 204);
             option_comboBox.FormattingEnabled = true;
-            option_comboBox.Items.AddRange(new object[] { "Теги", "Теги ИЛИ", "Часть тега", "MD5" });
+            option_comboBox.Items.AddRange(new object[] { "Теги", "Теги ИЛИ", "Часть тега", "MD5", "Соотношение ширины и высоты", "SQL" });
             option_comboBox.Location = new System.Drawing.Point(1111, 4);
             option_comboBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             option_comboBox.Name = "option_comboBox";

@@ -542,6 +542,28 @@ namespace Ange
                 return false;
             }
         }
+        private bool SelectIsRatioWnH()
+        {
+            if (this.option_comboBox.Text == "Соотношение ширины и высоты")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private bool SelectIsSQL()
+        {
+            if (this.option_comboBox.Text == "SQL")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         #region Custom Item Adaptor
         private class CustomAdaptor : ImageListView.ImageListViewItemAdaptor
         {
@@ -667,22 +689,18 @@ namespace Ange
                         tags.Add(tag);
                     }
                 }
+                imageListView2.SuspendLayout();
+                imageListView2.Items.Clear();
                 if (tags.Count > 1)
                 {
-                    imageListView2.SuspendLayout();
-                    imageListView2.Items.Clear();
                     List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), false, Form1.Erza);
                     foreach (ImageInfo img in Result)
                     {
                         imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView2.ResumeLayout();
-                    imageListView2.EnsureVisible(0);
                 }
                 else
                 {
-                    imageListView2.SuspendLayout();
-                    imageListView2.Items.Clear();
                     List<ImageInfo> Result;
                     if (tags.Count == 1)
                     {
@@ -696,13 +714,9 @@ namespace Ange
                     {
                         imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView2.ResumeLayout();
-                    imageListView2.EnsureVisible(0);
                 }
-                if (imageListView2.Items.Count > 0)
-                {
-                    imageListView2.EnsureVisible(0);
-                }
+                imageListView2.ResumeLayout();
+                imageListView2.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 return;
             }
@@ -717,22 +731,18 @@ namespace Ange
                         tags.Add(tag);
                     }
                 }
+                imageListView2.SuspendLayout();
+                imageListView2.Items.Clear();
                 if (tags.Count > 1)
                 {
-                    imageListView2.SuspendLayout();
-                    imageListView2.Items.Clear();
                     List<ImageInfo> Result = ErzaDB.GetImagesByTags(new List<string>(tags), true, Form1.Erza);
                     foreach (ImageInfo img in Result)
                     {
                         imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView2.ResumeLayout();
-                    imageListView2.EnsureVisible(0);
                 }
                 else
                 {
-                    imageListView2.SuspendLayout();
-                    imageListView2.Items.Clear();
                     List<ImageInfo> Result;
                     if (tags.Count == 1)
                     {
@@ -746,13 +756,9 @@ namespace Ange
                     {
                         imageListView2.Items.Add(img, img.Hash, adaptor);
                     }
-                    imageListView2.ResumeLayout();
-                    imageListView2.EnsureVisible(0);
                 }
-                if (imageListView2.Items.Count > 0)
-                {
-                    this.imageListView2.EnsureVisible(0);
-                }
+                imageListView2.ResumeLayout();
+                imageListView2.EnsureVisible(0);
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 return;
             }
@@ -767,10 +773,6 @@ namespace Ange
                 }
                 imageListView2.ResumeLayout();
                 imageListView2.EnsureVisible(0);
-                if (imageListView2.Items.Count > 0)
-                {
-                    this.imageListView2.EnsureVisible(0);
-                }
                 this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 return;
             }
@@ -784,10 +786,6 @@ namespace Ange
                     imageListView2.Items.Add(img, img.Hash, adaptor);
                     imageListView2.ResumeLayout();
                     imageListView2.EnsureVisible(0);
-                    if (imageListView2.Items.Count > 0)
-                    {
-                        this.imageListView2.EnsureVisible(0);
-                    }
                     this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 }
                 else
@@ -796,6 +794,104 @@ namespace Ange
                     imageListView2.Items.Clear();
                     imageListView2.ResumeLayout();
                 }
+                return;
+            }
+            if (SelectIsRatioWnH())
+            {
+                imageListView2.SuspendLayout();
+                imageListView2.Items.Clear();
+                List<ImageInfo> Result = new List<ImageInfo>();
+                string sql = "SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL AND CAST(width AS FLOAT) / CAST(height AS FLOAT) " + this.tags_textBox.Text;
+                try
+                {
+                    using (SQLiteCommand command = new SQLiteCommand(sql, Form1.Erza))
+                    {
+                        SQLiteDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            ImageInfo image = new ImageInfo();
+                            image.ImageID = (long)reader["image_id"];
+                            image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                            image.Hash = (string)reader["hash"];
+                            image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                            image.Width = Convert.ToInt32(reader["width"]);
+                            image.Height = Convert.ToInt32(reader["height"]);
+                            object o = reader["file_path"];
+                            if (o != DBNull.Value)
+                            {
+                                image.FilePath = (string)o;
+                            }
+                            o = reader["phash"];
+                            if (o != DBNull.Value)
+                            {
+                                image.PHash = (byte[])o;
+                            }
+                            Result.Add(image);
+                        }
+                        reader.Close();
+                    }
+                    foreach (ImageInfo img in Result)
+                    {
+                        imageListView2.Items.Add(img, img.Hash, adaptor);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                imageListView2.ResumeLayout();
+                imageListView2.EnsureVisible(0);
+
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
+                return;
+            }
+            if (SelectIsSQL())
+            {
+                imageListView2.SuspendLayout();
+                imageListView2.Items.Clear();
+                List<ImageInfo> Result = new List<ImageInfo>();
+                string sql = "SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL AND " + this.tags_textBox.Text;
+                try
+                {
+                    using (SQLiteCommand command = new SQLiteCommand(sql, Form1.Erza))
+                    {
+                        SQLiteDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            ImageInfo image = new ImageInfo();
+                            image.ImageID = (long)reader["image_id"];
+                            image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                            image.Hash = (string)reader["hash"];
+                            image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                            image.Width = Convert.ToInt32(reader["width"]);
+                            image.Height = Convert.ToInt32(reader["height"]);
+                            object o = reader["file_path"];
+                            if (o != DBNull.Value)
+                            {
+                                image.FilePath = (string)o;
+                            }
+                            o = reader["phash"];
+                            if (o != DBNull.Value)
+                            {
+                                image.PHash = (byte[])o;
+                            }
+                            Result.Add(image);
+                        }
+                        reader.Close();
+                    }
+                    foreach (ImageInfo img in Result)
+                    {
+                        imageListView2.Items.Add(img, img.Hash, adaptor);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                imageListView2.ResumeLayout();
+                imageListView2.EnsureVisible(0);
+
+                this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 return;
             }
         }
