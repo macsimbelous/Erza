@@ -302,7 +302,7 @@ namespace Erza
             int count = 0;
             while (true)
             {
-                nPostsCount = posts_count(String.Format("http://konachan.com/post.xml?tags={0}&limit=1", tag));
+                nPostsCount = posts_count(String.Format("https://konachan.com/post.xml?tags={0}&limit=1", tag));
                 if (nPostsCount >= 0)
                 {
                     break;
@@ -328,7 +328,7 @@ namespace Erza
             int count_errors = 0;
             for (; ; )
             {
-                string strURL = String.Format("http://konachan.com/post.xml?tags={0}&page={1}&limit={2}", tag, nPage, KONACHAN_LIMIT_POSTS);
+                string strURL = String.Format("https://konachan.com/post.xml?tags={0}&page={1}&limit={2}", tag, nPage, KONACHAN_LIMIT_POSTS);
                 Console.WriteLine("({0}/{1}) Загружаем и парсим: {2}", img_list.Count, nPostsCount, strURL);
                 try
                 {
