@@ -397,6 +397,7 @@ namespace GetGelbooru
                 //string s = reader.ReadToEnd();
                 //}
                 //string RawCookies = httpWebResponse.Headers["Set-Cookie"];
+                httpWebResponse.Cookies.Add(new Cookie("fringeBenefits", "yup","/", "gelbooru.com"));
                 return httpWebResponse.Cookies;
             }
             catch (WebException we)
