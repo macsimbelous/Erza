@@ -196,6 +196,8 @@ namespace Sagiri
                     return true;
                 case ".webp":
                     return true;
+                case ".avif":
+                    return true;
             }
             return false;
         }

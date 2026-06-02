@@ -37,7 +37,6 @@ using System.Reflection;
 using System.Diagnostics;
 using ImageMagick;
 using ImageMagick.Factories;
-using WebpWrapper;
 
 namespace Ange
 {
@@ -415,17 +414,12 @@ namespace Ange
             try
             {
                 Bitmap loBMP;
-                if (Path.GetExtension(lcFilename).ToLower() == ".webp")
+                if (Path.GetExtension(lcFilename).ToLower() == ".webp" || Path.GetExtension(lcFilename).ToLower() == ".avif")
                 {
-                    //using var webp = new WebPObject(File.ReadAllBytes(lcFilename));
-                    var m = new MagickFactory();
-                    //loBMP = new Bitmap(webp.GetImage());
-                    //loBMP = WebPDecoder.Decode(File.ReadAllBytes(lcFilename));
-                    using (WebP webp = new WebP())
+                    using (var magickImage = new MagickImage(lcFilename))
                     {
-                        loBMP = webp.Load(lcFilename);
+                        loBMP = magickImage.ToBitmap();
                     }
-
                 }
                 else
                 {

@@ -15,20 +15,12 @@
     along with Foobar.  If not, see <https://www.gnu.org/licenses/>.*/
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Drawing.Imaging;
 using ErzaLib2;
 using System.IO;
-using System.Data;
 using System.Data.SQLite;
 using ImageMagick;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
-using WebP.Net;
-using ImageMagick.Factories;
 
 namespace Maki
 {
@@ -47,10 +39,6 @@ namespace Maki
             //SQLiteConnection conn = new SQLiteConnection(previews);
             //conn.Open();
             string[] files = Directory.GetFiles("F:\\AnimeArt", "*.*", SearchOption.AllDirectories);
-            ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
-            EncoderParameters myEncoderParameters = new EncoderParameters(1);
-            EncoderParameter myEncoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
-            myEncoderParameters.Param[0] = myEncoderParameter;
             List<string> files_to_preview = new List<string>();
             for (int i=0;i< files.Length;i++)
             {
@@ -81,32 +69,14 @@ namespace Maki
                     }
                     string dest_file = PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg";
 
-                    //Directory.CreateDirectory(PreviewPath + "\\" + hash[0] + "\\" + hash[1]);
-                    if (Path.GetExtension(files_to_preview[i]).ToLower() == ".webp")
+                    using (MagickImage img = new MagickImage(files_to_preview[i]))
                     {
-                        Bitmap bitmap = WebPDecoder.Decode(File.ReadAllBytes(files_to_preview[i]));
-                        //using var webp = new WebPObject(File.ReadAllBytes(files_to_preview[i]));
-                        var m = new MagickFactory();
-                        //Bitmap bitmap = new Bitmap(webp.GetImage());
-                        MagickImage image = new MagickImage(m.Image.Create(bitmap));
-
-                        image.Resize(p_size);
-                        image.SetCompression(CompressionMethod.JPEG);
-                        image.Quality = 80;
-                        image.Write(dest_file);
-                        
+                        img.Resize(p_size);
+                        img.Format = MagickFormat.Jpeg;
+                        img.SetCompression(CompressionMethod.JPEG);
+                        img.Quality = 80;
+                        img.Write(dest_file);
                     }
-                    else
-                    {
-                        using (MagickImage img = new MagickImage(files_to_preview[i]))
-                        {
-                            img.Resize(p_size);
-                            img.SetCompression(CompressionMethod.JPEG);
-                            img.Quality = 80;
-                            img.Write(dest_file);
-                        }
-                    }
-
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Успех!");
                     Console.ResetColor();
@@ -119,35 +89,6 @@ namespace Maki
                     Console.ResetColor();
                     bad_files.Add(files_to_preview[i]);
                 }
-                /*Bitmap preview = CreateThumbnail(files_to_preview[i], PreviewWidth, PreviewHeight);
-                if (preview != null)
-                {
-                    string dest_file = PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg";
-                    Directory.CreateDirectory(PreviewPath + "\\" + hash[0] + "\\" + hash[1]);
-                    try
-                    {
-                        using (FileStream bw = new FileStream(dest_file, FileMode.Create))
-                        {
-                            preview.Save(bw, jpgEncoder, myEncoderParameters);
-                            bw.Close();
-                        }
-                        Console.WriteLine($"[{i + 1}/{files_to_preview.Count}] {files_to_preview[i]} Добавлен");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(ex.Message);
-                        Console.ResetColor();
-                    }
-                    
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"{files_to_preview[i]} Ошибка!");
-                    Console.ResetColor();
-                    bad_files.Add(files_to_preview[i]);
-                }*/
             }
             //transact.Commit();
             List<string> hashs = ReadAllHashFromPrewiewsDB();
@@ -182,29 +123,6 @@ namespace Maki
                 }
 
             }
-            /*List<string> exist_files = new List<string>();
-            foreach (string file in files)
-            {
-                if (ImageInfo.IsImageFile(file))
-                {
-                    exist_files.Add(Path.GetFileNameWithoutExtension(file));
-                }
-            }
-            exist_files.Sort();
-            for(int i = 0; i < hashs.Count; i++)
-            {
-                string hash = hashs[i];
-                int index = exist_files.BinarySearch(hash);
-                if(index < 0)
-                {
-                    File.Delete(PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg");
-                    Console.WriteLine("{0} Удалён!", hash);
-                }
-                else
-                {
-                    Console.WriteLine("{0} Присутствует!", hash);
-                }
-            }*/
             foreach(string s in bad_files)
             {
                 Console.WriteLine(s);
@@ -215,78 +133,6 @@ namespace Maki
         {
             return File.Exists(PreviewPath + "\\" + hash[0] + "\\" + hash[1] + "\\" + hash + ".jpg");
         }
-        public static Bitmap CreateThumbnail(string lcFilename, int lnWidth, int lnHeight)
-        {
-            System.Drawing.Bitmap bmpOut = null;
-            try
-            {
-                Bitmap loBMP = new Bitmap(lcFilename);
-                ImageFormat loFormat = loBMP.RawFormat;
-
-                //decimal lnRatio;
-                int lnNewWidth = 0;
-                int lnNewHeight = 0;
-
-                //*** If the image is smaller than a thumbnail just return it
-                if (loBMP.Width < lnWidth && loBMP.Height < lnHeight)
-                    return loBMP;
-
-                float temp = (float)loBMP.Width / (float)lnWidth;
-                if ((int)((float)loBMP.Height / temp) > lnHeight)
-                {
-                    temp = (float)loBMP.Height / (float)lnHeight;
-                    lnNewWidth = (int)((float)loBMP.Width / temp);
-                    lnNewHeight = lnHeight;
-                }
-                else
-                {
-                    lnNewWidth = lnWidth;
-                    lnNewHeight = (int)((float)loBMP.Height / temp);
-                }
-                /*if (loBMP.Width > loBMP.Height)
-                {
-                    lnRatio = (decimal)lnWidth / loBMP.Width;
-                    lnNewWidth = lnWidth;
-                    decimal lnTemp = loBMP.Height * lnRatio;
-                    lnNewHeight = (int)lnTemp;
-                }
-                else
-                {
-                    lnRatio = (decimal)lnHeight / loBMP.Height;
-                    lnNewHeight = lnHeight;
-                    decimal lnTemp = loBMP.Width * lnRatio;
-                    lnNewWidth = (int)lnTemp;
-                }*/
-                bmpOut = new Bitmap(lnNewWidth, lnNewHeight);
-                Graphics g = Graphics.FromImage(bmpOut);
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.FillRectangle(Brushes.White, 0, 0, lnNewWidth, lnNewHeight);
-                g.DrawImage(loBMP, 0, 0, lnNewWidth, lnNewHeight);
-
-                loBMP.Dispose();
-            }
-            catch
-            {
-                return null;
-            }
-
-            return bmpOut;
-        }
-        public static ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-
-            foreach (ImageCodecInfo codec in codecs)
-            {
-                if (codec.FormatID == format.Guid)
-                {
-                    return codec;
-                }
-            }
-            return null;
-        }
-
         public static List<string> ReadAllHashFromPrewiewsDB()
         {
             string[] files = Directory.GetFiles(PreviewPath, "*.*", SearchOption.AllDirectories);

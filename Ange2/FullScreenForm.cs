@@ -13,18 +13,18 @@
 
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <https://www.gnu.org/licenses/>.*/
+using ErzaLib2;
+using ImageMagick;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ErzaLib2;
-using System.IO;
-using WebpWrapper;
 
 namespace Ange
 {
@@ -125,11 +125,19 @@ namespace Ange
                 {
                     if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".webp")
                     {
-                        using (WebP webp = new WebP())
+                        using (var magickImage = new MagickImage(Result[this.Index].FilePath))
                         {
-                            pictureBox1.Image = webp.Load(Result[this.Index].FilePath);
+                            pictureBox1.Image = magickImage.ToBitmap();
                         }
                         ImageFormat = "WEBP";
+                    }
+                    else if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".avif")
+                    {
+                        using (var magickImage = new MagickImage(Result[this.Index].FilePath))
+                        {
+                            pictureBox1.Image = magickImage.ToBitmap();
+                        }
+                        ImageFormat = "AVIF";
                     }
                     else
                     {

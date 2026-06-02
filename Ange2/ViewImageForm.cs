@@ -15,6 +15,7 @@
     along with Foobar.  If not, see <https://www.gnu.org/licenses/>.*/
 using Ange.Properties;
 using ErzaLib2;
+using ImageMagick;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,7 +27,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WebpWrapper;
 
 namespace Ange
 {
@@ -85,13 +85,19 @@ namespace Ange
 
                     if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".webp")
                     {
-                        //using var webp = new WebPObject(File.ReadAllBytes(this.Result[this.Index].FilePath));
-                        //this.pictureBox1.Image = webp.GetImage().Clone() as Image;
-                        using (WebP webp = new WebP())
+                        using (var magickImage = new MagickImage(Result[this.Index].FilePath))
                         {
-                            pictureBox1.Image = webp.Load(Result[this.Index].FilePath);
+                            pictureBox1.Image = magickImage.ToBitmap();
                         }
                         ImageFormat = "WEBP";
+                    }
+                    else if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".avif")
+                    {
+                        using (var magickImage = new MagickImage(Result[this.Index].FilePath))
+                        {
+                            pictureBox1.Image = magickImage.ToBitmap();
+                        }
+                        ImageFormat = "AVIF";
                     }
                     else
                     {

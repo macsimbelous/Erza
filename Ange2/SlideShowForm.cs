@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ErzaLib2;
+using ImageMagick;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,8 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ErzaLib2;
-using WebpWrapper;
 
 namespace Ange
 {
@@ -103,19 +103,16 @@ namespace Ange
         {
             try
             {
-                if (Path.GetExtension(path).ToLower() == ".webp")
+                if (Path.GetExtension(path).ToLower() == ".webp" || Path.GetExtension(path).ToLower() == ".avif")
                 {
-                    //using var webp = new WebPObject(File.ReadAllBytes(path));
-                    //this.pictureBox1.Image = webp.GetImage();
-                    //pictureBox1.Image = WebPDecoder.Decode(File.ReadAllBytes(path));
-                    using (WebP webp = new WebP())
+                    using (var magickImage = new MagickImage(path))
                     {
-                        pictureBox1.Image = webp.Load(path);
+                        pictureBox1.Image = magickImage.ToBitmap();
                     }
                 }
                 else
                 {
-                    this.pictureBox1.ImageLocation = path;
+                    pictureBox1.ImageLocation = path;
                 }
                 
             }
