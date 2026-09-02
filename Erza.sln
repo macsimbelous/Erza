@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36804.6 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12120.119 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Erza", "Erza\Erza.csproj", "{FB05786A-9BF6-4909-97DA-03529030812B}"
 EndProject
@@ -35,6 +34,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucina", "Lucina2\Lucina.csproj", "{E9B00246-5894-CC9D-018D-0C8702A4EC35}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azusa", "Azusa\Azusa.csproj", "{016836A4-A208-49E2-9756-95EAE58F9622}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rias", "Rias\Rias.csproj", "{88578083-A53C-4166-9ADD-F0BF660FE058}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -266,6 +267,22 @@ Global
 		{016836A4-A208-49E2-9756-95EAE58F9622}.Release|x64.Build.0 = Release|Any CPU
 		{016836A4-A208-49E2-9756-95EAE58F9622}.Release|x86.ActiveCfg = Release|Any CPU
 		{016836A4-A208-49E2-9756-95EAE58F9622}.Release|x86.Build.0 = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|x64.Build.0 = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Debug|x86.Build.0 = Debug|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|x64.ActiveCfg = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|x64.Build.0 = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|x86.ActiveCfg = Release|Any CPU
+		{88578083-A53C-4166-9ADD-F0BF660FE058}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

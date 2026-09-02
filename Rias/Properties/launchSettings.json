@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Rias": {
+      "commandName": "Project",
+      "commandLineArgs": "end"
+    }
+  }
+}
