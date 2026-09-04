@@ -6,9 +6,10 @@ namespace Rias
 {
     internal class Program
     {
-        static int LIMIT = 5000;
+        static int LIMIT = 50000;
         static string UNSORTED_PATH = @"F:\AnimeArt\UnSorted\";
-        static string TAGS_PATH = UNSORTED_PATH + @"tags\";
+        //static string TAGS_PATH = UNSORTED_PATH + @"tags\";
+        static string TAGS_PATH = UNSORTED_PATH;
         static void Main(string[] args)
         {
             if (args.Length == 0) Console.WriteLine("Не заданы параметры");
@@ -84,21 +85,23 @@ namespace Rias
                 return;
             }
             //Добавляем теги в БД
-            for (int i = 0; i < files.Count; i++)
+            using (SQLiteConnection Connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite"))
             {
-                string hash = Path.GetFileNameWithoutExtension(files[i]);
-                Console.Write($"{i + 1}/{files.Count} {hash} ");
-                string text = File.ReadAllText(files[i]);
-                string[] spit_srt = text.Split(',');
-                List<string> tags = new List<string>();
-                foreach (var item in spit_srt)
+                Connection.Open();
+                SQLiteTransaction transact = Connection.BeginTransaction();
+                for (int i = 0; i < files.Count; i++)
                 {
-                    tags.Add(item.Trim().Replace(' ', '_'));
-                }
-                Console.Write($" {tags.Count}");
-                using (SQLiteConnection Connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite"))
-                {
-                    Connection.Open();
+                    string hash = Path.GetFileNameWithoutExtension(files[i]);
+                    Console.Write($"{i + 1}/{files.Count} {hash} ");
+                    string text = File.ReadAllText(files[i]);
+                    string[] spit_srt = text.Split(',');
+                    List<string> tags = new List<string>();
+                    foreach (var item in spit_srt)
+                    {
+                        tags.Add(item.Trim().Replace(' ', '_'));
+                    }
+                    Console.Write($" {tags.Count}");
+
                     List<long> tag_ids = new List<long>();
                     foreach (var tag in tags)
                     {
@@ -111,8 +114,10 @@ namespace Rias
                         tag_ids.Add(id);
                     }
                     AddTagsToImage(GetImageID(hash, Connection), tag_ids, Connection);
+
+                    Console.WriteLine($"...OK");
                 }
-                Console.WriteLine($"...OK");
+                transact.Commit();
             }
             foreach (var item in files)
             {
