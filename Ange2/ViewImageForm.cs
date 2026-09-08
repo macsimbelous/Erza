@@ -541,7 +541,7 @@ namespace Ange
 
             // Resize to 448x448
             using Mat resized = new Mat();
-            Cv2.Resize(src, resized, new Size(ImageSize, ImageSize), 0, 0, InterpolationFlags.Cubic);
+            Cv2.Resize(src, resized, new OpenCvSharp.Size(ImageSize, ImageSize), 0, 0, InterpolationFlags.Cubic);
 
             // Convert BGR (OpenCV Default) to RGB
             using Mat rgb = new Mat();
