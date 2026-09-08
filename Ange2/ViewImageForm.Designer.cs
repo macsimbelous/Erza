@@ -47,6 +47,7 @@
             RemoveTag_button = new System.Windows.Forms.Button();
             Search_button = new System.Windows.Forms.Button();
             add_to_favorited_button = new System.Windows.Forms.Button();
+            button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             contextMenuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -183,9 +184,9 @@
             AddTag_button.Location = new System.Drawing.Point(14, 536);
             AddTag_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             AddTag_button.Name = "AddTag_button";
-            AddTag_button.Size = new System.Drawing.Size(100, 32);
+            AddTag_button.Size = new System.Drawing.Size(74, 32);
             AddTag_button.TabIndex = 3;
-            AddTag_button.Text = "Добавить тег";
+            AddTag_button.Text = "Добавить";
             AddTag_button.UseVisualStyleBackColor = true;
             AddTag_button.Click += AddTag_button_Click;
             // 
@@ -193,12 +194,12 @@
             // 
             RemoveTag_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             RemoveTag_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            RemoveTag_button.Location = new System.Drawing.Point(123, 536);
+            RemoveTag_button.Location = new System.Drawing.Point(94, 536);
             RemoveTag_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             RemoveTag_button.Name = "RemoveTag_button";
-            RemoveTag_button.Size = new System.Drawing.Size(90, 32);
+            RemoveTag_button.Size = new System.Drawing.Size(73, 32);
             RemoveTag_button.TabIndex = 4;
-            RemoveTag_button.Text = "Удалить тег";
+            RemoveTag_button.Text = "Удалить";
             RemoveTag_button.UseVisualStyleBackColor = true;
             RemoveTag_button.Click += RemoveTag_button_Click;
             // 
@@ -210,7 +211,7 @@
             Search_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             Search_button.Name = "Search_button";
             Search_button.Size = new System.Drawing.Size(60, 32);
-            Search_button.TabIndex = 5;
+            Search_button.TabIndex = 6;
             Search_button.Text = "Найти";
             Search_button.UseVisualStyleBackColor = true;
             Search_button.Click += Search_button_Click;
@@ -222,15 +223,26 @@
             add_to_favorited_button.Location = new System.Drawing.Point(290, 536);
             add_to_favorited_button.Name = "add_to_favorited_button";
             add_to_favorited_button.Size = new System.Drawing.Size(35, 32);
-            add_to_favorited_button.TabIndex = 6;
+            add_to_favorited_button.TabIndex = 7;
             add_to_favorited_button.UseVisualStyleBackColor = true;
             add_to_favorited_button.Click += add_to_favorited_button_Click;
+            // 
+            // button1
+            // 
+            button1.Location = new System.Drawing.Point(173, 536);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(43, 32);
+            button1.TabIndex = 5;
+            button1.Text = "ИИ";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // ViewImageForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1305, 692);
+            Controls.Add(button1);
             Controls.Add(add_to_favorited_button);
             Controls.Add(Search_button);
             Controls.Add(RemoveTag_button);
@@ -272,5 +284,6 @@
         private System.Windows.Forms.Button RemoveTag_button;
         private System.Windows.Forms.Button Search_button;
         private System.Windows.Forms.Button add_to_favorited_button;
+        private System.Windows.Forms.Button button1;
     }
 }

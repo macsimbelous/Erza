@@ -17,5 +17,11 @@
     <Setting Name="PreviewPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">D:\previews</Value>
     </Setting>
+    <Setting Name="TaggerModel" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\utils\data\models\wd-eva02-large-tagger-v3\model.onnx</Value>
+    </Setting>
+    <Setting Name="SelectedTags" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\utils\data\models\wd-eva02-large-tagger-v3\selected_tags.csv</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
