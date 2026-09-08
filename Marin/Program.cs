@@ -12,56 +12,51 @@ namespace Marin
     {
         private const int ImageSize = 448; // MOAT Tagger uses 448x448 input size
         private const float Threshold = 0.35f; // Standard F1 threshold recommendation
-        private static List<ImageInfo> images;
+        private static List<ImageInfo>? images;
+        private static int MAX_TAGS = 0;
+        private static string MODEL = @"C:\utils\data\models\wd-eva02-large-tagger-v3\model.onnx";
+        private static string SELECTED_TAGS = @"C:\utils\data\models\wd-eva02-large-tagger-v3\selected_tags.csv";
         static void Main(string[] args)
         {
+            if(args.Length > 0)
+            {
+                MAX_TAGS = int.Parse(args[0]);
+            }
             //Считываем записи
-            images = new List<ImageInfo>();
+            //images = new List<ImageInfo>();
             using (SQLiteConnection Connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite"))
             {
                 Connection.Open();
-                long count_rows;
+                Console.Write("Получаем изображения из БД...");
+                images = GetAllImages(Connection);
                 //Определяем число записей
-                using (SQLiteCommand command = new SQLiteCommand())
-                {
-                    command.CommandText = "SELECT count(*) FROM images WHERE deleted = 0 AND tags IS NULL";
-                    command.Connection = Connection;
-                    count_rows = System.Convert.ToInt64(command.ExecuteScalar());
-                }
-                using (SQLiteCommand command = new SQLiteCommand())
-                {
-                    command.CommandText = "SELECT image_id, file_path FROM images WHERE deleted = 0 AND tags IS NULL";
-                    command.Connection = Connection;
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    int count = 0;
-                    while (reader.Read())
+                List<ImageInfo> temp = new List<ImageInfo>();
+                foreach (var image in images) 
+                { 
+                    if(image.TagIDs.Count <= MAX_TAGS)
                     {
-                        ImageInfo img = new ImageInfo(reader.GetInt64(0), reader.GetString(1), new List<(string Tag, float Confidence, int Category)>());
-
-                        images.Add(img);
-                        count++;
-                        Console.Write("Считано: {0} из {1}\r", count, count_rows);
+                        temp.Add(image);
                     }
-                    Console.WriteLine();
                 }
+                images = temp;
+                Console.WriteLine($"{images.Count} получено.");
             }
             //Проверяем количество
             if (images.Count <= 0)
             {
-                Console.WriteLine("Нет изображений без тегов.");
+                Console.WriteLine("Нет изображений для обработки.");
                 return;
             }
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
-            var tags = LoadTags(@"E:\Downloads\selected_tags (1).csv");
+            var tags = LoadTags(SELECTED_TAGS);
             int gpuDeviceId = 0; // The GPU device ID to execute on
             using var gpuSessionOptoins = SessionOptions.MakeSessionOptionWithCudaProvider(gpuDeviceId);
-            using var session = new InferenceSession(@"E:\Downloads\model (1).onnx", gpuSessionOptoins);
+            using var session = new InferenceSession(MODEL, gpuSessionOptoins);
             for (int i = 0; i < images.Count; i++)
             {
                 try
                 {
                     Console.Write($"{i + 1}/{images.Count} {images[i].FilePath} ");
-                    //var predictedTags = GetTags(@"E:\Downloads\model (1).onnx", @"E:\Downloads\selected_tags (1).csv", @"F:\pixiv_all\147319203_p0.png");
                     float[] inputData = PreprocessImage(images[i].FilePath);
 
                     // 3. Prepare the ONNX Tensor Input
@@ -84,11 +79,11 @@ namespace Marin
                         if (probabilities[i2] >= Threshold && i2 < tags.Count)
                         {
                             predictedTags.Add((tags[i2].Name, probabilities[i2], tags[i2].Category));
+                            images[i].Tags.Add(tags[i2].Name);
                         }
                     }
                     Console.Write($" {predictedTags.Count}");
                     Console.WriteLine($"...OK");
-                    images[i].Tags.AddRange(predictedTags);
                 }
                 catch (Exception e) { Console.WriteLine(e.Message); }
             }
@@ -213,11 +208,11 @@ namespace Marin
                         List<long> tag_ids = new List<long>();
                         foreach (var tag in images[i].Tags)
                         {
-                            long id = GetTagID(tag.Tag, Connection);
+                            long id = GetTagID(tag, Connection);
                             if (id < 0)
                             {
-                                AddTag(tag.Tag, Connection);
-                                id = GetTagID(tag.Tag, Connection);
+                                AddTag(tag, Connection);
+                                id = GetTagID(tag, Connection);
                             }
                             tag_ids.Add(id);
                         }
@@ -322,18 +317,153 @@ namespace Marin
                 command.ExecuteNonQuery();
             }
         }
+        public static List<ImageInfo> GetAllImages(SQLiteConnection Connection)
+        {
+            List<ImageInfo> imgs = new List<ImageInfo>();
+            string sql = "SELECT image_id, file_path, tags FROM images WHERE deleted = 0 AND file_path IS NOT NULL;";
+            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            {
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    ImageInfo image = new ImageInfo();
+                    image.ImageID = (long)reader["image_id"];
+                    object o = reader["file_path"];
+                    if (o != DBNull.Value)
+                    {
+                        image.FilePath = (string)o;
+                    }
+                    o = reader["tags"];
+                    if (o != DBNull.Value)
+                    {
+                       image.TagIDs = ParseStringOfTagIDs((string)o);
+                    }
+                    imgs.Add(image);
+                }
+                reader.Close();
+                return imgs;
+            }
+        }
     }
     internal class ImageInfo
     {
-        public long ImageID;
-        public string FilePath;
-        public List<(string Tag, float Confidence, int Category)> Tags;
-        public ImageInfo(long ImageID, string FilePath, List<(string Tag, float Confidence, int Category)> Tags) 
-        { 
-            this.ImageID = ImageID;
-            this.FilePath = FilePath;
-            this.Tags = Tags;
+        public bool Deleted = false;
+        public bool Favorited = false;
+        public long ImageID = -1;
+        public string? Hash = null;
+        public string? FilePath = null;
+        public int Width = 0;
+        public int Height = 0;
+        public byte[]? PHash;
+        public List<string> Tags = new List<string>();
+        public List<long> TagIDs = new List<long>();
+        public string GetStringOfTags()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < this.Tags.Count; i++)
+            {
+                if (i == 0)
+                {
+                    sb.Append(this.Tags[i]);
+                }
+                else
+                {
+                    sb.Append(' ');
+                    sb.Append(this.Tags[i]);
+                }
+            }
+            return sb.ToString();
+        }
+        public void AddTag(string Tag)
+        {
+            if ((Tag != null) && (Tag != String.Empty))
+            {
+                if (this.Tags.LastIndexOf(Tag) < 0)
+                {
+                    this.Tags.Add(Tag);
+                }
+            }
+        }
+        public void AddTags(string[] Tags)
+        {
+            foreach (string tag in Tags)
+            {
+                if ((tag != null) && (tag != String.Empty))
+                {
+                    if (this.Tags.LastIndexOf(tag) < 0)
+                    {
+                        this.Tags.Add(tag);
+                    }
+                }
+            }
+        }
+        public void AddTags(List<string> Tags)
+        {
+            foreach (string tag in Tags)
+            {
+                if ((tag != null) && (tag != String.Empty))
+                {
+                    if (this.Tags.LastIndexOf(tag) < 0)
+                    {
+                        this.Tags.Add(tag);
+                    }
+                }
+            }
+        }
+        public void AddStringOfTags(string TagsString)
+        {
+            string[] tags_array = TagsString.Split(' ');
+            foreach (string tag in tags_array)
+            {
+                if ((tag != null) && (tag != String.Empty))
+                {
+                    if (this.Tags.LastIndexOf(tag) < 0)
+                    {
+                        this.Tags.Add(tag);
+                    }
+                }
+            }
+        }
+        public override string ToString()
+        {
+            if (this.FilePath != String.Empty)
+            {
+                return FilePath.Substring(FilePath.LastIndexOf('\\') + 1);
+            }
+            else
+            {
+                return "No File!";
+            }
+        }
+        public static bool IsImageFile(string FilePath)
+        {
+            string ext = Path.GetExtension(FilePath);
+            switch (ext.ToLower())
+            {
+                case ".jpg":
+                    return true;
+                case ".jpeg":
+                    return true;
+                case ".jpe":
+                    return true;
+                case ".png":
+                    return true;
+                case ".bmp":
+                    return true;
+                case ".gif":
+                    return true;
+                case ".tif":
+                    return true;
+                case ".tiff":
+                    return true;
+                case ".webp":
+                    return true;
+                case ".avif":
+                    return true;
+            }
+            return false;
         }
     }
 }
+
 
