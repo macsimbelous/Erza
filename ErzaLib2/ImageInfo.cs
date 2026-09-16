@@ -31,6 +31,7 @@ namespace ErzaLib2
         public int Height = 0;
         public byte[]? PHash;
         public List<string> Tags = new List<string>();
+        public List<long> TagIDs = new List<long>();
         public string GetStringOfTags()
         {
             StringBuilder sb = new StringBuilder();

@@ -179,6 +179,7 @@ namespace Rias
             {
                 try
                 {
+                    if (String.IsNullOrEmpty(tag_id)) continue;
                     tag_ids.Add(long.Parse(tag_id));
                 }
                 catch (Exception) { }

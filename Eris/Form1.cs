@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SQLite;
+using ErzaLib2;
 
 namespace Eris
 {
@@ -117,7 +118,17 @@ namespace Eris
             if (dataGridView1.SelectedRows.Count <= 0) { return; }
             foreach (DataGridViewRow row in dataGridView1.SelectedRows)
             {
+                long TagID = (long)row.Cells["tag_id"].Value;
                 dataGridView1.Rows.Remove(row);
+                using (SQLiteTransaction transact = connection.BeginTransaction())
+                {
+                    List<ImageInfo> images = ErzaDB.GetImagesByTag(4, connection);
+                    foreach (ImageInfo image in images)
+                    { 
+                        ErzaDB.DeleteTagFromImage(TagID, image.ImageID, connection);
+                    }
+                    transact.Commit();
+                }
             }
             this.adapter.Update(this.table);
         }

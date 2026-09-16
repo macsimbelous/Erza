@@ -62,5 +62,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="10.0.12" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ErzaLib2\ErzaLib2.csproj" />
+  </ItemGroup>
   <PropertyGroup />
 </Project>

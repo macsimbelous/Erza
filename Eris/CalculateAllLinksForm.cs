@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using System.Data.SQLite;
+using ErzaLib2;
 
 namespace Eris
 {
@@ -26,22 +27,38 @@ namespace Eris
         }
         private void LongRunningTask(object o)
         {
-            List<TagsCount> it = new List<TagsCount>();
-            using (SQLiteCommand command = new SQLiteCommand(connection))
+            List<ImageInfo> images = new List<ImageInfo>();
+            string sql = "SELECT image_id, tags FROM images WHERE deleted = 0 AND file_path IS NOT NULL;";
+            using (SQLiteCommand command = new SQLiteCommand(sql, connection))
             {
-                command.CommandText = "SELECT count, tag_id FROM tags";
-                using(SQLiteDataReader reader = command.ExecuteReader())
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    ImageInfo image = new ImageInfo();
+                    //image.ImageID = (long)reader["image_id"];
+                    image.ImageID = reader.GetInt64(0);
+                    if (!reader.IsDBNull(1))
                     {
-                        it.Add(new TagsCount(reader.GetInt64(1), reader.GetInt64(0)));
+                        image.TagIDs = ErzaDB.ParseStringOfTagIDs(reader.GetString(1));
                     }
-                    reader.Close();
+                    /*object tags = reader["tags"];
+                    if (tags != DBNull.Value)
+                    {
+                        image.TagIDs = ParseStringOfTagIDs((string)tags);
+                    }*/
+                    images.Add(image);
                 }
+                reader.Close();
             }
+            synchronizationContext.Post(StartProgress, images.Count);
             using (SQLiteTransaction transact = connection.BeginTransaction())
             {
-                for (int i = 0; i < it.Count; i++)
+                //Обнуляем счётчики в БД
+                using (SQLiteCommand command = new SQLiteCommand("UPDATE tags SET count = 0", connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+                for (int i = 0; i < images.Count; i++)
                 {
                     if (Abort)
                     {
@@ -49,22 +66,15 @@ namespace Eris
                         synchronizationContext.Post(EndProgress, false);
                         return;
                     }
-                    long tcount = 0;
-                    using (SQLiteCommand command = new SQLiteCommand())
+                    if (images[i].TagIDs.Count > 0)
                     {
-                        command.CommandText = "SELECT COUNT(*) FROM images WHERE tags LIKE '%#' || @tag_id || '#%';";
-                        command.Parameters.AddWithValue("tag_id", it[i].TagID);
-                        command.Connection = connection;
-                        tcount = System.Convert.ToInt64(command.ExecuteScalar());
-                    }
-                    if(tcount != it[i].Count)
-                    {
-                        using (SQLiteCommand command = new SQLiteCommand(connection))
+                        foreach (long tag in images[i].TagIDs)
                         {
-                            command.CommandText = "UPDATE tags SET count = @count WHERE tag_id = @tag_id;";
-                            command.Parameters.AddWithValue("count", it[i].Count);
-                            command.Parameters.AddWithValue("tag_id", it[i].TagID);
-                            command.ExecuteNonQuery();
+                            using (SQLiteCommand command = new SQLiteCommand("UPDATE tags SET count = count + 1 WHERE tag_id = @tag_id", connection))
+                            {
+                                command.Parameters.AddWithValue("tag_id", tag);
+                                command.ExecuteNonQuery();
+                            }
                         }
                     }
                     synchronizationContext.Post(RefreshProgress, i + 1);
@@ -76,6 +86,13 @@ namespace Eris
         private void RefreshProgress(object progress) // это для вызова  через Пост/Сенд
         {
             progressBar1.Value = (int)progress;
+        }
+        private void StartProgress(object progress) // это для вызова  через Пост/Сенд
+        {
+            this.progressBar1.Maximum = (int)progress;
+            this.progressBar1.Minimum = 0;
+            this.progressBar1.Step = 1;
+            this.progressBar1.Value = 0;
         }
         private void EndProgress(object status)
         {
@@ -93,10 +110,6 @@ namespace Eris
 
         private void CalculateAllLinksForm_Load(object sender, EventArgs e)
         {
-            this.progressBar1.Maximum = this.table.Rows.Count;
-            this.progressBar1.Minimum = 0;
-            this.progressBar1.Step = 1;
-            this.progressBar1.Value = 0;
             this.Abort = false;
             synchronizationContext = SynchronizationContext.Current;
             thread = new Thread(LongRunningTask);
@@ -106,16 +119,6 @@ namespace Eris
         private void button1_Click(object sender, EventArgs e)
         {
             this.Abort = true;
-        }
-    }
-    public class TagsCount
-    {
-        public long TagID;
-        public long Count;
-        public TagsCount(long TagID, long Count)
-        {
-            this.Count = Count;
-            this.TagID = TagID;
         }
     }
 }

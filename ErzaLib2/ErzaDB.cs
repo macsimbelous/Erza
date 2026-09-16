@@ -434,6 +434,39 @@ namespace ErzaLib2
                 return imgs;
             }
         }
+        public static List<ImageInfo> GetImagesByTag(long TagID, SQLiteConnection Connection)
+        {
+            List<ImageInfo> imgs = new List<ImageInfo>();
+            string sql = "SELECT image_id, favorited, deleted, width, height, hash, phash, file_path FROM images WHERE deleted = 0 AND file_path IS NOT NULL AND tags LIKE '%#' || @tag_id || '#%'";
+            using (SQLiteCommand command = new SQLiteCommand(sql, Connection))
+            {
+                command.Parameters.AddWithValue("tag_id", TagID);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    ImageInfo image = new ImageInfo();
+                    image.ImageID = (long)reader["image_id"];
+                    image.Hash = (string)reader["hash"];
+                    image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                    image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                    image.Width = Convert.ToInt32(reader["width"]);
+                    image.Height = Convert.ToInt32(reader["height"]);
+                    object o = reader["file_path"];
+                    if (o != DBNull.Value)
+                    {
+                        image.FilePath = (string)o;
+                    }
+                    o = reader["phash"];
+                    if (o != DBNull.Value)
+                    {
+                        image.PHash = (byte[])o;
+                    }
+                    imgs.Add(image);
+                }
+                reader.Close();
+                return imgs;
+            }
+        }
         public static List<ImageInfo> GetImagesByPartTag(string PartTag, SQLiteConnection Connection)
         {
             List<long> tagids = new List<long>();
@@ -839,6 +872,7 @@ namespace ErzaLib2
             {
                 try
                 {
+                    if (String.IsNullOrEmpty(tag_id)) continue;
                     tag_ids.Add(long.Parse(tag_id));
                 }
                 catch(Exception) { }
