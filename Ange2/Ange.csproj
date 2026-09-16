@@ -90,15 +90,17 @@
   <ItemGroup>
     <PackageReference Include="AutoCompleteMenu-ScintillaNET" Version="2.1.1" />
     <PackageReference Include="ImageListViewCore" Version="0.0.3" />
-    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.13.1" />
-    <PackageReference Include="Magick.NET.Core" Version="14.13.1" />
-    <PackageReference Include="Magick.NET.SystemDrawing" Version="8.0.22" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.17.1" />
+    <PackageReference Include="Magick.NET.Core" Version="14.17.1" />
+    <PackageReference Include="Magick.NET.SystemDrawing" Version="8.0.27" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.29.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.30.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.6" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260627" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260627" />
     <PackageReference Include="Shipwreck.Phash" Version="0.5.0" />
     <PackageReference Include="Shipwreck.Phash.Bitmaps" Version="0.5.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
