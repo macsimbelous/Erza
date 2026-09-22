@@ -27,8 +27,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ErzaLib2\ErzaLib2.csproj" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.17.1" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Stub.System.Data.SQLite.Core.NetFramework" Version="1.0.119.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119.0" />
   </ItemGroup>

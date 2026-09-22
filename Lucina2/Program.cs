@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AngleSharp;
+﻿using AngleSharp;
 //using AngleSharp.Parser.Html;
 using AngleSharp.Dom;
-using System.Net;
-using System.Threading;
-using System.Xml;
-using System.IO;
-using System.Data.SQLite;
-using System.Xml.Linq;
 using AngleSharp.Html.Parser;
+using System;
+using System.Collections.Generic;
+using System.Data.SQLite;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Lucina
 {
@@ -20,36 +22,44 @@ namespace Lucina
     {
         static WebProxy proxy = null;
         static int count_tags = 0;
-        static string USER_AGENT = "Mozilla / 5.0 (Windows NT 10.0; Win64; x64) AppleWebKit / 537.36 (KHTML, like Gecko) Chrome / 124.0.0.0 YaBrowser / 24.6.0.0 Safari / 537.36";
+        //static string USER_AGENT = "Mozilla / 5.0 (Windows NT 10.0; Win64; x64) AppleWebKit / 537.36 (KHTML, like Gecko) Chrome / 124.0.0.0 YaBrowser / 24.6.0.0 Safari / 537.36";
+        static string USER_AGENT = "Lucina / 2.0.0.0";
         static SQLiteConnection connection = null;
+        private static HttpClient client;
         static void Main(string[] args)
         {
             //https://chan.sankakucomplex.com/tag/index?order=date&page=2
             Console.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
-#if DEBUG
-            proxy = new WebProxy("127.0.0.1", 8888);
-#else
-            proxy = new WebProxy("77.73.71.83", 8888);
-#endif
+
+            HttpClientHandler httpClientHandler = new HttpClientHandler()
+            {
+                Proxy = new WebProxy(File.ReadAllText(@"C:\utils\cfg\erza\proxy.txt"), false),
+                PreAuthenticate = false,
+                UseDefaultCredentials = false,
+            };
+            //httpClientHandler.Credentials = new NetworkCredential(proxyServerSettings.UserName, proxyServerSettings.Password);
+            client = new HttpClient(httpClientHandler);
+            // Добавляем User-Agent в заголовки по умолчанию
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(USER_AGENT);
             connection = new SQLiteConnection("data source=C:\\utils\\data\\erza.sqlite");
             connection.Open();
             List<Tag> TagList;
 
-            //TagList = GetTagsFromDanbooru();
-            //LoadToPostgres(TagList);
-            //TagList.Clear();
+            /*TagList = GetTagsFromDanbooru();
+            LoadToSQLite(TagList);
+            TagList.Clear();
 
             TagList = GetTagsFromKonachan();
-            //LoadToPostgres(TagList);
             LoadToSQLite(TagList);
             TagList.Clear();
 
             TagList = GetTagsYandere();
-            //LoadToPostgres(TagList);
+            LoadToSQLite(TagList);
+            TagList.Clear();*/
+
+            TagList = GetTagsFromGelbooru();
             LoadToSQLite(TagList);
             TagList.Clear();
-
-            GetTagsFromGelbooru();
 
             //GetTagsFromSankaku();
             //Console.WriteLine($"Тегов получено: {count}");
@@ -61,27 +71,19 @@ namespace Lucina
         #region Danbooru
         static List<Tag> GetTagsFromDanbooru()
         {
-            const string API_KEY = "KlKXxNoiLFiamylZi1E6iIZGV3x5ylouv-YEBN49U64";
-            const string LOGIN = "macsimbelous";
+            string API_KEY = File.ReadAllText(@"C:\utils\cfg\erza\danbooru-apikey.txt");
+            string LOGIN = File.ReadAllText(@"C:\utils\cfg\erza\danbooru-login.txt");
             const int DANBOORU_LIMIT_POSTS = 1000;
             int nPage = 1;
             List<Tag> img_list = new List<Tag>();
             int count_errors = 0;
-            WebClient Client = new WebClient();
-            //Client.Headers.Add("User-Agent", USER_AGENT);
-            Client.Headers["User-Agent"] = USER_AGENT;
-            //Client.Headers["User-Agent"] = "Licina / 2.0 (Windows NT 10.0; Win64; x64)";
-            if (Program.proxy != null)
-            {
-                Client.Proxy = Program.proxy;
-            }
             for (; ; )
             {
                 string strURL = String.Format($"https://danbooru.donmai.us/tags.xml?page={nPage}&limit={DANBOORU_LIMIT_POSTS}&login={LOGIN}&api_key={API_KEY}");
                 Console.WriteLine("({0}/ХЗ) Загружаем и парсим: {1}", img_list.Count, strURL);
                 try
                 {
-                    string xml = Client.DownloadString(strURL);
+                    string xml = DownloadString(strURL, null);
                     if (xml == null)
                     {
                         if (count_errors < 4)
@@ -119,7 +121,6 @@ namespace Lucina
                     continue;
                 }
             }
-            Client.Dispose();
             return img_list;
         }
         static List<Tag> ParseXMLDanBooru(string strXML)
@@ -179,74 +180,66 @@ namespace Lucina
         #region Konachan
         static List<Tag> GetTagsFromKonachan()
         {
-            const int KONACHAN_LIMIT_POSTS = 0;
+            const int KONACHAN_LIMIT_POSTS = 1000;
             List<Tag> TagList = new List<Tag>();
-            using (WebClient Client = new WebClient())
+            string strURL = String.Format($"https://konachan.com/tag.xml?limit={KONACHAN_LIMIT_POSTS}");
+            Console.Write($"Загружаем и парсим: {strURL}");
+            try
             {
-                Client.Headers.Add("User-Agent", USER_AGENT);
-                if (Program.proxy != null)
+                DateTime start = DateTime.Now;
+                string xml = DownloadString(strURL, null);
+                if (xml == null)
                 {
-                    Client.Proxy = Program.proxy;
+                    Console.WriteLine(" Ошибка! xml = null");
+                    return TagList;
                 }
-                string strURL = String.Format($"https://konachan.com/tag.xml?limit={KONACHAN_LIMIT_POSTS}");
-                Console.Write($"Загружаем и парсим: {strURL}");
+                XmlDocument mXML = new XmlDocument();
                 try
                 {
-                    Uri uri = new Uri(strURL);
-                    DateTime start = DateTime.Now;
-                    string xml = Client.DownloadString(uri);
-                    if (xml == null)
-                    {
-                        Console.WriteLine(" Ошибка! xml = null");
-                        return TagList;
-                    }
-                    XmlDocument mXML = new XmlDocument();
-                    try
-                    {
-                        mXML.LoadXml(xml);
-                    }
-                    catch (XmlException e)
-                    {
-                        Console.WriteLine(e.Message);
-                        return TagList;
-                    }
-                    XmlNodeList nodeList = mXML.GetElementsByTagName("tag");
-                    //Парсим посты
-                    for (int i = 0; i < nodeList.Count; i++)
-                    {
-                        Tag t = new Tag();
-                        XmlNode node = nodeList.Item(i);
-                        for (int j = 0; j < node.Attributes.Count; j++)
-                        {
-                            //Тэги
-                            if (node.Attributes[j].Name == "name")
-                            {
-                                t.Name = node.Attributes[j].Value;
-                                //mImgDescriptor.tags = new List<string>(mImgDescriptor.tags_string.Split(' ')); //Получаем массив тэгов
-                            }
-                            if (node.Attributes[j].Name == "type")
-                            {
-                                t.Type = System.Convert.ToInt64(node.Attributes[j].Value);
-                            }
-                            if (node.Attributes[j].Name == "count")
-                            {
-                                t.Count = System.Convert.ToInt64(node.Attributes[j].Value);
-                            }
-                        }
-                        t.Site = "konachan.com";
-                        t.Language = "eng";
-                        t.TypeName = GetTypeNameKonachan(t.Type);
-                        TagList.Add(t);
-                    }
-                    return TagList;
+                    mXML.LoadXml(xml);
                 }
-                catch (WebException we)
+                catch (XmlException e)
                 {
-                    Console.WriteLine(" Ошибка: " + we.Message);
-                    Thread.Sleep(60000);
+                    Console.WriteLine(e.Message);
                     return TagList;
                 }
+                XmlNodeList nodeList = mXML.GetElementsByTagName("tag");
+                //Парсим посты
+                for (int i = 0; i < nodeList.Count; i++)
+                {
+                    Tag t = new Tag();
+                    XmlNode node = nodeList.Item(i);
+                    for (int j = 0; j < node.Attributes.Count; j++)
+                    {
+                        //Тэги
+                        if (node.Attributes[j].Name == "name")
+                        {
+                            t.Name = node.Attributes[j].Value;
+                            //mImgDescriptor.tags = new List<string>(mImgDescriptor.tags_string.Split(' ')); //Получаем массив тэгов
+                        }
+                        if (node.Attributes[j].Name == "type")
+                        {
+                            t.Type = System.Convert.ToInt64(node.Attributes[j].Value);
+                        }
+                        if (node.Attributes[j].Name == "count")
+                        {
+                            t.Count = System.Convert.ToInt64(node.Attributes[j].Value);
+                        }
+                    }
+                    t.Site = "konachan.com";
+                    t.Language = "eng";
+                    t.TypeName = GetTypeNameKonachan(t.Type);
+                    TagList.Add(t);
+                }
+                return TagList;
             }
+            catch (WebException we)
+            {
+                Console.WriteLine(" Ошибка: " + we.Message);
+                Thread.Sleep(60000);
+                return TagList;
+            }
+
         }
         static string GetTypeNameKonachan(long Type)
         {
@@ -283,7 +276,7 @@ namespace Lucina
                 try
                 {
                     //string page = client.DownloadString(url);
-                    string page = DownloadString(url, url, null, USER_AGENT);
+                    string page = DownloadString(url, url); 
                     List<Tag> list = ParseTagsPage(page);
                     if (list.Count <= 0)
                     {
@@ -298,7 +291,7 @@ namespace Lucina
                         Thread.Sleep(5000);
                     }
                 }
-                catch (Exception e)
+                catch (System.Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Ошибка:\n{e.Message}");
@@ -406,7 +399,7 @@ namespace Lucina
                                     tags.Add(tag_jpn);
                                 }
                             }
-                            catch (Exception e)
+                            catch (System.Exception e)
                             {
                                 Console.WriteLine(e.Message);
                             }
@@ -423,21 +416,15 @@ namespace Lucina
             const int YANDERE_LIMIT_POSTS = 1000;
             int nPage = 1;                //Счетчик страниц
             List<Tag> TagList = new List<Tag>();
-            WebClient Client = new WebClient();
-            Client.Headers.Add("User-Agent", USER_AGENT);
-            if (Program.proxy != null)
-            {
-                Client.Proxy = Program.proxy;
-            }
             for (; ; )
             {
                 string strURL = String.Format($"https://yande.re/tag.xml?page={nPage}&limit={YANDERE_LIMIT_POSTS}");
                 Console.Write($"Загружаем и парсим: {strURL}");
                 try
                 {
-                    Uri uri = new Uri(strURL);
+                    System.Uri uri = new System.Uri(strURL);
                     DateTime start = DateTime.Now;
-                    string xml = Client.DownloadString(uri);
+                    string xml = DownloadString(strURL, null);
                     if (xml == null)
                     {
                         Console.WriteLine(" Ошибка! xml = null");
@@ -463,7 +450,6 @@ namespace Lucina
                     continue;
                 }
             }
-            Client.Dispose();
             return TagList;
         }
         static List<Tag> ParseXMLYandere(string strXML)
@@ -530,8 +516,9 @@ namespace Lucina
         }
         #endregion
         #region Gelbooru
-        static int GetTagsFromGelbooru()
+        static List<Tag> GetTagsFromGelbooru()
         {
+            List<Tag> TagList = new List<Tag>();
             int pid = 0;
             int max_pid = 0;
             List<string> post_list = new List<string>();
@@ -544,7 +531,7 @@ namespace Lucina
                 try
                 {
                     //string page = client.DownloadString(url);
-                    string page = DownloadString(url, url, null, USER_AGENT);
+                    string page = DownloadString(url, url);
                     if (init_page)
                     {
                         init_page = false;
@@ -558,14 +545,15 @@ namespace Lucina
                     else
                     {
                         //LoadToPostgres(list);
-                        LoadToSQLite(list);
+                        //LoadToSQLite(list);
+                        TagList.AddRange(list);
                         pid = pid + list.Count;
                         if(pid > (max_pid + 20)) { break; }
                         errors = 0;
                         Thread.Sleep(5000);
                     }
                 }
-                catch (Exception e)
+                catch (System.Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Ошибка:\n{e.Message}");
@@ -582,7 +570,7 @@ namespace Lucina
                     }
                 }
             }
-            return pid;
+            return TagList;
         }
         static int GetMaxPIDGelbooru(string Page)
         {
@@ -594,11 +582,22 @@ namespace Lucina
                 {
                     if(a_element.InnerHtml == "»")
                     {
-                        return Convert.ToInt32(a_element.InnerHtml);
+                        string pid = a_element.GetAttribute("href");
+                        int index = pid.LastIndexOf("=");
+                        if (index != -1)
+                        {
+                            pid = pid.Substring(index+1);
+                            return Convert.ToInt32(pid);
+                        }
+                        else
+                        {
+                            return -1;
+                        }
+                        
                     }
                 }
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 Console.WriteLine(e.Message);
             }
@@ -621,12 +620,13 @@ namespace Lucina
                             try
                             {
                                 var td = trelement.QuerySelectorAll("td");
+                                if(td.Length <= 0) { continue; }
                                 Tag tag = new Tag();
                                 tag.Site = "gelbooru.com";
                                 //первая ячейка
                                 //tag.Count = Convert.ToInt64(td[0].InnerHtml);
                                 //вторая ячейка
-                                if (td[0].InnerHtml == "Name") { continue; }
+                                //if (td[0].InnerHtml == "Name") { continue; }
                                 foreach (IElement a_element in td[0].QuerySelectorAll("a"))
                                 {
                                     string s = a_element.InnerHtml.Replace("\n", String.Empty);
@@ -646,7 +646,7 @@ namespace Lucina
                                 tag.Language = "eng";
                                 tags.Add(tag);
                             }
-                            catch (Exception e)
+                            catch (System.Exception e)
                             {
                                 Console.WriteLine(e.Message);
                             }
@@ -703,30 +703,33 @@ namespace Lucina
         }
         static void LoadToSQLite(List<Tag> TagList)
         {
-            for (int i = 0; i < TagList.Count; i++)
-            {
-                Program.count_tags++;
-                Console.Write($"[{Program.count_tags}] {TagList[i].Name}");
-                //SetTypeTag(TagList[i].Name, TagList[i].Type, connection);
-                if (ExistTagSQLite(TagList[i], connection))
+            using (SQLiteTransaction transaction = connection.BeginTransaction()) { 
+                for (int i = 0; i < TagList.Count; i++)
                 {
-                    using (SQLiteCommand comm = new SQLiteCommand("UPDATE tags SET type = @type WHERE tag = @tag", connection))
+                    Program.count_tags++;
+                    Console.Write($"[{Program.count_tags}] {TagList[i].Name}");
+                    //SetTypeTag(TagList[i].Name, TagList[i].Type, connection);
+                    if (ExistTagSQLite(TagList[i], connection))
                     {
-                        comm.Parameters.AddWithValue("type", TagList[i].Type);
-                        comm.Parameters.AddWithValue("tag", TagList[i].Name);
-                        comm.ExecuteNonQuery();
+                        using (SQLiteCommand comm = new SQLiteCommand("UPDATE tags SET type = @type WHERE tag = @tag", connection))
+                        {
+                            comm.Parameters.AddWithValue("type", TagList[i].Type);
+                            comm.Parameters.AddWithValue("tag", TagList[i].Name);
+                            comm.ExecuteNonQuery();
+                        }
                     }
-                }
-                else
-                {
-                    using (SQLiteCommand comm = new SQLiteCommand("INSERT INTO tags(type, tag) VALUES (@type, @tag);", connection))
+                    else
                     {
-                        comm.Parameters.AddWithValue("@type", TagList[i].Type);
-                        comm.Parameters.AddWithValue("@tag", TagList[i].Name);
-                        comm.ExecuteNonQuery();
+                        using (SQLiteCommand comm = new SQLiteCommand("INSERT INTO tags(type, tag) VALUES (@type, @tag);", connection))
+                        {
+                            comm.Parameters.AddWithValue("@type", TagList[i].Type);
+                            comm.Parameters.AddWithValue("@tag", TagList[i].Name);
+                            comm.ExecuteNonQuery();
+                        }
                     }
+                    Console.WriteLine(" Успех");
                 }
-                Console.WriteLine(" Успех");
+                transaction.Commit();
             }
         }
         static bool ExistTagSQLite(Tag TagInfo, SQLiteConnection Connection)
@@ -735,7 +738,7 @@ namespace Lucina
             {
                 comm.Parameters.AddWithValue("tag", TagInfo.Name);
                 object o = comm.ExecuteScalar();
-                if (o != null)
+                if (o != null && o != DBNull.Value)
                 {
                     return true;
                 }
@@ -745,26 +748,58 @@ namespace Lucina
                 }
             }
         }
-        static string DownloadString(string Url, string Referer, CookieCollection Cookies, string UserAgent)
+        static string DownloadString(string Url, string Referer)
         {
-            HttpWebRequest downloadRequest = (HttpWebRequest)WebRequest.Create(Url);
-            if (Program.proxy != null)
+            //string responseBody = client.GetStringAsync(Url).GetAwaiter().GetResult();
+            return DownloadStringAsync(Url, Referer).GetAwaiter().GetResult(); ;
+        }
+        private static async Task<string> DownloadStringAsync(string Url, string Referer)
+        {
+            // 1. Создаем объект запроса
+            using (var request = new HttpRequestMessage(HttpMethod.Get, Url))
             {
-                downloadRequest.Proxy = Program.proxy;
+                // 2. Добавляем заголовок Referer
+                if(Referer != null) request.Headers.Referrer = new System.Uri(Referer);
+
+                // 3. Добавляем заголовок Cookie (в формате "name1=value1; name2=value2")
+                //request.Headers.Add("Cookie", Cookies.ToString());
+
+                try
+                {
+                    // 4. Отправляем запрос
+                    using (HttpResponseMessage response = await client.SendAsync(request))
+                    {
+                        // Проверяем статус ответа (выдаст ошибку, если статус не 200-299)
+                        response.EnsureSuccessStatusCode();
+
+                        // 5. Читаем строку из ответа
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        return responseBody;
+                    }
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine($"Ошибка: {e.Message}");
+                    return null;
+                }
             }
-            downloadRequest.UserAgent = UserAgent;
-            //downloadRequest.CookieContainer = new CookieContainer();
-            //downloadRequest.CookieContainer.Add(Cookies);
-            if (Referer != null)
+        }
+        private static void SetCookieHandler()
+        {
+            // Создаем контейнер для кук
+            var cookieContainer = new CookieContainer();
+
+            // Добавляем начальную куку вручную для конкретного домена
+            cookieContainer.Add(new System.Uri("https://example.com"), new Cookie("session_id", "12345"));
+
+            var handler = new HttpClientHandler
             {
-                downloadRequest.Referer = Referer;
-            }
-            string source;
-            using (StreamReader reader = new StreamReader(downloadRequest.GetResponse().GetResponseStream()))
-            {
-                source = reader.ReadToEnd();
-            }
-            return source;
+                CookieContainer = cookieContainer,
+                UseCookies = true // Включает автоматическую работу с куками
+            };
+
+            // Передаем обработчик в HttpClient (делать это нужно ОДИН раз при старте)
+            client = new HttpClient(handler);
         }
     }
     public class Tag
