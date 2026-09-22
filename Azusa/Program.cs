@@ -1,5 +1,6 @@
 ﻿using ErzaLib2;
 using ImageDimensions;
+using ImageMagick;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TagLib;
 
 namespace Azusa
 {
@@ -80,116 +80,45 @@ namespace Azusa
         {
             try
             {
-                return ImageHelper.GetDimensions(Path);
-            }
-            catch (Exception)
-            {
-            }
-            TagLib.File file = null;
-            try
-            {
-                file = TagLib.File.Create(Path);
-                var image = file as TagLib.Image.File;
-                if (image.Properties != null)
+                using (var image = new MagickImage())
                 {
+                    // 2. Пингуем файл (читаются только заголовки и метаданные)
+                    image.Ping(Path);
+
+                    // Теперь доступны размеры без декодирования пикселей
+                    //Console.WriteLine($"Ширина: {image.Width}, Высота: {image.Height}");
                     Size s = new Size();
-                    s.Height = image.Properties.PhotoHeight;
-                    s.Width = image.Properties.PhotoWidth;
+                    s.Height = (int)image.Height;
+                    s.Width = (int)image.Width;
                     taglib_count++;
                     return s;
+
+                    // 3. Извлекаем EXIF-метаданные
+                    /*var exifProfile = image.GetExifProfile();
+                    if (exifProfile != null)
+                    {
+                        var dateTime = exifProfile.GetValue(ExifTag.DateTime);
+                        if (dateTime != null)
+                        {
+                            Console.WriteLine($"Дата съемки: {dateTime.Value}");
+                        }
+                    }
+
+                    // Также можно читать IPTC или XMP
+                    var iptcProfile = image.GetIptcProfile();*/
                 }
             }
             catch (Exception)
             {
             }
+            try
+            {
+                return ImageHelper.GetDimensions(Path);
+            }
+            catch (Exception)
+            {
+            }
             throw new Exception();
-        }
-        static bool IsImageFile(string s)
-        {
-            string ext = Path.GetExtension(s).ToLower();
-            switch (ext)
-            {
-                case ".jpg":
-                    return true;
-                //break;
-                case ".jpeg":
-                    return true;
-                //break;
-                case ".png":
-                    return true;
-                //break;
-                case ".bmp":
-                    return true;
-                //break;
-                case ".gif":
-                    return true;
-                //break;
-                case ".tif":
-                    return true;
-                //break;
-                case ".tiff":
-                    return true;
-                    //break;
-            }
-            return false;
-        }
-        static img_info ParsePhoto_TagLib(string path)
-        {
-            TagLib.File file = null;
-            try
-            {
-                file = TagLib.File.Create(path);
-            }
-            catch (TagLib.UnsupportedFormatException)
-            {
-                return null;
-            }
-            catch (TagLib.CorruptFileException)
-            {
-                return null;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-            var image = file as TagLib.Image.File;
-            if (file == null)
-            {
-                return null;
-            }
-            if (image.Properties != null)
-            {
-                img_info ii = new img_info();
-                ii.Height = image.Properties.PhotoHeight;
-                ii.Width = image.Properties.PhotoWidth;
-                ii.Ratio = (double)ii.Width / (double)ii.Height;
-                ii.hash = Path.GetFileNameWithoutExtension(path);
-                ii.Path = path;
-                //ii.Format = image.Properties.Description;
-                return ii;
-            }
-            return null;
-        }
-        static img_info ParsePhoto_ImageHelper(string path)
-        {
-            Size s;
-            try
-            {
-                s = ImageHelper.GetDimensions(path);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            img_info ii = new img_info();
-            ii.Height = s.Height;
-            ii.Width = s.Width;
-            ii.Ratio = Math.Round((double)ii.Width / (double)ii.Height, 2);
-            ii.hash = Path.GetFileNameWithoutExtension(path);
-            ii.Path = path;
-            //ii.Format = image.Properties.Description;
-            return ii;
         }
         protected static void OnExit(object sender, ConsoleCancelEventArgs args)
         {
