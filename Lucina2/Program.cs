@@ -28,9 +28,6 @@ namespace Lucina
         private static HttpClient client;
         static void Main(string[] args)
         {
-            //https://chan.sankakucomplex.com/tag/index?order=date&page=2
-            Console.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
-
             HttpClientHandler httpClientHandler = new HttpClientHandler()
             {
                 Proxy = new WebProxy(File.ReadAllText(@"C:\utils\cfg\erza\proxy.txt"), false),
@@ -45,7 +42,7 @@ namespace Lucina
             connection.Open();
             List<Tag> TagList;
 
-            /*TagList = GetTagsFromDanbooru();
+            TagList = GetTagsFromDanbooru();
             LoadToSQLite(TagList);
             TagList.Clear();
 
@@ -55,7 +52,7 @@ namespace Lucina
 
             TagList = GetTagsYandere();
             LoadToSQLite(TagList);
-            TagList.Clear();*/
+            TagList.Clear();
 
             TagList = GetTagsFromGelbooru();
             LoadToSQLite(TagList);
@@ -259,155 +256,6 @@ namespace Lucina
                     return "circle";
             }
             return "general";
-        }
-        #endregion
-        #region Sankakku
-        static int GetTagsFromSankaku()
-        {
-            int count = 0;
-            int pid = 1;                //Счетчик постов
-            List<string> post_list = new List<string>();
-            int errors = 0;
-            for (; ; )
-            {
-                //if (pid == 3) { break; }
-                string url = String.Format($"https://chan.sankakucomplex.com/tag/index?page={pid}");
-                Console.WriteLine($"({pid}) Загружаем и парсим: {url}");
-                try
-                {
-                    //string page = client.DownloadString(url);
-                    string page = DownloadString(url, url); 
-                    List<Tag> list = ParseTagsPage(page);
-                    if (list.Count <= 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        //LoadToPostgres(list);
-                        pid++;
-                        count = count + list.Count;
-                        errors = 0;
-                        Thread.Sleep(5000);
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Ошибка:\n{e.Message}");
-                    Console.ResetColor();
-                    if (errors < 100)
-                    {
-                        errors++;
-                        Thread.Sleep(300000); //5 минут
-                        continue;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            return count;
-        }
-        static List<Tag> ParseTagsPage(string Page)
-        {
-            List<Tag> tags = new List<Tag>();
-            var parser = new HtmlParser();
-            var document = parser.ParseDocument(Page);
-            foreach (IElement element in document.QuerySelectorAll("table"))
-            {
-                if (element.GetAttribute("class") == "highlightable")
-                {
-                    foreach (IElement tbody_element in element.QuerySelectorAll("tbody"))
-                    {
-                        foreach (IElement trelement in tbody_element.QuerySelectorAll("tr"))
-                        {
-                            try
-                            {
-                                var td = trelement.QuerySelectorAll("td");
-                                Tag tag = new Tag();
-                                Tag tag_jpn = new Tag();
-                                tag.Site = "chan.sankakucomplex.com";
-                                tag_jpn.Site = tag.Site;
-                                //первая ячейка
-                                tag.Count = Convert.ToInt64(td[0].InnerHtml);
-                                tag_jpn.Count = tag.Count;
-                                //вторая ячейка
-                                foreach (IElement a_element in td[1].QuerySelectorAll("a"))
-                                {
-                                    if (a_element.InnerHtml != "?")
-                                    {
-                                        string s = a_element.InnerHtml.Replace("\n", String.Empty);
-                                        tag.Name = s.Replace(" ", String.Empty);
-                                        //tag.Name = a_element.InnerHtml;
-                                    }
-                                }
-                                //третья ячейка
-                                foreach (IElement a_element in td[2].QuerySelectorAll("a"))
-                                {
-                                    if (a_element.InnerHtml != "?")
-                                    {
-                                        string s = a_element.InnerHtml.Replace("\n", String.Empty);
-                                        tag_jpn.Name = s.Replace(" ", String.Empty);
-                                        //tag.NameJpn = a_element.InnerHtml;
-                                    }
-                                }
-                                //четвёртая ячейка
-                                List<string> temp = new List<string>();
-                                foreach (IElement a_element in td[3].QuerySelectorAll("a"))
-                                {
-                                    if (a_element.InnerHtml != "?")
-                                    {
-                                        temp.Add(a_element.InnerHtml);
-                                    }
-                                }
-                                if (temp.Count > 0)
-                                {
-                                    tag.Parents = GetStringOfTags(temp);
-                                    tag_jpn.Parents = tag.Parents;
-                                }
-                                //пятая ячейка
-                                temp.Clear();
-                                foreach (IElement a_element in td[4].QuerySelectorAll("a"))
-                                {
-                                    if (a_element.InnerHtml != "?")
-                                    {
-                                        temp.Add(a_element.InnerHtml);
-                                    }
-                                }
-                                if (temp.Count > 0)
-                                {
-                                    tag.Children = GetStringOfTags(temp);
-                                    tag_jpn.Children = tag.Children;
-                                }
-                                //шестая ячейка
-                                string t = td[5].InnerHtml.Replace("\n", String.Empty);
-                                tag.TypeName = t.ToLower();
-                                tag.Type = GetTypeCode(tag.TypeName);
-
-                                tag_jpn.Type = tag.Type;
-                                tag_jpn.TypeName = tag.TypeName;
-                                tag.Language = "eng";
-                                tag_jpn.Language = "jpn";
-                                if (!String.IsNullOrEmpty(tag.Name))
-                                {
-                                    tags.Add(tag);
-                                }
-                                if (!String.IsNullOrEmpty(tag_jpn.Name))
-                                {
-                                    tags.Add(tag_jpn);
-                                }
-                            }
-                            catch (System.Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                    }
-                }
-            }
-            return tags;
         }
         #endregion
         #region Yandere
@@ -678,28 +526,12 @@ namespace Lucina
                     return 8;
                 case "meta":
                     return 9;
+                case "metadata":
+                    return 9;
                 case "studio":
                     return 2;
             }
             return 0;
-        }
-
-        static string GetStringOfTags(List<string> Tags)
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < Tags.Count; i++)
-            {
-                if (i == 0)
-                {
-                    sb.Append(Tags[i]);
-                }
-                else
-                {
-                    sb.Append(' ');
-                    sb.Append(Tags[i]);
-                }
-            }
-            return sb.ToString();
         }
         static void LoadToSQLite(List<Tag> TagList)
         {
@@ -708,6 +540,7 @@ namespace Lucina
                 {
                     Program.count_tags++;
                     Console.Write($"[{Program.count_tags}] {TagList[i].Name}");
+                    if (String.IsNullOrWhiteSpace(TagList[i].Name)) continue;
                     //SetTypeTag(TagList[i].Name, TagList[i].Type, connection);
                     if (ExistTagSQLite(TagList[i], connection))
                     {
