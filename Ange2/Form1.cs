@@ -1165,11 +1165,14 @@ namespace Ange
             if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) 
             {
                 //MessageBox.Show(imageListView2.SelectedItems[0].Index.ToString() + "|" + imageListView2.SelectedItems[imageListView2.SelectedItems.Count - 1].Index.ToString());
-                int start = imageListView2.SelectedItems[0].Index;
-                int end = imageListView2.SelectedItems[imageListView2.SelectedItems.Count - 1].Index;
-                for (int i = start; i <= end; i++)
+                if (this.imageListView2.SelectedItems.Count > 1)
                 {
-                    imageListView2.Items[i].Selected = true;
+                    int start = imageListView2.SelectedItems[0].Index;
+                    int end = imageListView2.SelectedItems[imageListView2.SelectedItems.Count - 1].Index;
+                    for (int i = start; i <= end; i++)
+                    {
+                        imageListView2.Items[i].Selected = true;
+                    }
                 }
             }
         }
