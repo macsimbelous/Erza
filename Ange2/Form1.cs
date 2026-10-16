@@ -49,9 +49,6 @@ namespace Ange
         public static SQLiteConnection Erza;
         //SolidBrush brush;
         private CustomAdaptor adaptor;
-        private int PrevItemIndex = 0;
-        private int EndItemIndex = 0;
-
         public Form1()
         {
             InitializeComponent();
@@ -1050,17 +1047,6 @@ namespace Ange
                 toolStripStatusLabel2.Text = "Тегов: " + img.Tags.Count.ToString();
                 //toolStripStatusLabel2.ToolTipText = tt.ToString();
                 toolTip1.SetToolTip(statusStrip1, tt.ToString());
-
-                
-                if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
-                {
-                    //MessageBox.Show(PrevItemIndex.ToString() + "|" + e.Item.Index.ToString());
-                    EndItemIndex = e.Item.Index;
-                }
-                else
-                {
-                    PrevItemIndex = e.Item.Index;
-                }
             }
         }
 
@@ -1179,18 +1165,8 @@ namespace Ange
             if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) 
             {
                 //MessageBox.Show(imageListView2.SelectedItems[0].Index.ToString() + "|" + imageListView2.SelectedItems[imageListView2.SelectedItems.Count - 1].Index.ToString());
-                int start;
-                int end;
-                if (PrevItemIndex > EndItemIndex)
-                {
-                    end = PrevItemIndex;
-                    start = EndItemIndex;
-                }
-                else
-                {
-                    start = PrevItemIndex;
-                    end = EndItemIndex;
-                }
+                int start = imageListView2.SelectedItems[0].Index;
+                int end = imageListView2.SelectedItems[imageListView2.SelectedItems.Count - 1].Index;
                 for (int i = start; i <= end; i++)
                 {
                     imageListView2.Items[i].Selected = true;
