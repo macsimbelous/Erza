@@ -49,6 +49,8 @@ namespace Ange
         public static SQLiteConnection Erza;
         //SolidBrush brush;
         private CustomAdaptor adaptor;
+        private int PrevItemIndex = 0;
+        private int EndItemIndex = 0;
 
         public Form1()
         {
@@ -197,6 +199,7 @@ namespace Ange
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DeleteImage();
+            this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
         }
         private void imageListView2_KeyDown(object sender, KeyEventArgs e)
         {
@@ -257,10 +260,14 @@ namespace Ange
         {
             if (this.imageListView2.SelectedItems.Count > 0)
             {
+                int index = imageListView2.SelectedItems[0].Index;
                 if (MessageBox.Show("Удалить выбранные(" + this.imageListView2.SelectedItems.Count.ToString() + ") изображения?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     RemoveImages();
                 }
+                index = index - 1;
+                if(index < 0) index = 0;
+                if(imageListView2.Items.Count > 0) imageListView2.EnsureVisible(index);
             }
         }
         private void RemoveImages()
@@ -1039,10 +1046,21 @@ namespace Ange
                 //toolTip1.SetToolTip(imageListView2, e.Item.UserComment.Replace(' ', '\n'));
                 //toolTip1.SetToolTip(imageListView2, tt.ToString());
                 //toolTip1.Show(tt.ToString(), imageListView2);
-
+                toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
                 toolStripStatusLabel2.Text = "Тегов: " + img.Tags.Count.ToString();
                 //toolStripStatusLabel2.ToolTipText = tt.ToString();
                 toolTip1.SetToolTip(statusStrip1, tt.ToString());
+
+                
+                if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
+                {
+                    //MessageBox.Show(PrevItemIndex.ToString() + "|" + e.Item.Index.ToString());
+                    EndItemIndex = e.Item.Index;
+                }
+                else
+                {
+                    PrevItemIndex = e.Item.Index;
+                }
             }
         }
 
@@ -1154,6 +1172,30 @@ namespace Ange
             imageListView2.ResumeLayout();
             imageListView2.EnsureVisible(0);
             this.toolStripStatusLabel1.Text = "Изображений найдено: " + imageListView2.Items.Count.ToString();
+        }
+
+        private void imageListView2_SelectionChanged(object sender, EventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) 
+            {
+                //MessageBox.Show(imageListView2.SelectedItems[0].Index.ToString() + "|" + imageListView2.SelectedItems[imageListView2.SelectedItems.Count - 1].Index.ToString());
+                int start;
+                int end;
+                if (PrevItemIndex > EndItemIndex)
+                {
+                    end = PrevItemIndex;
+                    start = EndItemIndex;
+                }
+                else
+                {
+                    start = PrevItemIndex;
+                    end = EndItemIndex;
+                }
+                for (int i = start; i <= end; i++)
+                {
+                    imageListView2.Items[i].Selected = true;
+                }
+            }
         }
     }
 }
