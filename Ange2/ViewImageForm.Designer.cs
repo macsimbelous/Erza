@@ -48,19 +48,28 @@
             Search_button = new System.Windows.Forms.Button();
             add_to_favorited_button = new System.Windows.Forms.Button();
             button1 = new System.Windows.Forms.Button();
+            splitContainer1 = new System.Windows.Forms.SplitContainer();
+            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             contextMenuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
             // 
-            pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             pictureBox1.ContextMenuStrip = contextMenuStrip1;
-            pictureBox1.Location = new System.Drawing.Point(477, 23);
-            pictureBox1.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            pictureBox1.Location = new System.Drawing.Point(0, 0);
+            pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new System.Drawing.Size(1367, 1107);
+            pictureBox1.Size = new System.Drawing.Size(971, 637);
             pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -71,68 +80,68 @@
             contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { viewinfullscreenToolStripMenuItem, edittagsToolStripMenuItem, nextToolStripMenuItem, prevToolStripMenuItem, deleteToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new System.Drawing.Size(200, 164);
+            contextMenuStrip1.Size = new System.Drawing.Size(152, 114);
             // 
             // viewinfullscreenToolStripMenuItem
             // 
             viewinfullscreenToolStripMenuItem.Name = "viewinfullscreenToolStripMenuItem";
-            viewinfullscreenToolStripMenuItem.Size = new System.Drawing.Size(199, 32);
+            viewinfullscreenToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             viewinfullscreenToolStripMenuItem.Text = "На весь экран";
             viewinfullscreenToolStripMenuItem.Click += viewinfullscreenToolStripMenuItem_Click;
             // 
             // edittagsToolStripMenuItem
             // 
             edittagsToolStripMenuItem.Name = "edittagsToolStripMenuItem";
-            edittagsToolStripMenuItem.Size = new System.Drawing.Size(199, 32);
+            edittagsToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             // 
             // nextToolStripMenuItem
             // 
             nextToolStripMenuItem.Name = "nextToolStripMenuItem";
-            nextToolStripMenuItem.Size = new System.Drawing.Size(199, 32);
+            nextToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             nextToolStripMenuItem.Text = "Следуюшее";
             nextToolStripMenuItem.Click += nextToolStripMenuItem_Click;
             // 
             // prevToolStripMenuItem
             // 
             prevToolStripMenuItem.Name = "prevToolStripMenuItem";
-            prevToolStripMenuItem.Size = new System.Drawing.Size(199, 32);
+            prevToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             prevToolStripMenuItem.Text = "Предыдушее";
             prevToolStripMenuItem.Click += prevToolStripMenuItem_Click;
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new System.Drawing.Size(199, 32);
+            deleteToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             deleteToolStripMenuItem.Text = "Удалить";
             deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
             // listBox1
             // 
-            listBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 204);
             listBox1.FormattingEnabled = true;
-            listBox1.Location = new System.Drawing.Point(20, 23);
-            listBox1.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            listBox1.Location = new System.Drawing.Point(3, 4);
+            listBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             listBox1.Name = "listBox1";
             listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            listBox1.Size = new System.Drawing.Size(447, 816);
+            listBox1.Size = new System.Drawing.Size(324, 489);
             listBox1.TabIndex = 1;
             listBox1.DrawItem += listBox1_DrawItem;
             listBox1.DoubleClick += listBox1_DoubleClick;
             // 
             // groupBox1
             // 
-            groupBox1.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             groupBox1.Controls.Add(tags_count_label);
             groupBox1.Controls.Add(size_label);
             groupBox1.Controls.Add(resolution_label);
             groupBox1.Controls.Add(format_label);
+            groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            groupBox1.Location = new System.Drawing.Point(20, 960);
-            groupBox1.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            groupBox1.Location = new System.Drawing.Point(3, 541);
+            groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             groupBox1.Name = "groupBox1";
-            groupBox1.Padding = new System.Windows.Forms.Padding(4, 7, 4, 7);
-            groupBox1.Size = new System.Drawing.Size(449, 168);
+            groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            groupBox1.Size = new System.Drawing.Size(324, 92);
             groupBox1.TabIndex = 2;
             groupBox1.TabStop = false;
             groupBox1.Text = "Свойства";
@@ -141,10 +150,9 @@
             // 
             tags_count_label.AutoSize = true;
             tags_count_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            tags_count_label.Location = new System.Drawing.Point(10, 123);
-            tags_count_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            tags_count_label.Location = new System.Drawing.Point(7, 74);
             tags_count_label.Name = "tags_count_label";
-            tags_count_label.Size = new System.Drawing.Size(64, 25);
+            tags_count_label.Size = new System.Drawing.Size(44, 16);
             tags_count_label.TabIndex = 3;
             tags_count_label.Text = "label3";
             // 
@@ -152,10 +160,9 @@
             // 
             size_label.AutoSize = true;
             size_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            size_label.Location = new System.Drawing.Point(10, 93);
-            size_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            size_label.Location = new System.Drawing.Point(7, 56);
             size_label.Name = "size_label";
-            size_label.Size = new System.Drawing.Size(64, 25);
+            size_label.Size = new System.Drawing.Size(44, 16);
             size_label.TabIndex = 2;
             size_label.Text = "label3";
             // 
@@ -163,10 +170,9 @@
             // 
             resolution_label.AutoSize = true;
             resolution_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            resolution_label.Location = new System.Drawing.Point(10, 62);
-            resolution_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            resolution_label.Location = new System.Drawing.Point(7, 37);
             resolution_label.Name = "resolution_label";
-            resolution_label.Size = new System.Drawing.Size(64, 25);
+            resolution_label.Size = new System.Drawing.Size(44, 16);
             resolution_label.TabIndex = 1;
             resolution_label.Text = "label2";
             // 
@@ -174,10 +180,9 @@
             // 
             format_label.AutoSize = true;
             format_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            format_label.Location = new System.Drawing.Point(10, 32);
-            format_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            format_label.Location = new System.Drawing.Point(7, 19);
             format_label.Name = "format_label";
-            format_label.Size = new System.Drawing.Size(64, 25);
+            format_label.Size = new System.Drawing.Size(44, 16);
             format_label.TabIndex = 0;
             format_label.Text = "label1";
             // 
@@ -185,10 +190,10 @@
             // 
             AddTag_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             AddTag_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            AddTag_button.Location = new System.Drawing.Point(20, 893);
-            AddTag_button.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            AddTag_button.Location = new System.Drawing.Point(7, 3);
+            AddTag_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             AddTag_button.Name = "AddTag_button";
-            AddTag_button.Size = new System.Drawing.Size(106, 53);
+            AddTag_button.Size = new System.Drawing.Size(74, 32);
             AddTag_button.TabIndex = 3;
             AddTag_button.Text = "Добавить";
             AddTag_button.UseVisualStyleBackColor = true;
@@ -198,10 +203,10 @@
             // 
             RemoveTag_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             RemoveTag_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            RemoveTag_button.Location = new System.Drawing.Point(134, 893);
-            RemoveTag_button.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            RemoveTag_button.Location = new System.Drawing.Point(87, 3);
+            RemoveTag_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             RemoveTag_button.Name = "RemoveTag_button";
-            RemoveTag_button.Size = new System.Drawing.Size(104, 53);
+            RemoveTag_button.Size = new System.Drawing.Size(73, 32);
             RemoveTag_button.TabIndex = 4;
             RemoveTag_button.Text = "Удалить";
             RemoveTag_button.UseVisualStyleBackColor = true;
@@ -211,10 +216,10 @@
             // 
             Search_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             Search_button.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 204);
-            Search_button.Location = new System.Drawing.Point(317, 893);
-            Search_button.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            Search_button.Location = new System.Drawing.Point(215, 2);
+            Search_button.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             Search_button.Name = "Search_button";
-            Search_button.Size = new System.Drawing.Size(86, 53);
+            Search_button.Size = new System.Drawing.Size(60, 32);
             Search_button.TabIndex = 6;
             Search_button.Text = "Найти";
             Search_button.UseVisualStyleBackColor = true;
@@ -224,10 +229,9 @@
             // 
             add_to_favorited_button.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             add_to_favorited_button.Image = (System.Drawing.Image)resources.GetObject("add_to_favorited_button.Image");
-            add_to_favorited_button.Location = new System.Drawing.Point(414, 893);
-            add_to_favorited_button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            add_to_favorited_button.Location = new System.Drawing.Point(281, 2);
             add_to_favorited_button.Name = "add_to_favorited_button";
-            add_to_favorited_button.Size = new System.Drawing.Size(50, 53);
+            add_to_favorited_button.Size = new System.Drawing.Size(35, 32);
             add_to_favorited_button.TabIndex = 7;
             add_to_favorited_button.UseVisualStyleBackColor = true;
             add_to_favorited_button.Click += add_to_favorited_button_Click;
@@ -235,30 +239,70 @@
             // button1
             // 
             button1.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            button1.Location = new System.Drawing.Point(247, 893);
-            button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            button1.Location = new System.Drawing.Point(166, 3);
             button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(61, 53);
+            button1.Size = new System.Drawing.Size(43, 32);
             button1.TabIndex = 5;
             button1.Text = "ИИ";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
+            // splitContainer1
+            // 
+            splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            splitContainer1.Location = new System.Drawing.Point(0, 0);
+            splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(tableLayoutPanel1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(pictureBox1);
+            splitContainer1.Size = new System.Drawing.Size(1305, 637);
+            splitContainer1.SplitterDistance = 330;
+            splitContainer1.TabIndex = 8;
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.ColumnCount = 1;
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel1.Controls.Add(groupBox1, 0, 2);
+            tableLayoutPanel1.Controls.Add(panel1, 0, 1);
+            tableLayoutPanel1.Controls.Add(listBox1, 0, 0);
+            tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 3;
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            tableLayoutPanel1.Size = new System.Drawing.Size(330, 637);
+            tableLayoutPanel1.TabIndex = 0;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(AddTag_button);
+            panel1.Controls.Add(RemoveTag_button);
+            panel1.Controls.Add(button1);
+            panel1.Controls.Add(Search_button);
+            panel1.Controls.Add(add_to_favorited_button);
+            panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            panel1.Location = new System.Drawing.Point(0, 497);
+            panel1.Margin = new System.Windows.Forms.Padding(0);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(330, 40);
+            panel1.TabIndex = 3;
+            // 
             // ViewImageForm
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1864, 1153);
-            Controls.Add(button1);
-            Controls.Add(add_to_favorited_button);
-            Controls.Add(Search_button);
-            Controls.Add(RemoveTag_button);
-            Controls.Add(AddTag_button);
-            Controls.Add(groupBox1);
-            Controls.Add(listBox1);
-            Controls.Add(pictureBox1);
+            ClientSize = new System.Drawing.Size(1305, 637);
+            Controls.Add(splitContainer1);
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
-            Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             Name = "ViewImageForm";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "Просмотр";
@@ -268,6 +312,12 @@
             contextMenuStrip1.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
+            tableLayoutPanel1.ResumeLayout(false);
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
 
         }
@@ -292,5 +342,8 @@
         private System.Windows.Forms.Button Search_button;
         private System.Windows.Forms.Button add_to_favorited_button;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Panel panel1;
     }
 }
