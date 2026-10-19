@@ -57,7 +57,7 @@ namespace Ange
         SolidBrush MediumColor = new SolidBrush(Color.Blue);
         SolidBrush MetaColor = new SolidBrush(Color.Violet);
         const int ImageSize = 448; // MOAT Tagger uses 448x448 input size
-        const float Threshold = 0.35f; // Standard F1 threshold recommendation
+        const float Threshold = 0.4772f; // Standard F1 threshold recommendation
         public ViewImageForm()
         {
             InitializeComponent();

@@ -11,7 +11,7 @@ namespace Marin
     internal class Program
     {
         private const int ImageSize = 448; // MOAT Tagger uses 448x448 input size
-        private const float Threshold = 0.35f; // Standard F1 threshold recommendation
+        private const float Threshold = 0.4772f; // Standard F1 threshold recommendation
         private static List<ImageInfo>? images;
         private static int MAX_TAGS = 0;
         private static string MODEL = @"C:\utils\data\models\wd-eva02-large-tagger-v3\model.onnx";
