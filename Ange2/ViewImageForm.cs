@@ -183,6 +183,14 @@ namespace Ange
             {
                 imageFormat = "WMF";
             }
+            if (System.Drawing.Imaging.ImageFormat.Webp.Equals(image.RawFormat))
+            {
+                imageFormat = "WebP";
+            }
+            if (System.Drawing.Imaging.ImageFormat.Heif.Equals(image.RawFormat))
+            {
+                imageFormat = "HEIF";
+            }
             if (imageFormat.Length == 0)
             {
                 imageFormat = "Unknown";

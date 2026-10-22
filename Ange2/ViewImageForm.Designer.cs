@@ -69,7 +69,7 @@
             pictureBox1.Location = new System.Drawing.Point(0, 0);
             pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new System.Drawing.Size(971, 637);
+            pictureBox1.Size = new System.Drawing.Size(980, 637);
             pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -118,13 +118,14 @@
             // listBox1
             // 
             listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 204);
             listBox1.FormattingEnabled = true;
             listBox1.Location = new System.Drawing.Point(3, 4);
             listBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             listBox1.Name = "listBox1";
             listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            listBox1.Size = new System.Drawing.Size(324, 489);
+            listBox1.Size = new System.Drawing.Size(315, 489);
             listBox1.TabIndex = 1;
             listBox1.DrawItem += listBox1_DrawItem;
             listBox1.DoubleClick += listBox1_DoubleClick;
@@ -141,7 +142,7 @@
             groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            groupBox1.Size = new System.Drawing.Size(324, 92);
+            groupBox1.Size = new System.Drawing.Size(315, 92);
             groupBox1.TabIndex = 2;
             groupBox1.TabStop = false;
             groupBox1.Text = "Свойства";
@@ -250,6 +251,7 @@
             // splitContainer1
             // 
             splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             splitContainer1.Location = new System.Drawing.Point(0, 0);
             splitContainer1.Name = "splitContainer1";
             // 
@@ -261,7 +263,7 @@
             // 
             splitContainer1.Panel2.Controls.Add(pictureBox1);
             splitContainer1.Size = new System.Drawing.Size(1305, 637);
-            splitContainer1.SplitterDistance = 330;
+            splitContainer1.SplitterDistance = 321;
             splitContainer1.TabIndex = 8;
             // 
             // tableLayoutPanel1
@@ -278,7 +280,7 @@
             tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            tableLayoutPanel1.Size = new System.Drawing.Size(330, 637);
+            tableLayoutPanel1.Size = new System.Drawing.Size(321, 637);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // panel1
@@ -292,7 +294,7 @@
             panel1.Location = new System.Drawing.Point(0, 497);
             panel1.Margin = new System.Windows.Forms.Padding(0);
             panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(330, 40);
+            panel1.Size = new System.Drawing.Size(321, 40);
             panel1.TabIndex = 3;
             // 
             // ViewImageForm
