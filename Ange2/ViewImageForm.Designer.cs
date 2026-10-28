@@ -73,7 +73,12 @@
             pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
+            pictureBox1.Paint += pictureBox1_Paint;
             pictureBox1.DoubleClick += pictureBox1_DoubleClick;
+            pictureBox1.MouseDown += pictureBox1_MouseDown;
+            pictureBox1.MouseMove += pictureBox1_MouseMove;
+            pictureBox1.MouseUp += pictureBox1_MouseUp;
+            pictureBox1.Resize += pictureBox1_Resize;
             // 
             // contextMenuStrip1
             // 

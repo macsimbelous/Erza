@@ -28,35 +28,41 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.SuspendLayout();
+            pictureBox1 = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            SuspendLayout();
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.Black;
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(284, 262);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
+            pictureBox1.BackColor = System.Drawing.Color.Black;
+            pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            pictureBox1.Location = new System.Drawing.Point(0, 0);
+            pictureBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new System.Drawing.Size(331, 302);
+            pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
+            pictureBox1.Paint += pictureBox1_Paint;
+            pictureBox1.MouseDown += pictureBox1_MouseDown;
+            pictureBox1.MouseMove += pictureBox1_MouseMove;
+            pictureBox1.MouseUp += pictureBox1_MouseUp;
+            pictureBox1.Resize += pictureBox1_Resize;
             // 
             // FullScreenForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.pictureBox1);
-            this.Name = "FullScreenForm";
-            this.Text = "FullScreenForm";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FullScreenForm_FormClosed);
-            this.Load += new System.EventHandler(this.FullScreenForm_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FullScreenForm_KeyDown);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(331, 302);
+            Controls.Add(pictureBox1);
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "FullScreenForm";
+            Text = "FullScreenForm";
+            FormClosed += FullScreenForm_FormClosed;
+            Load += FullScreenForm_Load;
+            KeyDown += FullScreenForm_KeyDown;
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ResumeLayout(false);
 
         }
 

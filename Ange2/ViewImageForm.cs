@@ -16,20 +16,19 @@
 using Ange.Properties;
 using ErzaLib2;
 using ImageMagick;
+using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime.Tensors;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.ML.OnnxRuntime;
-using Microsoft.ML.OnnxRuntime.Tensors;
-using OpenCvSharp;
 
 namespace Ange
 {
@@ -58,15 +57,28 @@ namespace Ange
         SolidBrush MetaColor = new SolidBrush(Color.Violet);
         const int ImageSize = 448; // MOAT Tagger uses 448x448 input size
         const float Threshold = 0.4772f; // Standard F1 threshold recommendation
+        // Переменные для зума и панорамирования
+        private float zoomFactor = 1.0f;
+        private PointF panOffset = new PointF(0, 0);
+        private System.Drawing.Point startPanPoint = new System.Drawing.Point(0, 0);
+        private bool isPanning = false;
+
+        // Исходный коэффициент масштаба, при котором картинка идеально вписана
+        private float initialZoom = 1.0f;
+
+        private Image CurrentImage = null;
         public ViewImageForm()
         {
             InitializeComponent();
+            // Включаем поддержку колесика мыши для PictureBox
+            pictureBox1.MouseWheel += pictureBox1_MouseWheel;
         }
 
         private void ViewImageForm_Load(object sender, EventArgs e)
         {
             LoadImage();
             listBox1.DrawMode = DrawMode.OwnerDrawVariable;
+            if(CurrentImage != null) ResetZoomAndPan();
         }
         private void LoadImage()
         {
@@ -82,6 +94,15 @@ namespace Ange
             long FileSize;
             try
             {
+                zoomFactor = 1.0f;
+                panOffset = new PointF(0, 0);
+                startPanPoint = new System.Drawing.Point(0, 0);
+                isPanning = false;
+                if (CurrentImage != null)
+                {
+                    CurrentImage.Dispose();
+                    CurrentImage = null;
+                }
                 if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
                 if (fs != null) { fs.Close(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
@@ -92,7 +113,8 @@ namespace Ange
                     {
                         using (var magickImage = new MagickImage(Result[this.Index].FilePath))
                         {
-                            pictureBox1.Image = magickImage.ToBitmap();
+                            //pictureBox1.Image = magickImage.ToBitmap();
+                            CurrentImage = magickImage.ToBitmap();
                         }
                         ImageFormat = "WEBP";
                     }
@@ -100,20 +122,41 @@ namespace Ange
                     {
                         using (var magickImage = new MagickImage(Result[this.Index].FilePath))
                         {
-                            pictureBox1.Image = magickImage.ToBitmap();
+                            //pictureBox1.Image = magickImage.ToBitmap();
+                            CurrentImage = magickImage.ToBitmap();
                         }
                         ImageFormat = "AVIF";
+                    }
+                    else if (Path.GetExtension(this.Result[this.Index].FilePath).ToLower() == ".gif")
+                    {
+                        fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
+                        this.pictureBox1.Image = Image.FromStream(fs);
+                        ImageFormat = GetImageFormat(this.pictureBox1.Image);
                     }
                     else
                     {
                         fs = new System.IO.FileStream(this.Result[this.Index].FilePath, FileMode.Open, FileAccess.Read);
-                        this.pictureBox1.Image = Image.FromStream(fs);
+                        //this.pictureBox1.Image = Image.FromStream(fs);
+                        //CurrentImage = Image.FromStream(fs);
                         //fs.Close();
-                        ImageFormat = GetImageFormat(this.pictureBox1.Image);
+                        Bitmap b = new Bitmap(fs);
+                        b.SetResolution(this.DeviceDpi, this.DeviceDpi);
+                        CurrentImage = b;
+                        ImageFormat = GetImageFormat(CurrentImage);
                     }
                     pictureBox1.Enabled = true;
+                    
+                    ResetZoomAndPan();
                     this.format_label.Text = "Формат: " + ImageFormat;
-                    this.resolution_label.Text = String.Format($"Разрешение: {this.pictureBox1.Image.Size.Width} x {this.pictureBox1.Image.Size.Height}");
+                    //this.resolution_label.Text = String.Format($"Разрешение: {this.pictureBox1.Image.Size.Width} x {this.pictureBox1.Image.Size.Height}");
+                    if (CurrentImage != null) 
+                    {
+                        resolution_label.Text = String.Format($"Разрешение: {CurrentImage.Size.Width} x {CurrentImage.Size.Height}");
+                    }
+                    else
+                    {
+                        this.resolution_label.Text = String.Format($"Разрешение: {this.pictureBox1.Image.Size.Width} x {this.pictureBox1.Image.Size.Height}");
+                    }
                     /*if (this.Result[this.Index].Tags.Count == 0)
                     {
                         Result[this.Index].Tags = ErzaDB.GetTagsByImageID(Result[this.Index].ImageID, ((Form1)this.Parent).Erza);
@@ -236,6 +279,11 @@ namespace Ange
                 case Keys.Delete:
                     if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
                     {
+                        if (CurrentImage != null)
+                        {
+                            CurrentImage.Dispose();
+                            CurrentImage = null;
+                        }
                         if (this.pictureBox1.Image != null)
                         {
                             pictureBox1.Enabled = false;
@@ -257,6 +305,24 @@ namespace Ange
                             this.Close();
                         }
                     }
+                    break;
+                case Keys.Add:
+                    ZoomImageForKey(1.1f);
+                    break;
+                case Keys.Oemplus:
+                    ZoomImageForKey(1.1f);
+                    break;
+                case Keys.D0:
+                    ResetZoomAndPan();
+                    break;
+                case Keys.NumPad0:
+                    ResetZoomAndPan();
+                    break;
+                case Keys.Subtract:
+                    ZoomImageForKey(0.9f);
+                    break;
+                case Keys.OemMinus:
+                    ZoomImageForKey(0.9f);
                     break;
             }
             return true;
@@ -288,6 +354,11 @@ namespace Ange
         {
             if (MessageBox.Show("Удалить изображение " + this.Result[this.Index].FilePath + "?", "Предупреждение!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
+                if (CurrentImage != null)
+                {
+                    CurrentImage.Dispose();
+                    CurrentImage = null;
+                }
                 if (this.pictureBox1.Image != null)
                 {
                     pictureBox1.Enabled = false;
@@ -440,7 +511,15 @@ namespace Ange
             if (fs != null) { fs.Close(); }
             try
             {
-                this.pictureBox1.Image.Dispose();
+                if (CurrentImage != null)
+                {
+                    CurrentImage.Dispose();
+                    CurrentImage = null;
+                }
+                if (pictureBox1.Image != null)
+                {
+                    pictureBox1.Image.Dispose();
+                }
             }
             catch { }
         }
@@ -594,6 +673,156 @@ namespace Ange
                 }
             }
             return tagsList;
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            if (CurrentImage == null) return;
+
+            Graphics g = e.Graphics;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+            Matrix matrix = new Matrix();
+            matrix.Translate(panOffset.X, panOffset.Y);
+            matrix.Scale(zoomFactor, zoomFactor);
+
+            g.Transform = matrix;
+            g.DrawImage(CurrentImage, 0, 0);
+        }
+
+        private void pictureBox1_Resize(object sender, EventArgs e)
+        {
+            // Пересчитываем центрирование при изменении размеров окна
+            ResetZoomAndPan();
+        }
+
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && CurrentImage != null)
+            {
+                isPanning = true;
+                startPanPoint = e.Location;
+                pictureBox1.Cursor = Cursors.Hand;
+            }
+        }
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isPanning)
+            {
+                float dx = e.X - startPanPoint.X;
+                float dy = e.Y - startPanPoint.Y;
+
+                panOffset.X += dx;
+                panOffset.Y += dy;
+
+                startPanPoint = e.Location;
+
+                // Применяем ограничения на перетаскивание
+                KeepImageInBounds();
+
+                pictureBox1.Invalidate();
+            }
+        }
+
+        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isPanning = false;
+                pictureBox1.Cursor = Cursors.Default;
+            }
+        }
+        private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (CurrentImage == null) return;
+
+            float zoomDelta = e.Delta > 0 ? 1.1f : 0.9f;
+
+            // Ограничения масштаба относительно исходного "вписанного" размера (от 0.5x до 15x)
+            float newZoom = zoomFactor * zoomDelta;
+            if (newZoom < initialZoom * 0.5f || newZoom > initialZoom * 15.0f) return;
+
+            float mouseX = e.X;
+            float mouseY = e.Y;
+
+            // Корректируем смещение, чтобы зум шел в точку курсора
+            panOffset.X = mouseX - zoomDelta * (mouseX - panOffset.X);
+            panOffset.Y = mouseY - zoomDelta * (mouseY - panOffset.Y);
+
+            zoomFactor = newZoom;
+
+            // Проверяем ограничения после зума, чтобы картинка не улетела
+            KeepImageInBounds();
+
+            pictureBox1.Invalidate();
+        }
+        // Функция сброса и автоматического вписывания по центру
+        private void ResetZoomAndPan()
+        {
+            if (CurrentImage == null || pictureBox1.Width == 0 || pictureBox1.Height == 0) return;
+
+            // Вычисляем масштаб, чтобы картинка вписалась в PictureBox с сохранением пропорций
+            float ratioX = (float)pictureBox1.Width / (float)CurrentImage.Width;
+            float ratioY = (float)pictureBox1.Height / (float)CurrentImage.Height;
+
+            // Используем Math.Min для вписывания (Zoom) или Math.Max, если нужно заполнить (Stretch)
+            initialZoom = Math.Min(ratioX, ratioY);
+            zoomFactor = initialZoom;
+
+            // Центрируем картинку
+            float posX = ((float)pictureBox1.Width - ((float)CurrentImage.Width * zoomFactor)) / 2f;
+            float posY = ((float)pictureBox1.Height - ((float)CurrentImage.Height * zoomFactor)) / 2f;
+
+            panOffset = new PointF(posX, posY);
+
+            pictureBox1.Invalidate();
+        }
+        // Метод контроля границ панорамирования
+        private void KeepImageInBounds()
+        {
+            if (CurrentImage == null) return;
+
+            // Текущие размеры картинки с учетом зума
+            float currentWidth = (float)CurrentImage.Width * zoomFactor;
+            float currentHeight = (float)CurrentImage.Height * zoomFactor;
+
+            // Правило: на экране должно оставаться минимум 50 пикселей изображения
+            float margin = 50f;
+
+            // Ограничения для левой/правой границы
+            if (panOffset.X > (float)pictureBox1.Width - margin)
+                panOffset.X = (float)pictureBox1.Width - margin;
+
+            if (panOffset.X < -currentWidth + margin)
+                panOffset.X = -currentWidth + margin;
+
+            // Ограничения для верхней/нижней границы
+            if (panOffset.Y > (float)pictureBox1.Height - margin)
+                panOffset.Y = (float)pictureBox1.Height - margin;
+
+            if (panOffset.Y < -currentHeight + margin)
+                panOffset.Y = -currentHeight + margin;
+        }
+        private void ZoomImageForKey(float zoomDelta)
+        {
+            // Ограничения масштаба относительно исходного "вписанного" размера (от 0.5x до 15x)
+            float newZoom = zoomFactor * zoomDelta;
+            if (newZoom < initialZoom * 0.5f || newZoom > initialZoom * 15.0f) return;
+
+            float mouseX = (float)pictureBox1.Height / 2f;
+            float mouseY = (float)pictureBox1.Width / 2f;
+
+            // Корректируем смещение, чтобы зум шел в точку курсора
+            panOffset.X = mouseX - zoomDelta * (mouseX - panOffset.X);
+            panOffset.Y = mouseY - zoomDelta * (mouseY - panOffset.Y);
+
+            zoomFactor = newZoom;
+
+            // Проверяем ограничения после зума, чтобы картинка не улетела
+            KeepImageInBounds();
+
+            pictureBox1.Invalidate();
         }
     }
 }
