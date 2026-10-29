@@ -67,6 +67,7 @@ namespace Ange
         private float initialZoom = 1.0f;
 
         private Image CurrentImage = null;
+        private int Dpi = 144;
         public ViewImageForm()
         {
             InitializeComponent();
@@ -76,9 +77,10 @@ namespace Ange
 
         private void ViewImageForm_Load(object sender, EventArgs e)
         {
+            this.Size = Properties.Settings.Default.SizeViewImageForm;
             LoadImage();
             listBox1.DrawMode = DrawMode.OwnerDrawVariable;
-            if(CurrentImage != null) ResetZoomAndPan();
+            if (CurrentImage != null) ResetZoomAndPan();
         }
         private void LoadImage()
         {
@@ -140,16 +142,17 @@ namespace Ange
                         //CurrentImage = Image.FromStream(fs);
                         //fs.Close();
                         Bitmap b = new Bitmap(fs);
-                        b.SetResolution(this.DeviceDpi, this.DeviceDpi);
+                        //b.SetResolution(this.DeviceDpi, this.DeviceDpi);
+                        b.SetResolution(Dpi, Dpi);
                         CurrentImage = b;
                         ImageFormat = GetImageFormat(CurrentImage);
                     }
                     pictureBox1.Enabled = true;
-                    
+
                     ResetZoomAndPan();
                     this.format_label.Text = "Формат: " + ImageFormat;
                     //this.resolution_label.Text = String.Format($"Разрешение: {this.pictureBox1.Image.Size.Width} x {this.pictureBox1.Image.Size.Height}");
-                    if (CurrentImage != null) 
+                    if (CurrentImage != null)
                     {
                         resolution_label.Text = String.Format($"Разрешение: {CurrentImage.Size.Width} x {CurrentImage.Size.Height}");
                     }
@@ -522,6 +525,8 @@ namespace Ange
                 }
             }
             catch { }
+            Properties.Settings.Default.SizeViewImageForm = this.Size;
+            //Properties.Settings.Default.Save();
         }
 
         private void add_to_favorited_button_Click(object sender, EventArgs e)
@@ -823,6 +828,11 @@ namespace Ange
             KeepImageInBounds();
 
             pictureBox1.Invalidate();
+        }
+
+        private void ViewImageForm_DpiChanged(object sender, DpiChangedEventArgs e)
+        {
+            Dpi = e.DeviceDpiNew;
         }
     }
 }

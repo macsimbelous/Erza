@@ -23,5 +23,8 @@
     <Setting Name="SelectedTags" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\utils\data\models\wd-eva02-large-tagger-v3\selected_tags.csv</Value>
     </Setting>
+    <Setting Name="SizeViewImageForm" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">1321, 676</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

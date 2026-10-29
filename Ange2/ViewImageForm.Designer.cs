@@ -315,6 +315,7 @@
             Text = "Просмотр";
             FormClosed += ViewImageForm_FormClosed;
             Load += ViewImageForm_Load;
+            DpiChanged += ViewImageForm_DpiChanged;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             contextMenuStrip1.ResumeLayout(false);
             groupBox1.ResumeLayout(false);

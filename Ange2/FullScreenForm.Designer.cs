@@ -60,6 +60,7 @@
             Text = "FullScreenForm";
             FormClosed += FullScreenForm_FormClosed;
             Load += FullScreenForm_Load;
+            DpiChanged += FullScreenForm_DpiChanged;
             KeyDown += FullScreenForm_KeyDown;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);

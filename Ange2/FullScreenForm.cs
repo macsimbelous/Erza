@@ -49,6 +49,7 @@ namespace Ange
         private float initialZoom = 1.0f;
 
         private Image CurrentImage = null;
+        private int Dpi = 144;
         public FullScreenForm()
         {
             InitializeComponent();
@@ -217,7 +218,8 @@ namespace Ange
                         //CurrentImage = Image.FromStream(fs);
                         //fs.Close();
                         Bitmap b = new Bitmap(fs);
-                        b.SetResolution(this.DeviceDpi, this.DeviceDpi);
+                        //b.SetResolution(this.DeviceDpi, this.DeviceDpi);
+                        b.SetResolution(Dpi, Dpi);
                         CurrentImage = b;
                         ImageFormat = GetImageFormat(this.pictureBox1.Image);
                     }
@@ -458,6 +460,11 @@ namespace Ange
             KeepImageInBounds();
 
             pictureBox1.Invalidate();
+        }
+
+        private void FullScreenForm_DpiChanged(object sender, DpiChangedEventArgs e)
+        {
+            Dpi = e.DeviceDpiNew;
         }
     }
 }
