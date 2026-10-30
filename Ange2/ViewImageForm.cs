@@ -73,11 +73,25 @@ namespace Ange
             InitializeComponent();
             // Включаем поддержку колесика мыши для PictureBox
             pictureBox1.MouseWheel += pictureBox1_MouseWheel;
+            this.Size = Properties.Settings.Default.SizeViewImageForm;
+            Screen screen = Screen.FromControl(this);
+            Rectangle area = screen.WorkingArea;
+
+            if (this.Width > area.Width || this.Height > area.Height)
+            {
+                this.Width = Math.Min(this.Width, area.Width);
+                this.Height = Math.Min(this.Height, area.Height);
+                this.Location = new System.Drawing.Point(area.Left, area.Top);
+            }
+            else
+            {
+                this.CenterToParent();
+            }
         }
 
         private void ViewImageForm_Load(object sender, EventArgs e)
         {
-            this.Size = Properties.Settings.Default.SizeViewImageForm;
+
             LoadImage();
             listBox1.DrawMode = DrawMode.OwnerDrawVariable;
             if (CurrentImage != null) ResetZoomAndPan();

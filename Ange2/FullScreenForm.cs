@@ -221,7 +221,7 @@ namespace Ange
                         //b.SetResolution(this.DeviceDpi, this.DeviceDpi);
                         b.SetResolution(Dpi, Dpi);
                         CurrentImage = b;
-                        ImageFormat = GetImageFormat(this.pictureBox1.Image);
+                        ImageFormat = GetImageFormat(CurrentImage);
                     }
                     pictureBox1.Enabled = true;
                     ResetZoomAndPan();
