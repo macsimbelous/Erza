@@ -119,7 +119,12 @@ namespace Ange
                     CurrentImage.Dispose();
                     CurrentImage = null;
                 }
-                if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                pictureBox1.Enabled = false;
+                if (this.pictureBox1.Image != null) 
+                {
+                    this.pictureBox1.Image.Dispose();
+                    this.pictureBox1.Image = null; 
+                }
                 if (fs != null) { fs.Close(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {

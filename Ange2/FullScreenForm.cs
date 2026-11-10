@@ -166,6 +166,7 @@ namespace Ange
 
                 g.Transform = matrix;
                 g.DrawImage(CurrentImage, 0, 0);
+                g.Transform = null;
                 string s = String.Format("Ширина: {0}\nВысота: {1}\nРазмер: {2:N0}\nФормат: {3}\nТеги:\n{4}", this.pictureBox1.Width, this.pictureBox1.Height, FileSize, ImageFormat, TagString);
                 g.DrawString(s, new Font("Arial", 10), System.Drawing.Brushes.White, new Point(0, 0));
             }
@@ -183,7 +184,12 @@ namespace Ange
                     CurrentImage.Dispose();
                     CurrentImage = null;
                 }
-                if (this.pictureBox1.Image != null) { this.pictureBox1.Image.Dispose(); }
+                pictureBox1.Enabled = false;
+                if (this.pictureBox1.Image != null) 
+                { 
+                    this.pictureBox1.Image.Dispose();
+                    this.pictureBox1.Image = null;
+                }
                 if (fs != null) { fs.Close(); }
                 if (System.IO.File.Exists(this.Result[this.Index].FilePath))
                 {
