@@ -119,7 +119,7 @@ namespace Ange
                     CurrentImage.Dispose();
                     CurrentImage = null;
                 }
-                pictureBox1.Enabled = false;
+                //pictureBox1.Enabled = false;
                 if (this.pictureBox1.Image != null) 
                 {
                     this.pictureBox1.Image.Dispose();
@@ -166,7 +166,7 @@ namespace Ange
                         CurrentImage = b;
                         ImageFormat = GetImageFormat(CurrentImage);
                     }
-                    pictureBox1.Enabled = true;
+                    //pictureBox1.Enabled = true;
 
                     ResetZoomAndPan();
                     this.format_label.Text = "Формат: " + ImageFormat;

@@ -166,7 +166,7 @@ namespace Ange
 
                 g.Transform = matrix;
                 g.DrawImage(CurrentImage, 0, 0);
-                g.Transform = null;
+                g.Transform = new Matrix();
                 string s = String.Format("Ширина: {0}\nВысота: {1}\nРазмер: {2:N0}\nФормат: {3}\nТеги:\n{4}", this.pictureBox1.Width, this.pictureBox1.Height, FileSize, ImageFormat, TagString);
                 g.DrawString(s, new Font("Arial", 10), System.Drawing.Brushes.White, new Point(0, 0));
             }
@@ -184,7 +184,7 @@ namespace Ange
                     CurrentImage.Dispose();
                     CurrentImage = null;
                 }
-                pictureBox1.Enabled = false;
+                //pictureBox1.Enabled = false;
                 if (this.pictureBox1.Image != null) 
                 { 
                     this.pictureBox1.Image.Dispose();
@@ -229,7 +229,7 @@ namespace Ange
                         CurrentImage = b;
                         ImageFormat = GetImageFormat(CurrentImage);
                     }
-                    pictureBox1.Enabled = true;
+                    //pictureBox1.Enabled = true;
                     ResetZoomAndPan();
                     Result[this.Index].Tags = ErzaDB.GetTagsByImageIDToString(Result[this.Index].ImageID, Form1.Erza);
                     StringBuilder tag_string = new StringBuilder();
