@@ -1,9 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ErzaLib2;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Threading.Tasks;
+
 namespace Risa;
 
 public partial class ImageItem : ObservableObject
@@ -12,6 +16,9 @@ public partial class ImageItem : ObservableObject
     public string? Title { get; }
     public ImageInfo ImageInfo { get; }
     private string ThumbnailPath;
+    // Ограничиваем чтение с диска до 6 параллельных потоков
+    private static readonly SemaphoreSlim _diskSemaphore = new(6, 6);
+    private CancellationTokenSource? _loadCts;
 
     [ObservableProperty]
     private Bitmap? _thumbnail;
@@ -48,6 +55,62 @@ public partial class ImageItem : ObservableObject
         finally
         {
             _isLoading = false;
+        }
+    }
+    public async void LoadThumbnailAsync()
+    {
+        if (Thumbnail != null || _loadCts != null) return;
+
+        _loadCts = new CancellationTokenSource();
+        var token = _loadCts.Token;
+
+        try
+        {
+            await _diskSemaphore.WaitAsync(token);
+            try
+            {
+                var bitmap = await Task.Run(() =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    using var stream = File.OpenRead(FilePath);
+                    //return Bitmap.DecodeToWidth(stream, 160, BitmapInterpolationMode.LowQuality);
+                    return new Bitmap(stream);
+                }, token);
+
+                if (!token.IsCancellationRequested)
+                {
+                    await Dispatcher.UIThread.InvokeAsync(() => Thumbnail = bitmap);
+                }
+                else
+                {
+                    bitmap.Dispose();
+                }
+            }
+            finally
+            {
+                _diskSemaphore.Release();
+            }
+        }
+        catch
+        {
+            // Отмена при быстрой прокрутке или ошибка доступа к файлу
+        }
+        finally
+        {
+            _loadCts?.Dispose();
+            _loadCts = null;
+        }
+    }
+
+    public void UnloadThumbnail()
+    {
+        _loadCts?.Cancel();
+
+        if (Thumbnail != null)
+        {
+            var old = Thumbnail;
+            Thumbnail = null;
+            old.Dispose();
         }
     }
 }

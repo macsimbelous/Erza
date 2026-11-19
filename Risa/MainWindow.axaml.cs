@@ -77,7 +77,8 @@ public partial class MainWindow : Window
         {
             foreach (var item in rowItems)
             {
-                item.EnsureLoaded();
+                //item.EnsureLoaded();
+                item.LoadThumbnailAsync();
             }
         }
     }
@@ -87,12 +88,13 @@ public partial class MainWindow : Window
         {
             foreach (var item in rowItems)
             {
-                if (item.Thumbnail != null)
+                /*(if (item.Thumbnail != null)
                 {
                     var old = item.Thumbnail;
                     item.Thumbnail = null;
                     old.Dispose();
-                }
+                }*/
+                item.UnloadThumbnail();
             }
         }
     }
