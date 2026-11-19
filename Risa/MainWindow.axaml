@@ -1,0 +1,144 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:scg="using:System.Collections.Generic"
+        xmlns:sc="using:System.Collections"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Risa.MainWindow"
+        xmlns:vm="using:Risa"
+        x:DataType="vm:MainViewModel"
+        Closing="OnWindowClosing"
+        Title="Risa">
+        <Window.Styles>
+        <!-- Убираем стандартное выделение всей строки целиком -->
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter,
+        ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <!-- Стили самой плитки картинки -->
+        <Style Selector="Border.tile">
+            <Setter Property="Background" Value="#252526"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Border.tile:pointerover">
+            <Setter Property="Background" Value="#323234"/>
+        </Style>
+        <Style Selector="Border.tile.selected">
+            <Setter Property="BorderBrush" Value="#0078D7"/>
+            <Setter Property="Background" Value="#263B4E"/>
+        </Style>
+    </Window.Styles>
+    <Grid Margin="2"
+          RowDefinitions="Auto, *, Auto"
+          ColumnDefinitions="*, Auto, Auto, Auto">
+        <AutoCompleteBox Margin="2,2,2,2" Grid.Row="0" Grid.Column="0"
+                         x:Name="autobox"
+                         Watermark="Введите тег..."
+                         FilterMode="StartsWith"
+                         MinimumPrefixLength="2" />
+        <ComboBox x:Name="option_comboBox" Margin="2,2,2,2" SelectedIndex="0" MaxDropDownHeight="200" Grid.Row="0" Grid.Column="1">
+            <ComboBoxItem>Теги</ComboBoxItem>
+            <ComboBoxItem>Теги ИЛИ</ComboBoxItem>
+            <ComboBoxItem>Часть тега</ComboBoxItem>
+            <ComboBoxItem>MD5</ComboBoxItem>
+            <ComboBoxItem>Соотношение ширины и высоты</ComboBoxItem>
+            <ComboBoxItem>SQL</ComboBoxItem>
+        </ComboBox>
+        <Button Click="SearchButtonClick" Margin="2,2,2,2" Content="Найти" Grid.Row="0" Grid.Column="2"/>
+        <Button Margin="2,2,2,2" Content="Слайд шоу" Grid.Row="0" Grid.Column="3"/>
+
+
+        <!-- Строка 1, Колонка 0 -->
+               <!-- Виртуализированный список строк -->
+        <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                 x:Name="RowsListBox"
+                 ItemsSource="{Binding ImageRows}"
+                 Background="Transparent"
+                 SizeChanged="OnListSizeChanged"
+                 ContainerClearing="OnContainerClearing"
+                 ContainerPrepared="OnRowContainerPrepared">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <!-- Горизонтальная строка элементов -->
+                    <ItemsControl x:DataType="sc:IEnumerable" ItemsSource="{Binding}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" Columns="{Binding $parent[Window].((vm:MainViewModel)DataContext).ColumnsCount}"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:ImageItem">
+                                <!-- Отдельная плитка -->
+                                <Border Classes="tile"
+                                        Classes.selected="{Binding IsSelected}"
+                                        DoubleTapped="OnTileDoubleTapped"
+                                        PointerPressed="OnTilePointerPressed">
+                                    <!-- Контекстное меню плитки -->
+                                    <Border.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Открыть"
+                                                      Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).OpenSelectedCommand}"/>
+                                            <MenuItem Header="Показать в папке"
+                                                      Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).ShowInExplorerCommand}"/>
+                                            <Separator/>
+                                            <MenuItem Header="Удалить из списка"
+                                                      Foreground="#FF5555"
+                                                      Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).RemoveSelectedCommand}"/>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+                                    <Grid RowDefinitions="225, Auto">
+                                        <!-- Картинка -->
+                                        <Border Grid.Row="0" CornerRadius="6" ClipToBounds="True" Background="#181818">
+                                            <Image Source="{Binding Thumbnail}" Stretch="Uniform"/>
+                                        </Border>
+
+                                        <!-- Имя файла -->
+                                        <TextBlock Grid.Row="1"
+                                                   Text="{Binding Title}"
+                                                   HorizontalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Margin="0,6,0,0"
+                                                   FontSize="12"/>
+
+                                        <!-- Галочка выделения -->
+                                        <Border Grid.Row="0"
+                                                IsVisible="{Binding IsSelected}"
+                                                Background="#0078D7"
+                                                CornerRadius="10"
+                                                Width="22" Height="22"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Top"
+                                                Margin="6">
+                                            <TextBlock Text="✓" Foreground="White" FontSize="12" FontWeight="Bold"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <!-- Строка 2, занимает обе колонки -->
+        <TextBlock x:Name="ResultText"
+                   Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
+                   Text="Результат появится здесь"
+                   Margin="0,2,0,0"
+                   Foreground="Gray"/>
+    </Grid>
+</Window>
