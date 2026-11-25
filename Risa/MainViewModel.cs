@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using ErzaLib2;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Risa;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly List<ImageItem> _allImages = new();
+    public readonly List<ImageItem> _allImages = new();
     public int CountImages { get {  return _allImages.Count; }  }
 
     // Опорный элемент для выделения диапазона через Shift
@@ -310,6 +311,24 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void OpenSelected()
+    {
+        /*var first = _allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null && File.Exists(first.FilePath))
+        {
+            Process.Start(new ProcessStartInfo(first.FilePath) { UseShellExecute = true });
+        }*/
+        var first = _allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null)
+        {
+            //var viewimagewindow = new ViewImageWindow();
+            //viewimagewindow.CurrentImageInfo = first.ImageInfo;
+            //viewimagewindow.ShowDialog<string?>(this).GetAwaiter().GetResult();
+            //viewimagewindow.Show();
+            WeakReferenceMessenger.Default.Send(new OpenViewImageWindowMessage(first));
+        }
+    }
+    [RelayCommand]
+    private void OpenSelectedSystemApp()
     {
         var first = _allImages.FirstOrDefault(x => x.IsSelected);
         if (first != null && File.Exists(first.FilePath))

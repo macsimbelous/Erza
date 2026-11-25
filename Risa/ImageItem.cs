@@ -72,7 +72,7 @@ public partial class ImageItem : ObservableObject
                 var bitmap = await Task.Run(() =>
                 {
                     token.ThrowIfCancellationRequested();
-                    using var stream = File.OpenRead(FilePath);
+                    using var stream = File.OpenRead(ThumbnailPath);
                     //return Bitmap.DecodeToWidth(stream, 160, BitmapInterpolationMode.LowQuality);
                     return new Bitmap(stream);
                 }, token);

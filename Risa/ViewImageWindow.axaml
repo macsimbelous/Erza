@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:models="using:Risa"
+        xmlns:conv="using:Risa.Converters"
+        x:Class="Risa.ViewImageWindow"
+        xmlns:paz="using:Avalonia.Controls.PanAndZoom"
+        xmlns:anim="using:AnimatedImage.Avalonia"
+        Opened="OnOpened"
+        WindowStartupLocation="CenterScreen"
+        Title="ViewImageWindow">
+    <Grid Margin="2"
+          RowDefinitions="*, Auto, Auto">
+          <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="205" MinWidth="205"/>
+        <ColumnDefinition Width="4"/>
+        <ColumnDefinition Width="*" MinWidth="150"/>
+    </Grid.ColumnDefinitions>
+        <GridSplitter Grid.Column="1" Background="Gray" ResizeDirection="Columns" Grid.RowSpan="3"/>
+        <!--<ListBox Grid.Row="0" Grid.Column="0" x:Name="TagsListBox"></ListBox>-->
+        <ListBox Grid.Row="0" Grid.Column="0" x:Name="TagsListBox" SelectionMode="Multiple">
+        <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="models:RisaTagInfo">
+                <Grid ColumnDefinitions="*, Auto" Margin="4">
+                    <!-- Название тега (тоже окрашено в цвет типа) -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Tag}" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{Binding Type, Converter={x:Static conv:TagConverters.TypeToBrushConverter}}"/>
+                        
+                        <TextBlock Text="{Binding Localization}" 
+                                   FontSize="12" 
+                                   Foreground="Gray"
+                                   IsVisible="{Binding Localization, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    </StackPanel>
+                    <!-- Цветной бейдж для типа тега -->
+                    <!--<Border Grid.Column="1" 
+                            Background="{Binding Type, Converter={x:Static conv:TagConverters.TypeToBrushConverter}}" 
+                            CornerRadius="4" 
+                            Padding="6,2" 
+                            Margin="0,0,8,0">
+                        <TextBlock HorizontalAlignment="Right" Text="{Binding Type}" FontSize="11" Foreground="White" FontWeight="SemiBold"/>
+                    </Border>-->
+                    <!-- Без цветного бейджа для типа тега -->
+                    <!--<TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Type}" FontSize="11" Foreground="{Binding Type, Converter={x:Static conv:TagConverters.TypeToBrushConverter}}" FontWeight="SemiBold"/>-->
+                    <!-- Количество -->
+                    <TextBlock Grid.Column="1" 
+                               Text="{Binding Count, StringFormat='({0})'}" 
+                               Foreground="Gray" 
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0"/>
+                </Grid>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
+            <Button Click="AddTagsButtonClick" Content="+" FontWeight="Bold"/>
+            <Button Click="RemoveTagsButtonClick" Content="-" FontWeight="Bold"/>
+            <Button>ИИ</Button>
+            <Button Click="SearchButtonClick">Найти</Button>
+            <Button Click="FavoritedButtonClick"><Image x:Name="FavoritedButton" Width="24" Height="17" Source="/Assets/not_favorited.png"/></Button>
+        </StackPanel>
+        <Grid Grid.Column="0" Grid.Row="2" ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,2,0">
+            <TextBlock Grid.Row="0" Grid.Column="0">Формат файла:</TextBlock>
+            <TextBlock x:Name="ImageFormatTextBlock" Grid.Row="0" Grid.Column="1" Text="JPEG" TextAlignment="Right"/>
+            <TextBlock Grid.Row="1" Grid.Column="0">Разрешение:</TextBlock>
+            <TextBlock x:Name="ImageResolutionTextBlock" Grid.Row="1" Grid.Column="1" Text="0x0" TextAlignment="Right"/>
+            <TextBlock Grid.Row="2" Grid.Column="0">Рамер файла:</TextBlock>
+            <TextBlock x:Name="ImageFileSizeTextBlock" Grid.Row="2" Grid.Column="1" Text="0" TextAlignment="Right"/>
+            <TextBlock Grid.Row="3" Grid.Column="0">Количество тегов:</TextBlock>
+            <TextBlock x:Name="CountTagsTextBlock" Grid.Row="3" Grid.Column="1" Text="0" TextAlignment="Right"/>
+        </Grid>
+            <!-- ZoomBorder перехватывает колесико мыши для зума и клик+перетаскивание для панорамирования -->
+    <paz:ZoomBorder x:Name="ZoomBorder"
+                    Stretch="Uniform"
+                    ZoomSpeed="1.2"
+                    MinZoomX="0.5" MaxZoomX="10"
+                    MinZoomY="0.5" MaxZoomY="10"
+                    ClipToBounds="True"
+                    Focusable="True"
+                    Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                    Background="Transparent">
+        <Image x:Name="CurrentImage" />
+    </paz:ZoomBorder>
+    </Grid>
+</Window>

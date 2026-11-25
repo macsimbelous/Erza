@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using CommunityToolkit.Mvvm.Messaging;
 using ErzaLib2;
 using HarfBuzzSharp;
 using SkiaSharp;
@@ -9,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SQLite;
+using System.Text;
+using Tmds.DBus.Protocol;
 
 namespace Risa;
 
@@ -18,10 +21,7 @@ public partial class MainWindow : Window
     public static string PreviewPath = "D:\\previews";
     private const int PreviewWidth = 300;
     private const int PreviewHeight = 225;
-    public ObservableCollection<string> Tags { get; } = new()
-    {
-        "Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Иркутск"
-    };
+    public ObservableCollection<string> Tags { get; } = new();
     public MainWindow()
     {
         InitializeComponent();
@@ -67,8 +67,46 @@ public partial class MainWindow : Window
                 }
             }
         }
-        
         autobox.ItemsSource = Tags;
+        // 1. Фильтруем элементы только по последнему введенному слову
+        autobox.ItemFilter = (searchText, item) =>
+        {
+            if (string.IsNullOrWhiteSpace(searchText) || item is not string word)
+                return false;
+
+            // Берем часть текста после последнего пробела
+            var lastWord = GetLastWord(searchText);
+            if (string.IsNullOrEmpty(lastWord))
+                return false;
+
+            return word.StartsWith(lastWord, StringComparison.OrdinalIgnoreCase);
+        };
+
+        // 2. При выборе элемента из списка формируем итоговую строку
+        autobox.TextSelector = (searchText, selectedItem) =>
+        {
+            if (string.IsNullOrEmpty(searchText))
+                return selectedItem;
+
+            int lastSpaceIndex = searchText.LastIndexOf(' ');
+
+            // Если пробелов не было, просто возвращаем выбранное слово + пробел
+            if (lastSpaceIndex == -1)
+                return selectedItem + " ";
+
+            // Оставляем текст до последнего пробела и приклеиваем выбранное слово
+            string prefix = searchText.Substring(0, lastSpaceIndex + 1);
+            return prefix + selectedItem + " ";
+        };
+        WeakReferenceMessenger.Default.Register<OpenViewImageWindowMessage>(this, (r, m) =>
+        {
+            var win = new ViewImageWindow()
+            {
+                DataContext = this.DataContext
+            };
+            win.ShowDialog(this);
+        });
+
     }
     // Вызывается виртуализатором только для видимых строк при скролле
     private void OnRowContainerPrepared(object? sender, ContainerPreparedEventArgs e)
@@ -131,14 +169,57 @@ public partial class MainWindow : Window
             }
         }
     }
-    private void OnTileDoubleTapped(object? sender, TappedEventArgs e)
+    private async void OnTileDoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is Control control &&
-            control.DataContext is ImageItem item &&
-            DataContext is MainViewModel vm)
+        var win = new ViewImageWindow()
         {
-            vm.OpenImage(item);
-            e.Handled = true;
+            DataContext = this.DataContext
+        };
+        await win.ShowDialog(this);
+        if (win.SelectedTags.Count > 0)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < win.SelectedTags.Count; i++)
+            {
+                if (i == 0)
+                {
+                    sb.Append(win.SelectedTags[i]);
+                }
+                else
+                {
+                    sb.Append(' ');
+                    sb.Append(win.SelectedTags[i]);
+                }
+            }
+            autobox.Text = sb.ToString();
+            option_comboBox.SelectedIndex = 0;
+            SearchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        }
+    }
+    private async void OnOpenMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        var win = new ViewImageWindow()
+        {
+            DataContext = this.DataContext
+        };
+        await win.ShowDialog(this);
+        if (win.SelectedTags.Count > 0)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < win.SelectedTags.Count; i++)
+            {
+                if (i == 0)
+                {
+                    sb.Append(win.SelectedTags[i]);
+                }
+                else
+                {
+                    sb.Append(' ');
+                    sb.Append(win.SelectedTags[i]);
+                }
+            }
+            autobox.Text = sb.ToString();
+            SearchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }
     }
     private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
@@ -295,4 +376,10 @@ public partial class MainWindow : Window
             return false;
         }
     }
+    private string GetLastWord(string text)
+    {
+        int lastSpaceIndex = text.LastIndexOf(' ');
+        return lastSpaceIndex == -1 ? text : text.Substring(lastSpaceIndex + 1);
+    }
 }
+public record OpenViewImageWindowMessage(ImageItem Item);

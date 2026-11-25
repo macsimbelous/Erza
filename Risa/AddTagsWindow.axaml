@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Risa.AddTagsWindow"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        Title="AddTagsWindow">
+  <Grid ColumnDefinitions="*" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" Margin="3">
+      <AutoCompleteBox Grid.Column="0" Grid.Row="0"
+                       x:Name="autobox"
+                       Watermark="Введите тег..."
+                       FilterMode="Custom"
+                       Margin="2"
+                       MinimumPrefixLength="2"/>
+      <StackPanel Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal">
+          <Button Content="BDSM" Tag="BDSM" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="bondage" Tag="bondage" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="women livestoc" Tag="women_livestoc" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="blindfold" Tag="blindfold" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="leash" Tag="leash" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="pet play" Tag="pet_play" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="milking machine" Tag="milking_machine" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="womb tattoo" Tag="womb_tattoo" Click="OnActionButtonClick" Margin="2"/>
+      </StackPanel>
+      <StackPanel Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Orientation="Horizontal">
+          <Button Content="gag" Tag="gag" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="ball gag" Tag="ball_gag" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="dildo gag" Tag="dildo_gag" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="ring gag" Tag="ring_gag" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="slave" Tag="slave" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="prison" Tag="prison" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="toilet" Tag="toilet" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="horseback riding" Tag="horseback_riding" Click="OnActionButtonClick" Margin="2"/>
+      </StackPanel>
+      <StackPanel Grid.Column="0" Grid.Row="3" HorizontalAlignment="Left" Orientation="Horizontal">
+          <Button Content="guro" Tag="guro" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="quadruple amputee" Tag="quadruple_amputee" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="decapitation" Tag="decapitation" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="brain sex" Tag="brain_sex" Click="OnActionButtonClick" Margin="2"/>
+      </StackPanel>
+      <StackPanel Grid.Column="0" Grid.Row="4" HorizontalAlignment="Left" Orientation="Horizontal">
+          <Button Content="bestiality" Tag="bestiality" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="dog" Tag="dog" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="horse" Tag="horse" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="pig" Tag="pig" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="bull" Tag="bull" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="tentacle" Tag="tentacle" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="orc" Tag="orc" Click="OnActionButtonClick" Margin="2"/>
+      </StackPanel>
+      <StackPanel Grid.Column="0" Grid.Row="5" HorizontalAlignment="Left" Orientation="Horizontal">
+          <Button Content="sex" Tag="sex" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="group sex" Tag="group_sex" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="vaginal" Tag="vaginal" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="anal" Tag="anal" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="oral" Tag="oral" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="fellatio" Tag="fellatio" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="nipple penetration" Tag="nipple_penetration" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="cum in mouth" Tag="cum_in_mouth" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="cum on body" Tag="cum_on_body" Click="OnActionButtonClick" Margin="2"/>
+      </StackPanel>
+      <StackPanel Grid.Column="0" Grid.Row="6" HorizontalAlignment="Left" Orientation="Horizontal">
+          <Button Content="rape" Tag="rape" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="forced" Tag="forced" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="double penetration" Tag="double_penetration" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="triple penetration" Tag="triple_penetration" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="prostitution" Tag="prostitution" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="forced prostitution" Tag="forced_prostitutionM" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="whore" Tag="whore" Click="OnActionButtonClick" Margin="2"/>
+      </StackPanel>
+      <StackPanel Grid.Column="0" Grid.Row="7" HorizontalAlignment="Left" Orientation="Horizontal">
+          <Button Content="trap" Tag="trap" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="yaoi" Tag="yaoi" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="intersex" Tag="intersex" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="futanari" Tag="futanari" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="yuri" Tag="yuri" Click="OnActionButtonClick" Margin="2"/>
+          <Button Content="favorited" Tag="favorited" Click="OnActionButtonClick" Margin="2"/>
+      </StackPanel>
+      <StackPanel Grid.Column="0" Grid.Row="8" HorizontalAlignment="Right" Orientation="Horizontal">
+          <Button Click="OnOKClick" Margin="2">OK</Button>
+          <Button Click="OnCancelClick" Margin="2">Отмена</Button>
+      </StackPanel>
+  </Grid>
+</Window>
