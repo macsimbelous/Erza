@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Risa.FindSimilarOptionsWindow"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        Title="FindSimilarOptionsWindow">
+  <StackPanel Margin="4" Orientation="Horizontal" HorizontalAlignment="Left">
+      <TextBlock Margin="4" Text="Похожесть(%)" VerticalAlignment="Center" FontSize="18"/>
+      <NumericUpDown x:Name="SimilarNumericUpDown"
+               Margin="4"
+               Minimum="0"
+               Maximum="100"
+               Increment="1"
+               Value="95"
+               FormatString="0"/>
+      <Button Margin="4" Content="OK" Click="OnOKClick"/>
+      <Button Margin="4" Content="Отмена" Click="OnCancelClick"/>
+  </StackPanel>
+</Window>

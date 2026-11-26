@@ -10,7 +10,7 @@
         x:DataType="vm:MainViewModel"
         Closing="OnWindowClosing"
         Title="Risa">
-        <Window.Styles>
+    <Window.Styles>
         <!-- Убираем стандартное выделение всей строки целиком -->
         <Style Selector="ListBoxItem">
             <Setter Property="Padding" Value="0"/>
@@ -57,11 +57,11 @@
             <ComboBoxItem>SQL</ComboBoxItem>
         </ComboBox>
         <Button x:Name="SearchButton" Click="SearchButtonClick" Margin="2,2,2,2" Content="Найти" Grid.Row="0" Grid.Column="2"/>
-        <Button Margin="2,2,2,2" Content="Слайд шоу" Grid.Row="0" Grid.Column="3"/>
+        <Button Click="SlideShowButtonClick" Margin="2,2,2,2" Content="Слайд шоу" Grid.Row="0" Grid.Column="3"/>
 
 
         <!-- Строка 1, Колонка 0 -->
-               <!-- Виртуализированный список строк -->
+        <!-- Виртуализированный список строк -->
         <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
                  x:Name="RowsListBox"
                  ItemsSource="{Binding ImageRows}"
@@ -69,7 +69,12 @@
                  SizeChanged="OnListSizeChanged"
                  ContainerClearing="OnContainerClearing"
                  ContainerPrepared="OnRowContainerPrepared">
-
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Показать избранное" Click="OnFavoritedShowMenuItemClick"/>
+                    <MenuItem Header="Показать без тегов" Click="OnNoTagsShowMenuItemClick"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <!-- Горизонтальная строка элементов -->
@@ -91,14 +96,29 @@
                                     <Border.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Окрыть" Click="OnOpenMenuItemClick"/>
-                                            <MenuItem Header="Открыть системной программе"
-                                                      Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).OpenSelectedSystemAppCommand}"/>
-                                            <MenuItem Header="Показать в папке"
-                                                      Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).ShowInExplorerCommand}"/>
+                                            <MenuItem Header="Окрыть на полный экран" Click="OnOpenInFullScreenMenuItemClick"/>
+                                            <MenuItem Header="Открыть системной программе" Click="OnOpenSystemAppMenuItemClick"/>
+                                            <MenuItem Header="Показать в папке" Click="OnShowInExplorerMenuItemClick"/>
                                             <Separator/>
-                                            <MenuItem Header="Удалить из списка"
+                                            <MenuItem Header="Показать избранное" Click="OnFavoritedShowMenuItemClick"/>
+                                            <MenuItem Header="Показать без тегов" Click="OnNoTagsShowMenuItemClick"/>
+                                            <MenuItem Header="Найти похожие" Click="OnFindSimilarMenuItemClick"/>
+                                            <Separator/>
+                                            <MenuItem Header="Добавить в избранное" Click="OnAddToFavoritedMenuItemClick"/>
+                                            <MenuItem Header="Удалить из избранного" Click="OnRemoveToFavoritedMenuItemClick"/>
+                                            <MenuItem Header="Скопировать MD5 в буфер" Click="CopyHashToClipboardMenuItemClick"/>
+                                            <MenuItem Header="Скопировать теги в буфер" Click="OnCopyTagsToClipboardMenuItemClick"/>
+                                            <MenuItem Header="Добавить теги" Click="OnAddTagsMenuItemClick"/>
+                                            <Separator/>
+                                            <MenuItem Header="Копировать в обои" Click="CopyToWallMenuItemClick"/>
+                                            <MenuItem Header="Копировать в каталог" Click="CopyToDirMenuItemClick"/>
+                                            <MenuItem Header="Переместить в каталог" Click="MoveToDirMenuItemClick"/>
+                                            <Separator/>
+                                            <MenuItem Header="Пересоздать эскиз" Click="OnReCreateThumbnailMenuItemClick"/>
+                                            <Separator/>
+                                            <MenuItem Header="Удалить"
                                                       Foreground="#FF5555"
-                                                      Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).RemoveSelectedCommand}"/>
+                                                      Click="OnRemoveMenuItemClick"/>
                                         </ContextMenu>
                                     </Border.ContextMenu>
                                     <Grid RowDefinitions="225, Auto">
@@ -136,10 +156,23 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <!-- Строка 2, занимает обе колонки -->
-        <TextBlock x:Name="ResultText"
-                   Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
-                   Text="Результат появится здесь"
-                   Margin="0,2,0,0"
-                   Foreground="Gray"/>
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Left" Orientation="Horizontal">
+            <TextBlock
+                Text="Изображений найдено: "
+                Margin="0,2,0,0"
+                Foreground="Gray"/>
+            <TextBlock x:Name="ResultText"
+                       Text="0"
+                       Margin="0,2,0,0"
+                       Foreground="Gray"/>
+            <TextBlock
+                Text="Выделено: "
+                Margin="10,2,0,0"
+                Foreground="Gray"/>
+            <TextBlock
+                Text="{Binding SelectedCount}"
+                Margin="0,2,0,0"
+                Foreground="Gray"/>
+        </StackPanel>
     </Grid>
 </Window>

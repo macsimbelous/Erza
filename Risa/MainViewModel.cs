@@ -9,12 +9,14 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Shipwreck.Phash;
+
 namespace Risa;
 
 public partial class MainViewModel : ObservableObject
 {
     public readonly List<ImageItem> _allImages = new();
-    public int CountImages { get {  return _allImages.Count; }  }
+    public int CountImages { get { return _allImages.Count; } }
 
     // Опорный элемент для выделения диапазона через Shift
     private ImageItem? _anchorItem;
@@ -22,7 +24,7 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<List<ImageItem>> ImageRows { get; } = new();
 
     [ObservableProperty]
-    private int _selectedCount;
+    private int _selectedCount = 0;
 
     [ObservableProperty]
     private int _columnsCount = 4;
@@ -223,6 +225,119 @@ public partial class MainViewModel : ObservableObject
         }
         RebuildRows();
     }
+    public void LoadImagesByNoTags()
+    {
+        _allImages.Clear();
+        List<ImageInfo> Result = new List<ImageInfo>();
+        using (SQLiteCommand command = new SQLiteCommand())
+        {
+            command.CommandText = "SELECT image_id, hash, deleted, file_path, width, height, favorited, phash FROM images WHERE deleted = 0 AND tags IS NULL;";
+            command.Connection = MainWindow.Erza;
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                ImageInfo image = new ImageInfo();
+                image.ImageID = (long)reader["image_id"];
+                image.Hash = (string)reader["hash"];
+                image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                image.Width = Convert.ToInt32(reader["width"]);
+                image.Height = Convert.ToInt32(reader["height"]);
+                object o = reader["file_path"];
+                if (o != DBNull.Value)
+                {
+                    image.FilePath = (string)o;
+                }
+                o = reader["phash"];
+                if (o != DBNull.Value)
+                {
+                    image.PHash = (byte[])o;
+                }
+                Result.Add(image);
+            }
+            reader.Close();
+        }
+        foreach (ImageInfo img in Result)
+        {
+            _allImages.Add(new ImageItem(img));
+        }
+        RebuildRows();
+    }
+    public void LoadImagesByFavorited()
+    {
+        _allImages.Clear();
+        List<ImageInfo> Result = new List<ImageInfo>();
+        using (SQLiteCommand command = new SQLiteCommand())
+        {
+            command.CommandText = "SELECT image_id, hash, deleted, file_path, width, height, favorited, phash FROM images WHERE deleted = 0 AND favorited = 1";
+            command.Connection = MainWindow.Erza;
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                ImageInfo image = new ImageInfo();
+                image.ImageID = (long)reader["image_id"];
+                image.Hash = (string)reader["hash"];
+                image.Deleted = Convert.ToBoolean(reader["deleted"]);
+                image.Favorited = Convert.ToBoolean(reader["favorited"]);
+                image.Width = Convert.ToInt32(reader["width"]);
+                image.Height = Convert.ToInt32(reader["height"]);
+                object o = reader["file_path"];
+                if (o != DBNull.Value)
+                {
+                    image.FilePath = (string)o;
+                }
+                o = reader["phash"];
+                if (o != DBNull.Value)
+                {
+                    image.PHash = (byte[])o;
+                }
+                Result.Add(image);
+            }
+            reader.Close();
+        }
+        foreach (ImageInfo img in Result)
+        {
+            _allImages.Add(new ImageItem(img));
+        }
+        RebuildRows();
+    }
+    public void LoadImagesBySimillar(ImageItem Item, double Simillar)
+    {
+        _allImages.Clear();
+        List<ImageInfo> Result = new List<ImageInfo>();
+        List<long> similars = new List<long>();
+        using (SQLiteCommand command = new SQLiteCommand("select image_id, phash from images WHERE phash IS NOT NULL", MainWindow.Erza))
+        {
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                long imageid = (long)reader["image_id"];
+                if (imageid == Item.ImageInfo.ImageID)
+                {
+                    similars.Insert(0, imageid);
+                }
+                else
+                {
+                    byte[] current_phash = (byte[])reader["phash"];
+                    double result = ImagePhash.GetCrossCorrelation(Item.ImageInfo.PHash, current_phash);
+                    if (result >= Simillar)
+                    {
+                        similars.Add(imageid);
+                    }
+                }
+            }
+            reader.Close();
+        }
+        foreach (long img_id in similars)
+        {
+            ImageInfo? temp = ErzaDB.GetImageWithOutTags(img_id, MainWindow.Erza);
+            if (temp != null)
+            {
+                _allImages.Add(new ImageItem(temp));
+            }
+        }
+        RebuildRows();
+    }
     public void UpdateColumns(int newColumns)
     {
         if (newColumns < 1) newColumns = 1;
@@ -290,16 +405,6 @@ public partial class MainViewModel : ObservableObject
 
         SelectedCount = _allImages.Count(x => x.IsSelected);
     }
-    public void OpenImage(ImageItem item)
-    {
-        if (!File.Exists(item.FilePath)) return;
-
-        // Пример: открыть изображение в стандартном просмотрщике системы
-        Process.Start(new ProcessStartInfo(item.FilePath)
-        {
-            UseShellExecute = true
-        });
-    }
     // Правый клик: если плитка еще не выделена, выделяем только её
     public void SelectOnRightClick(ImageItem clickedItem)
     {
@@ -309,55 +414,14 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void OpenSelected()
+    public void RemoveSelected(List<ImageItem> items)
     {
-        /*var first = _allImages.FirstOrDefault(x => x.IsSelected);
-        if (first != null && File.Exists(first.FilePath))
-        {
-            Process.Start(new ProcessStartInfo(first.FilePath) { UseShellExecute = true });
-        }*/
-        var first = _allImages.FirstOrDefault(x => x.IsSelected);
-        if (first != null)
-        {
-            //var viewimagewindow = new ViewImageWindow();
-            //viewimagewindow.CurrentImageInfo = first.ImageInfo;
-            //viewimagewindow.ShowDialog<string?>(this).GetAwaiter().GetResult();
-            //viewimagewindow.Show();
-            WeakReferenceMessenger.Default.Send(new OpenViewImageWindowMessage(first));
-        }
-    }
-    [RelayCommand]
-    private void OpenSelectedSystemApp()
-    {
-        var first = _allImages.FirstOrDefault(x => x.IsSelected);
-        if (first != null && File.Exists(first.FilePath))
-        {
-            Process.Start(new ProcessStartInfo(first.FilePath) { UseShellExecute = true });
-        }
-    }
-
-    [RelayCommand]
-    private void ShowInExplorer()
-    {
-        var first = _allImages.FirstOrDefault(x => x.IsSelected);
-        if (first != null && File.Exists(first.FilePath))
-        {
-            // Открывает папку и выделяет файл в Проводнике Windows
-            Process.Start("explorer.exe", $"/select,\"{first.FilePath}\"");
-        }
-    }
-
-    [RelayCommand]
-    private void RemoveSelected()
-    {
-        var toRemove = _allImages.Where(x => x.IsSelected).ToList();
-        if (toRemove.Count == 0) return;
-
-        foreach (var item in toRemove)
+        foreach (var item in items)
         {
             item.Thumbnail?.Dispose(); // Освобождаем память
             _allImages.Remove(item);
+            ErzaDB.DeleteImage(item.ImageInfo.ImageID, MainWindow.Erza);
+            RecycleBinService.MoveToRecycleBin(item.ImageInfo.FilePath);
         }
 
         SelectedCount = 0;

@@ -1,17 +1,26 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Messaging;
 using ErzaLib2;
 using HarfBuzzSharp;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Dto;
+using MsBox.Avalonia.Enums;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SQLite;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Text;
 using Tmds.DBus.Protocol;
+using ImageMagick;
 
 namespace Risa;
 
@@ -19,6 +28,7 @@ public partial class MainWindow : Window
 {
     public static SQLiteConnection Erza;
     public static string PreviewPath = "D:\\previews";
+    private string WallPath = "D:\\Wallpapers\\";
     private const int PreviewWidth = 300;
     private const int PreviewHeight = 225;
     public ObservableCollection<string> Tags { get; } = new();
@@ -98,15 +108,6 @@ public partial class MainWindow : Window
             string prefix = searchText.Substring(0, lastSpaceIndex + 1);
             return prefix + selectedItem + " ";
         };
-        WeakReferenceMessenger.Default.Register<OpenViewImageWindowMessage>(this, (r, m) =>
-        {
-            var win = new ViewImageWindow()
-            {
-                DataContext = this.DataContext
-            };
-            win.ShowDialog(this);
-        });
-
     }
     // Вызывается виртуализатором только для видимых строк при скролле
     private void OnRowContainerPrepared(object? sender, ContainerPreparedEventArgs e)
@@ -222,6 +223,411 @@ public partial class MainWindow : Window
             SearchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }
     }
+    private async void OnOpenInFullScreenMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        var win = new FullScreenWindow()
+        {
+            DataContext = this.DataContext
+        };
+        await win.ShowDialog(this);
+    }
+    private async void OnRemoveMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var toRemove = vm._allImages.Where(x => x.IsSelected).ToList();
+        if (toRemove.Count == 0) return;
+        var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+        {
+            ButtonDefinitions = ButtonEnum.YesNo,
+            ContentTitle = "Подтверждение",
+            ContentMessage = "Изображений выбрано: " + toRemove.Count + "\nУдалить?",
+            Icon = MsBox.Avalonia.Enums.Icon.Question,
+            // Открыть строго по центру родительского окна
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        });
+        // Обязательно передаем 'this' (ссылку на родительский Window)
+        var result = await box.ShowWindowDialogAsync(this);
+        if (result == ButtonResult.Yes)
+        {
+            vm.RemoveSelected(toRemove);
+            ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+        }
+    }
+    private async void OnOpenSystemAppMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null && File.Exists(first.FilePath))
+        {
+            Process.Start(new ProcessStartInfo(first.FilePath) { UseShellExecute = true });
+        }
+    }
+    private async void OnShowInExplorerMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null && File.Exists(first.FilePath))
+        {
+            // Открывает папку и выделяет файл в Проводнике Windows
+            Process.Start("explorer.exe", $"/select,\"{first.FilePath}\"");
+        }
+    }
+    private async void CopyToWallMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var toCopy = vm._allImages.Where(x => x.IsSelected).ToList();
+        if (toCopy.Count == 0) return;
+        foreach (var item in toCopy)
+        {
+            try
+            {
+                string dest_path = WallPath + Path.GetFileName(item.ImageInfo.FilePath);
+                if (File.Exists(dest_path))
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ButtonDefinitions = ButtonEnum.YesNo,
+                        ContentTitle = "Подтверждение",
+                        ContentMessage = "Целевой фаил уже сушествует, перезаписать?",
+                        Icon = MsBox.Avalonia.Enums.Icon.Warning,
+                        // Открыть строго по центру родительского окна
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        EnterDefaultButton = ClickEnum.Ok
+                    });
+                    // Обязательно передаем 'this' (ссылку на родительский Window)
+                    var result = await box.ShowWindowDialogAsync(this);
+                    if (result == ButtonResult.Yes)
+                    {
+                        File.Delete(dest_path);
+                        File.Copy(item.ImageInfo.FilePath, dest_path);
+                    }
+                }
+                else
+                {
+                    File.Copy(item.ImageInfo.FilePath, dest_path);
+                }
+            }
+            catch (IOException ex)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    ContentTitle = "Ошибка!",
+                    ContentMessage = ex.Message,
+                    Icon = MsBox.Avalonia.Enums.Icon.Error,
+                    // Открыть строго по центру родительского окна
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                });
+                // Обязательно передаем 'this' (ссылку на родительский Window)
+                await box.ShowWindowDialogAsync(this);
+            }
+        }
+    }
+    private async void CopyHashToClipboardMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null)
+        {
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            if (clipboard is not null)
+            {
+                await clipboard.SetTextAsync(first.ImageInfo.Hash);
+            }
+        }
+    }
+    private async void CopyToDirMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var toCopy = vm._allImages.Where(x => x.IsSelected).ToList();
+        if (toCopy.Count == 0) return;
+        // Получаем TopLevel от текущего окна или контрола
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel is null) return;
+
+        // Открываем системный диалог выбора папки
+        var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Выберите папку",
+            AllowMultiple = false // true, если нужно выбрать несколько папок
+        });
+
+        if (folders.Count > 0)
+        {
+            // Получаем локальный путь к папке (на десктопе)
+            string? folderPath = folders[0].TryGetLocalPath();
+
+            // Или URI (универсально для всех платформ, включая мобильные и Web)
+            //Uri folderUri = folders[0].Path;
+
+            foreach (var item in toCopy)
+            {
+                try
+                {
+                    string dest_path = folderPath + "\\" + Path.GetFileName(item.ImageInfo.FilePath);
+                    if (File.Exists(dest_path))
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                        {
+                            ButtonDefinitions = ButtonEnum.YesNo,
+                            ContentTitle = "Подтверждение",
+                            ContentMessage = "Целевой фаил уже сушествует, перезаписать?",
+                            Icon = MsBox.Avalonia.Enums.Icon.Warning,
+                            // Открыть строго по центру родительского окна
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            EnterDefaultButton = ClickEnum.Ok
+                        });
+                        // Обязательно передаем 'this' (ссылку на родительский Window)
+                        var result = await box.ShowWindowDialogAsync(this);
+                        if (result == ButtonResult.Yes)
+                        {
+                            File.Delete(dest_path);
+                            File.Copy(item.ImageInfo.FilePath, dest_path);
+                        }
+                    }
+                    else
+                    {
+                        File.Copy(item.ImageInfo.FilePath, dest_path);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        ContentTitle = "Ошибка!",
+                        ContentMessage = ex.Message,
+                        Icon = MsBox.Avalonia.Enums.Icon.Error,
+                        // Открыть строго по центру родительского окна
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner
+                    });
+                    // Обязательно передаем 'this' (ссылку на родительский Window)
+                    await box.ShowWindowDialogAsync(this);
+                }
+            }
+        }
+    }
+    private async void MoveToDirMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var toCopy = vm._allImages.Where(x => x.IsSelected).ToList();
+        if (toCopy.Count == 0) return;
+        // Получаем TopLevel от текущего окна или контрола
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel is null) return;
+
+        // Открываем системный диалог выбора папки
+        var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Выберите папку",
+            AllowMultiple = false // true, если нужно выбрать несколько папок
+        });
+
+        if (folders.Count > 0)
+        {
+            // Получаем локальный путь к папке (на десктопе)
+            string? folderPath = folders[0].TryGetLocalPath();
+
+            // Или URI (универсально для всех платформ, включая мобильные и Web)
+            //Uri folderUri = folders[0].Path;
+
+            foreach (var item in toCopy)
+            {
+                try
+                {
+                    string dest_path = folderPath + "\\" + Path.GetFileName(item.ImageInfo.FilePath);
+                    if (File.Exists(dest_path))
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                        {
+                            ButtonDefinitions = ButtonEnum.YesNo,
+                            ContentTitle = "Подтверждение",
+                            ContentMessage = "Целевой фаил уже сушествует, перезаписать?",
+                            Icon = MsBox.Avalonia.Enums.Icon.Warning,
+                            // Открыть строго по центру родительского окна
+                            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                            EnterDefaultButton = ClickEnum.Ok
+                        });
+                        // Обязательно передаем 'this' (ссылку на родительский Window)
+                        var result = await box.ShowWindowDialogAsync(this);
+                        if (result == ButtonResult.Yes)
+                        {
+                            File.Delete(dest_path);
+                            File.Move(item.ImageInfo.FilePath, dest_path);
+                        }
+                    }
+                    else
+                    {
+                        File.Move(item.ImageInfo.FilePath, dest_path);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        ContentTitle = "Ошибка!",
+                        ContentMessage = ex.Message,
+                        Icon = MsBox.Avalonia.Enums.Icon.Error,
+                        // Открыть строго по центру родительского окна
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner
+                    });
+                    // Обязательно передаем 'this' (ссылку на родительский Window)
+                    await box.ShowWindowDialogAsync(this);
+                }
+            }
+        }
+    }
+    private async void OnCopyTagsToClipboardMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null && File.Exists(first.FilePath))
+        {
+            List<string> tags = ErzaDB.GetTagsByImageIDToString(first.ImageInfo.ImageID, MainWindow.Erza);
+            if (tags.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < tags.Count; i++)
+                {
+                    if (i == 0)
+                    {
+                        sb.Append(tags[i]);
+                    }
+                    else
+                    {
+                        sb.Append(' ');
+                        sb.Append(tags[i]);
+                    }
+                }
+                var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+                if (clipboard is not null)
+                {
+                    await clipboard.SetTextAsync(sb.ToString());
+                }
+            }
+        }
+    }
+    private async void OnNoTagsShowMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        autobox.Text = String.Empty;
+        MainViewModel vm = (MainViewModel)DataContext;
+        vm.LoadImagesByNoTags();
+        ResultText.Text = vm.CountImages.ToString();
+    }
+    private async void OnFavoritedShowMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        autobox.Text = String.Empty;
+        MainViewModel vm = (MainViewModel)DataContext;
+        vm.LoadImagesByFavorited();
+        ResultText.Text = vm.CountImages.ToString();
+    }
+    private async void OnAddTagsMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null)
+        {
+            var dialog = new AddTagsWindow();
+            // Ждём закрытия и получаем результат (если закрыли крестиком — вернётся null)
+            string? result = await dialog.ShowDialog<string>(this);
+            if (result != null)
+            {
+                ImageInfo img = first.ImageInfo;
+                string[] tags = result.Trim().Split(' ');
+                img.AddTags(tags);
+                ErzaDB.LoadImageToErza(img, MainWindow.Erza);
+            }
+        }
+    }
+    private async void OnAddToFavoritedMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null)
+        {
+            ErzaDB.SetImageFavorit(first.ImageInfo.ImageID, true, MainWindow.Erza);
+            first.ImageInfo.Favorited = true;
+        }
+    }
+    private async void OnRemoveToFavoritedMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null)
+        {
+            ErzaDB.SetImageFavorit(first.ImageInfo.ImageID, false, MainWindow.Erza);
+            first.ImageInfo.Favorited = false;
+        }
+    }
+    private async void OnReCreateThumbnailMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var toCopy = vm._allImages.Where(x => x.IsSelected).ToList();
+        //if (toCopy.Count == 0) return;
+        foreach (var item in toCopy)
+        {
+            try
+            {
+                var p_size = new MagickGeometry(PreviewWidth, PreviewHeight);
+                string dest_file = PreviewPath + "\\" + item.ImageInfo.Hash[0] + "\\" + item.ImageInfo.Hash[1] + "\\" + item.ImageInfo.Hash + ".jpg";
+                using (MagickImage img = new MagickImage(item.ImageInfo.FilePath))
+                {
+                    img.Resize(p_size);
+                    img.Format = MagickFormat.Jpeg;
+                    img.SetCompression(CompressionMethod.JPEG);
+                    img.Quality = 80;
+                    img.Write(dest_file);
+                }
+                item.LoadThumbnailAsync();
+            }
+            catch (IOException ex)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    ContentTitle = "Ошибка!",
+                    ContentMessage = ex.Message,
+                    Icon = MsBox.Avalonia.Enums.Icon.Error,
+                    // Открыть строго по центру родительского окна
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                });
+                // Обязательно передаем 'this' (ссылку на родительский Window)
+                await box.ShowWindowDialogAsync(this);
+            }
+        }
+    }
+    private async void OnFindSimilarMenuItemClick(object? sender, RoutedEventArgs e)
+    {
+        MainViewModel vm = (MainViewModel)DataContext;
+        var first = vm._allImages.FirstOrDefault(x => x.IsSelected);
+        if (first != null)
+        {
+            if (first.ImageInfo.PHash == null)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    ContentTitle = "Ошибка!",
+                    ContentMessage = "Нет PHash",
+                    Icon = MsBox.Avalonia.Enums.Icon.Error,
+                    // Открыть строго по центру родительского окна
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                });
+                // Обязательно передаем 'this' (ссылку на родительский Window)
+                await box.ShowWindowDialogAsync(this);
+                return;
+            }
+            var dialog = new FindSimilarOptionsWindow();
+            // Ждём закрытия и получаем результат (если закрыли крестиком — вернётся null)
+            decimal? result = await dialog.ShowDialog<decimal>(this);
+            if (result != null)
+            {
+                double similar = Convert.ToDouble(result);
+                vm.LoadImagesBySimillar(first, similar);
+            }
+        }
+    }
     private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
     {
         Erza.Close();
@@ -233,7 +639,7 @@ public partial class MainWindow : Window
             if (DataContext is MainViewModel vm)
             {
                 vm.LoadAllImages();
-                ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+                ResultText.Text = vm.CountImages.ToString();
             }
             return;
         }
@@ -251,7 +657,7 @@ public partial class MainWindow : Window
             if (DataContext is MainViewModel vm)
             {
                 vm.LoadImagesByTags(tags);
-                ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+                ResultText.Text = vm.CountImages.ToString();
             }
             return;
         }
@@ -269,7 +675,7 @@ public partial class MainWindow : Window
             if (DataContext is MainViewModel vm)
             {
                 vm.LoadImagesByTagsOr(tags);
-                ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+                ResultText.Text = vm.CountImages.ToString();
             }
             return;
         }
@@ -278,7 +684,7 @@ public partial class MainWindow : Window
             if (DataContext is MainViewModel vm)
             {
                 vm.LoadImagesByPartTag(this.autobox.Text);
-                ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+                ResultText.Text = vm.CountImages.ToString();
             }
             return;
         }
@@ -287,7 +693,7 @@ public partial class MainWindow : Window
             if (DataContext is MainViewModel vm)
             {
                 vm.LoadImagesByMD5(this.autobox.Text);
-                ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+                ResultText.Text = vm.CountImages.ToString();
             }
             return;
         }
@@ -296,7 +702,7 @@ public partial class MainWindow : Window
             if (DataContext is MainViewModel vm)
             {
                 vm.LoadImagesByRatioWnH(this.autobox.Text);
-                ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+                ResultText.Text = vm.CountImages.ToString();
             }
             return;
         }
@@ -305,10 +711,14 @@ public partial class MainWindow : Window
             if (DataContext is MainViewModel vm)
             {
                 vm.LoadImagesBySQL(this.autobox.Text);
-                ResultText.Text = "Изображений найдено: " + vm.CountImages.ToString();
+                ResultText.Text = vm.CountImages.ToString();
             }
             return;
         }
+    }
+    private void SlideShowButtonClick(object? sender, RoutedEventArgs e)
+    {
+
     }
     private bool SelectIsTags()
     {
@@ -382,4 +792,3 @@ public partial class MainWindow : Window
         return lastSpaceIndex == -1 ? text : text.Substring(lastSpaceIndex + 1);
     }
 }
-public record OpenViewImageWindowMessage(ImageItem Item);
