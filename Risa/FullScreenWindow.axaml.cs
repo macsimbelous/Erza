@@ -1,6 +1,5 @@
 using AnimatedImage;
 using AnimatedImage.Avalonia;
-using AnimatedImage.Avalonia;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;

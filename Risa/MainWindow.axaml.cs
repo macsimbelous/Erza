@@ -716,9 +716,14 @@ public partial class MainWindow : Window
             return;
         }
     }
-    private void SlideShowButtonClick(object? sender, RoutedEventArgs e)
+    private async void SlideShowButtonClick(object? sender, RoutedEventArgs e)
     {
-
+        var win = new SlideShowWindow()
+        {
+            AllImages = ((MainViewModel)DataContext)._allImages,
+            Delay = 5
+        };
+        await win.ShowDialog(this);
     }
     private bool SelectIsTags()
     {

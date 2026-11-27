@@ -57,7 +57,7 @@
             <ComboBoxItem>SQL</ComboBoxItem>
         </ComboBox>
         <Button x:Name="SearchButton" Click="SearchButtonClick" Margin="2,2,2,2" Content="Найти" Grid.Row="0" Grid.Column="2"/>
-        <Button Click="SlideShowButtonClick" Margin="2,2,2,2" Content="Слайд шоу" Grid.Row="0" Grid.Column="3"/>
+        <Button Click="SlideShowButtonClick" Margin="2,2,2,2" Content="Слайд-шоу" Grid.Row="0" Grid.Column="3"/>
 
 
         <!-- Строка 1, Колонка 0 -->
@@ -99,6 +99,7 @@
                                             <MenuItem Header="Окрыть на полный экран" Click="OnOpenInFullScreenMenuItemClick"/>
                                             <MenuItem Header="Открыть системной программе" Click="OnOpenSystemAppMenuItemClick"/>
                                             <MenuItem Header="Показать в папке" Click="OnShowInExplorerMenuItemClick"/>
+                                            <MenuItem Header="Запустить слайд-шоу" Click="SlideShowButtonClick"/>
                                             <Separator/>
                                             <MenuItem Header="Показать избранное" Click="OnFavoritedShowMenuItemClick"/>
                                             <MenuItem Header="Показать без тегов" Click="OnNoTagsShowMenuItemClick"/>
