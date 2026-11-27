@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:scg="using:System.Collections.Generic"
         xmlns:sc="using:System.Collections"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="Risa.MainWindow"
         xmlns:vm="using:Risa"
         x:DataType="vm:MainViewModel"
@@ -122,7 +122,7 @@
                                                       Click="OnRemoveMenuItemClick"/>
                                         </ContextMenu>
                                     </Border.ContextMenu>
-                                    <Grid RowDefinitions="225, Auto">
+                                    <Grid RowDefinitions="240, Auto">
                                         <!-- Картинка -->
                                         <Border Grid.Row="0" CornerRadius="6" ClipToBounds="True" Background="#181818">
                                             <Image Source="{Binding Thumbnail}" Stretch="Uniform"/>

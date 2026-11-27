@@ -31,7 +31,7 @@ namespace Risa
             _timer.Tick += (s, e) =>
             {
                 Index = (Index + 1) % AllImages.Count;
-                LoadImage();
+                LoadImage2();
             };
             _timer.Start();
         }
@@ -45,7 +45,7 @@ namespace Risa
             // Назначаем источник анимации
             var stream = File.OpenRead(filePath);
             var source = new AnimatedImageSourceStream(stream);
-            ImageBehavior.SetAnimatedSource(CurrentImage, source);
+            ImageBehavior.SetAnimatedSource(SlideControl, source);
         }
         private void LoadImage()
         {
@@ -58,13 +58,19 @@ namespace Risa
             else
             {
                 var stream = File.OpenRead(item.ImageInfo.FilePath);
-                CurrentImage.Source = new Bitmap(stream);
+                SlideControl.Content = new Bitmap(stream);
             }
+        }
+        private void LoadImage2()
+        {
+            if (AllImages.Count == 0) return;
+            ImageItem item = AllImages[Index];
+            SlideControl.Content = item.ImageInfo.FilePath;
         }
         private void OnOpened(object? sender, EventArgs e)
         {
             if (AllImages.Count > 0)
-                LoadImage();
+                LoadImage2();
         }
         // Останавливаем таймер при закрытии окна во избежание утечек памяти
         protected override void OnClosed(EventArgs e)
@@ -90,7 +96,7 @@ namespace Risa
                             Index = 0;
                         }
                     }
-                    LoadImage();
+                    LoadImage2();
                     ResetTimer();
                     e.Handled = true; // Предотвращаем дальнейшую обработку (например, смену фокуса)
                     break;
@@ -101,7 +107,7 @@ namespace Risa
                     {
                         Index = 0;
                     }
-                    LoadImage();
+                    LoadImage2();
                     ResetTimer();
                     e.Handled = true;
                     break;
@@ -119,7 +125,7 @@ namespace Risa
                             Index = 0;
                         }
                     }
-                    LoadImage();
+                    LoadImage2();
                     ResetTimer();
                     e.Handled = true;
                     break;
@@ -130,7 +136,7 @@ namespace Risa
                     {
                         Index = 0;
                     }
-                    LoadImage();
+                    LoadImage2();
                     ResetTimer();
                     e.Handled = true;
                     break;

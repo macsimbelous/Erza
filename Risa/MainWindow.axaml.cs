@@ -7,6 +7,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Messaging;
 using ErzaLib2;
 using HarfBuzzSharp;
+using ImageMagick;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Enums;
@@ -20,7 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Tmds.DBus.Protocol;
-using ImageMagick;
+//using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Risa;
 
@@ -142,7 +143,7 @@ public partial class MainWindow : Window
     {
         if (DataContext is MainViewModel vm)
         {
-            int cols = (int)(e.NewSize.Width / PreviewWidth);
+            int cols = (int)(e.NewSize.Width / (PreviewWidth + 10));
             vm.UpdateColumns(cols);
         }
     }
@@ -196,6 +197,12 @@ public partial class MainWindow : Window
             option_comboBox.SelectedIndex = 0;
             SearchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }
+        else
+        {
+            MainViewModel vm = (MainViewModel)DataContext;
+            int result = (int)Math.Ceiling((double)vm.CountImages / (double)vm.ColumnsCount);
+            RowsListBox.ScrollIntoView(result);
+        }
     }
     private async void OnOpenMenuItemClick(object? sender, RoutedEventArgs e)
     {
@@ -222,6 +229,12 @@ public partial class MainWindow : Window
             autobox.Text = sb.ToString();
             SearchButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }
+        else
+        {
+            MainViewModel vm = (MainViewModel)DataContext;
+            int result = (int)Math.Ceiling((double)vm.CountImages / (double)vm.ColumnsCount);
+            RowsListBox.ScrollIntoView(result);
+        }
     }
     private async void OnOpenInFullScreenMenuItemClick(object? sender, RoutedEventArgs e)
     {
@@ -230,6 +243,9 @@ public partial class MainWindow : Window
             DataContext = this.DataContext
         };
         await win.ShowDialog(this);
+        MainViewModel vm = (MainViewModel)DataContext;
+        int result = (int)Math.Ceiling((double)vm.CountImages / (double)vm.ColumnsCount);
+        RowsListBox.ScrollIntoView(result);
     }
     private async void OnRemoveMenuItemClick(object? sender, RoutedEventArgs e)
     {

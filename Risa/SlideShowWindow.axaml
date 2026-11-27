@@ -1,4 +1,5 @@
 <Window xmlns="https://github.com/avaloniaui"
+        xmlns:anim="https://github.com/whistyun/AnimatedImage.Avalonia"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,7 +8,21 @@
         WindowState="FullScreen"
         Opened="OnOpened"
         Title="SlideShowWindow">
-    <Image x:Name="CurrentImage" Stretch="Uniform"
+
+        <TransitioningContentControl x:Name="SlideControl">
+        <!-- Настройка типа и длительности анимации -->
+        <TransitioningContentControl.PageTransition>
+            <CrossFade Duration="0:0:0.8" />
+        </TransitioningContentControl.PageTransition>
+
+        <!-- Шаблон того, как именно отображать объект Bitmap -->
+        <TransitioningContentControl.ContentTemplate>
+            <DataTemplate DataType="x:String">
+               <Image x:Name="CurrentImage" Stretch="Uniform"
+               anim:ImageBehavior.AnimatedSource="{Binding}"
                HorizontalAlignment="Stretch"
                VerticalAlignment="Stretch"/>
+            </DataTemplate>
+        </TransitioningContentControl.ContentTemplate>
+    </TransitioningContentControl>
 </Window>
