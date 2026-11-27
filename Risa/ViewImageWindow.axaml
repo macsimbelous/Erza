@@ -58,8 +58,8 @@
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
             <Button Click="AddTagsButtonClick" Content="+" FontWeight="Bold"/>
             <Button Click="RemoveTagsButtonClick" Content="-" FontWeight="Bold"/>
-            <Button>ИИ</Button>
-            <Button Click="SearchButtonClick">Найти</Button>
+            <Button Click="GenAITagsButtonClick" Content="ИИ"/>
+            <Button Click="SearchButtonClick" Content="Найти"/>
             <Button Click="FavoritedButtonClick"><Image x:Name="FavoritedButton" Width="24" Height="17" Source="/Assets/not_favorited.png"/></Button>
         </StackPanel>
         <Grid Grid.Column="0" Grid.Row="2" ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,2,0">
