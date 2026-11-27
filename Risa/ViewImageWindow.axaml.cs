@@ -163,6 +163,22 @@ namespace Risa
                     LoadImage();
                     e.Handled = true;
                     break;
+                case Key.Escape:
+                    // Действие при нажатии Esc
+                    this.Close();
+                    e.Handled = true;
+                    break;
+                case Key.Delete:
+                    // Действие при нажатии Del
+                    MainViewModel vm = (MainViewModel)DataContext;
+                    vm.RemoveSelected(new List<ImageItem>((IEnumerable<ImageItem>)AllImages[Index]));
+                    if (Index >= AllImages.Count)
+                    {
+                        Index = 0;
+                    }
+                    LoadImage();
+                    e.Handled = true;
+                    break;
             }
         }
         private void FavoritedButtonClick(object? sender, RoutedEventArgs e)

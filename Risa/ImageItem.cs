@@ -32,7 +32,7 @@ public partial class ImageItem : ObservableObject
     {
         ImageInfo = imageinfo;
         Title = Path.GetFileName(imageinfo.FilePath);
-        ThumbnailPath = MainWindow.PreviewPath + "\\" + ImageInfo.Hash[0] + "\\" + ImageInfo.Hash[1] + "\\" + ImageInfo.Hash + ".jpg";
+        ThumbnailPath = MainWindow.PreviewPath + "\\" + imageinfo.Hash[0] + "\\" + imageinfo.Hash[1] + "\\" + imageinfo.Hash + ".jpg";
     }
 
     // Вызывается только тогда, когда строка попадает в видимую область экрана
@@ -46,7 +46,7 @@ public partial class ImageItem : ObservableObject
             Thumbnail = await Task.Run(() =>
             {
                 //using var stream = File.OpenRead(FilePath);
-                //return Bitmap.DecodeToWidth(stream, 200);
+                //return Bitmap.DecodeToWidth(stream, PreviewWidth);
                 using var stream = File.OpenRead(ThumbnailPath);
                 return new Bitmap(stream);
             });
