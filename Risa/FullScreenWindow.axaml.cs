@@ -61,8 +61,10 @@ namespace Risa
             }
             else
             {
+                ImageBehavior.SetAnimatedSource(CurrentImage, null);
                 var stream = File.OpenRead(item.ImageInfo.FilePath);
                 CurrentImage.Source = new Bitmap(stream);
+                stream.Close();
                 ZoomBorder.ResetMatrix();
             }
         }

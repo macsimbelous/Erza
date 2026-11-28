@@ -5,6 +5,7 @@
         x:Class="Risa.FindSimilarOptionsWindow"
         SizeToContent="WidthAndHeight"
         CanResize="False"
+        WindowStartupLocation="CenterOwner"
         Title="FindSimilarOptionsWindow">
   <StackPanel Margin="4" Orientation="Horizontal" HorizontalAlignment="Left">
       <TextBlock Margin="4" Text="Похожесть(%)" VerticalAlignment="Center" FontSize="18"/>

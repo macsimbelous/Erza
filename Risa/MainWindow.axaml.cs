@@ -639,7 +639,7 @@ public partial class MainWindow : Window
             decimal? result = await dialog.ShowDialog<decimal>(this);
             if (result != null)
             {
-                double similar = Convert.ToDouble(result);
+                double similar = Convert.ToDouble(result) / 100;
                 vm.LoadImagesBySimillar(first, similar);
             }
         }
